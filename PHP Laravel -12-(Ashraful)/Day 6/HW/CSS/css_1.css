@@ -1,0 +1,20 @@
+
+.One-1 > h2{
+    font-size:20;
+    color:green;
+    
+}
+.One-1 > p{
+    font-size:14px;
+    color:rgb(76, 53, 177);
+   
+
+}
+#paragraph{
+    font-size: medium;
+    color: aqua;
+}
+.two-2 > h2{
+    font-size: large;
+    color:blue;
+}

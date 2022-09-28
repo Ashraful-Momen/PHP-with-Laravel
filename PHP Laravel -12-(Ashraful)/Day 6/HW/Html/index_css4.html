@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=Passions+Conflict&display=swap" rel="stylesheet">
+    <style>
+        *{
+            /*     "*"-> sine use for all element    */
+        }
+        div + p{
+            color:#2FA5F2;
+        }
+        div +p ~ p {   /*after (div + p) then use for all tags! */
+            color:red;
+            font-family: 'Passions Conflict', cursive;
+            font-size: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Hello</h1>
+        <h2>Bangladesh</h2>
+    </div>
+    <p>This is paragraph</p>
+    <p>This is paragraph</p>
+    <p>This is paragraph</p>
+
+</body>
+</html>

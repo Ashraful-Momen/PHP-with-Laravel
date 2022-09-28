@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfrom</title>
+    <style>
+        .one{
+            height:200px;
+            width: 300px;
+            margin:0px auto;
+            background-color:aquamarine;
+            margin-top:250px;
+            transition:3s;
+            text-decoration: line-through , justify;
+          
+
+        }
+        .hello{
+            height:200px;
+            width: 300px;
+            margin:-352px 0px 0px 29px;
+            background-color:red;
+            float:left;
+            
+        }
+        .hello:hover{
+            transform:skew(45);
+        }
+        .one:hover{
+            /* transform:scale(2) rotate(45deg);    don't use "," here */
+            transform: translate(220px,30px);
+            opacity: .7px;
+           
+        }
+    </style>
+</head>
+<body>
+    <div class="one">
+        <p >Bangladesh</p>
+    </div>
+    <div class="hello">
+        Hello
+    </div>
+</body>
+</html>
