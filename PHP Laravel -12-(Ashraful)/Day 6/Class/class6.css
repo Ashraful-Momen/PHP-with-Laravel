@@ -1,0 +1,36 @@
+*{
+    margin:0px ;
+    padding:0px;
+}
+
+.one {
+    width:400px;
+    height:200px;
+    padding:0px;
+    float: left;
+    background:green;
+    border: 1px solid black;
+    margin: 200px 0 0 500px;
+}
+.two{
+    width:100px;
+    height:100px;
+    padding:0px;
+    float: left;
+    background:red;
+    border: 1px solid rgb(179, 26, 26);
+    border-radius:50px 50px 50px 50px; /*top , right, bottom , left  working as clock ways*/ 
+    margin: 50px 0 0 150px;
+    
+}
+.one{
+    height: 200px;
+    width: 300px;
+    background-color: blue;
+    border: 5px solid;
+}
+.two{
+    height: 200px;
+    width: 300px;
+    background-color: red;
+}

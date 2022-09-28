@@ -1,0 +1,32 @@
+
+* {
+    margin:0px ;
+    padding:0px;
+    /* box-sizing: border-box; inside border */
+}
+
+/* .box-one{
+    height: 200px;
+    width: 300px;
+    background-color: blue;
+    border: 5px solid;
+}
+.box-two{
+    height: 200px;
+    width: 300px;
+    background-color: red;
+} */
+.box-design{
+    height: 300px;
+    width: 400px;
+}
+/* .box-design:hover{
+   
+    background-color: tomato;
+    width: auto;
+    height: 300px;
+    /* cursor: pointer;
+    transform: scale(2.0);
+    transition: 2s; }
+    */
+  

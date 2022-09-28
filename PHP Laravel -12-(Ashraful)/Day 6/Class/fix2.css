@@ -1,0 +1,138 @@
+* {
+
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+}
+
+.cal-1 {
+    width: 8.33%;
+}
+
+.cal-2 {
+    width: 16.66%;
+}
+
+.cal-3 {
+
+    width: 25%;
+}
+
+.cal-4 {
+
+    width: 33.3%;
+}
+
+.cal-5 {
+
+    width: 41.66%;
+}
+
+.cal-6 {
+    width: 50%;
+
+}
+
+.cal-7 {
+
+    width: 58.33%;
+}
+
+.cal-8 {
+
+    width: 66.66%;
+}
+
+.cal-9 {
+
+    width: 75%;
+}
+
+.cal-10 {
+
+    width: 83.33%;
+}
+
+.cal-11 {
+
+    width: 91.66%;
+}
+
+.cal-12 {
+    width: 100%;
+}
+
+[class*='cal-'] {
+    float: left;
+    height: 70px;
+    border: 1px solid red;
+}
+
+@media only screen and (min-width:360px) and (max-width:760px) {
+    [class*='cal-'] {
+        float: left;
+        height: 70px;
+        border: 1px solid red;
+    }
+
+    .cal-1 {
+        width: 100%;
+    }
+
+    .cal-2 {
+        width: 100%;
+    }
+
+    .cal-3 {
+
+        width: 100%;
+    }
+
+    .cal-4 {
+
+        width: 100%;
+    }
+
+    .cal-5 {
+
+        width: 100%;
+    }
+
+    .cal-6 {
+        width: 100%;
+
+    }
+
+    .cal-7 {
+
+        width: 100%;
+    }
+
+    .cal-8 {
+
+        width: 100%;
+    }
+
+    .cal-9 {
+
+        width: 100%;
+    }
+
+    .cal-10 {
+
+        width: 100%;
+    }
+
+    .cal-11 {
+
+        width: 100%;
+    }
+
+    .cal-12 {
+        width: 100%;
+    }
+
+}
