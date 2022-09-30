@@ -14,7 +14,12 @@ body {
     height: 2000px;
 }
 
-.row {}
+.row:after {
+    content:"";
+    clear:both; /*control floating behaviour;*/
+    display:block; /*take free space*/
+    
+}
 
 .col_1 {width: 8.33%;}
 
