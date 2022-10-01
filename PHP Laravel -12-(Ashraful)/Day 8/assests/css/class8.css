@@ -1,0 +1,118 @@
+*{
+    box-sizing: border-box;
+    
+    background-color: aqua;
+    
+}
+body{
+
+    margin:0;
+    padding:0;
+}
+
+.container{
+    /* content:" ";
+    clear:both;
+    display:block;
+    border: 1px solid green; */
+    width: 100%;
+    
+}
+
+.col_1{width: 8.33%;}
+.col_2{width: 16.66%;}
+.col_3{width: 25%;}
+.col_4{width: 33.33%}
+.col_5{width: 41.66%;}
+.col_6{width: 50%}
+.col_7{width:58.33%}
+.col_8{width:66.66%}
+.col_9{width:75%}
+.col_10{width:83.33%}
+.col_11{width:91.66%}
+.col_12{width:100%}
+
+[class*="col_"]
+{
+    height:50px;
+    float:left;
+    border:1px solid black;
+}
+
+.header{
+    height: 100px;
+}
+
+.menu > ul > li {
+    list-style:none;
+    float:left;
+    margin: 0 0 0 0;
+    padding:10px;
+}
+.menu > ul > li >a  {
+    text-decoration:none;
+}
+
+.menu{ 
+    height:100px;
+    margin: 0 0 0 0;
+
+}
+
+/* slider animation with image */
+@keyframes slider-animation{
+
+    0%{
+        background-repeat: no-repeat;
+        background-image: url(../../media/img/1.jpg);
+    }
+    25%{
+        background-repeat: no-repeat;
+        background-image: url(../../media/img/2.jpg);
+    }
+    50%{
+        background-repeat: no-repeat;
+        background-image: url(../../media/img/3.jpg);
+    }
+ 
+
+} 
+/*  color animation
+@keyframes slider-animation{
+    0%{
+        background: green;
+    }
+    25%{
+        background:yellow;
+    }
+    50%{
+        background:black;
+    }
+    75%{
+        background:tomato;
+    }
+    100%{
+        background:skyblue;
+    }
+
+} */
+
+
+
+
+.slider{ 
+    height: 600px;
+    background-image:url(../../media/img/1.jpg) ;
+    background-repeat: no-repeat;
+    animation:slider-animation 25s infinite forwards;
+    /* animation-duration:10s;
+    animation-iteration-count:infinite; */
+}
+
+.service{height: 300px;}
+
+.about{height:250px}
+
+.footer_top{height: 200px;}
+
+.footer{height:100px}
