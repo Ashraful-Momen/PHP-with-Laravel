@@ -1,0 +1,42 @@
+*{
+    box-sizing:border-box;
+    margin:0px;
+    padding:0px;
+}
+.three{
+
+    height: 200px;
+    width: 200px;
+    background:black;
+    color:white;
+    overflow:hidden;
+}
+.two > .three > p{
+    margin-top:100px ;
+
+}
+.one + div > div > div{
+    background: red;
+    overflow: hidden;
+    margin-top: 100px;
+    height: 200px;
+    width:200px
+
+
+
+}
+.one + div > div > div> p{
+    margin-top: 100px;
+}
+
+/* .one + div + div> ol > li{
+    color: green;
+
+} 
+ .one + div ~ div > ol> li{
+    margin-top: 20px;
+    color: rgb(9, 225, 245);
+} */
+ol> li:nth-child(n){
+    color: rgb(22, 142, 9);
+}
