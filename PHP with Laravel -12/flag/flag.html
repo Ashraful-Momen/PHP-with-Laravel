@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .container{
+            margin:0px;
+            padding:0px;
+            box-sizing:border-box;
+            float: left;
+            content:" ";
+            display: block;
+          
+          
+            
+        }
+        .abc{
+            background-image: linear-gradient(to right top, red ,blue );
+            height: 100vh;
+            width: 1376px;
+            display:flex;
+            flex-direction:row;
+            flex-wrap:wrap;
+            justify-content: center;
+            align-content: center;
+
+
+        }
+        .row{
+            
+            /* display:flex;
+            flex-wrap: wrap;
+            border: 1px solid red;
+            justify-content: center;
+            align-items: center; */
+            /* position: absolute; */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+
+            height: 200px;
+            width:300px;
+            background-color:green;
+            margin: 0 0 0 0;
+            
+            
+        }
+        .circle{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            width: 100px;
+            height:100px;
+            background-color: red;
+            border-radius:70%;
+            
+            /* margin-top:50px;
+            padding:10px; */
+            /* margin-top: 50px; */
+            /* position:relative; */
+        }
+        p{
+            background-color: linear-gradient(green,red,black);
+        }
+    </style>
+</head>
+<body class="container">
+    <div class="abc" height="100%" width="100%">
+        <div class="row">
+            <div class="circle">
+                <marquee direction="left" onclick="this.stop()" ondblclick="this.start()"><p>Bangladesh</p></marquee>
+            </div>
+        </div>
+    
+    </div>
+</body>
+</html>
