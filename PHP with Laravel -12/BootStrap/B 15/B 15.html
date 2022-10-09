@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Carousel</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+
+    <style>
+      
+        .carousel-item>img{
+            padding-top: 2%;
+            padding-left: 5%;
+            padding-bottom: 5%;
+            margin-left: 2%;
+            margin-right: 6%;
+            width: 500px;
+            height: inherit;
+            align-items: center;
+            border-radius: 7px;
+         
+        }
+        .carousel-item{
+            font-style: italic;
+            text-align: center;
+        }
+        .color{
+            background-image: linear-gradient(to right, pink,rgb(117, 193, 236));
+        }
+    </style>
+  
+</head>
+
+<body>
+   <div class="container">
+   
+        <div class="row ">
+            <div class="col-12 color">
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    </div>
+                    <div class="carousel-inner text-white text-weight-italic">
+                      <div class="carousel-item active ">
+                            
+                        <p>Item 1. Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur soluta, dolorem itaque et explicabo provident!</p>
+                        <img src="../../PHP with Laravel -12/Photos/photo_form_wix.webp" alt="" class="justify-content-center">
+                    </div>
+                      <div class="carousel-item">
+                        <p>Item 2. Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur soluta, dolorem itaque et explicabo provident!</p>
+                        <img src="../../PHP with Laravel -12/Photos/converted image/2_image_from_facebook.jpg" alt="" class="rounded">
+                        
+                      </div>
+                      <div class="carousel-item">
+                        <p>Item 3. Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur soluta, dolorem itaque et explicabo provident!</p>
+                        <img src="../../PHP with Laravel -12/Photos/converted image/2_image_from_facebook.jpg" alt="" class="rounded-">
+                        
+                      </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
+                  </div>
+            </div>
+        </div>
+   </div>
+    <!-- place footer here -->
+  </footer>
+  <!-- Bootstrap JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+    integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+  </script>
+</body>
+
+</html>
