@@ -1,0 +1,25 @@
+.carousel-item>img{
+    padding-top: 2%;
+    padding-left: 5%;
+    padding-bottom: 5%;
+    margin-left: 2%;
+    margin-right: 6%;
+    width: 500px;
+    height: inherit;
+    align-items: center;
+    border-radius: 7px;
+
+}
+.carousel-item{
+    font-style: italic;
+    text-align: center;
+}
+.color{
+    background-image: linear-gradient(to right, pink,rgb(117, 193, 236));
+}
+body{
+    background-image: linear-gradient(to right, pink,rgb(117, 193, 236));
+}
+ul>.drowpdown{
+    margin-top:0px;
+}
