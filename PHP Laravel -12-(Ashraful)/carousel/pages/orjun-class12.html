@@ -1,0 +1,192 @@
+/* CSS */
+
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+.slider img{
+	height: 400px;
+	width: 100%;
+}
+
+.cards .style-h4{
+	color: blueviolet;
+}
+.c-position{
+	top: 35%;
+}
+
+/* HTML */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This is a Class Test</title>
+    <link rel="stylesheet" href="../assets/bootstrap/bootstrap.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  
+    <style>
+        
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+.slider img{
+	height: 400px;
+	width: 100%;
+}
+
+.cards .style-h4{
+	color: blueviolet;
+}
+.c-position{
+	top: 35%;
+}
+    </style>
+</head>
+<body>
+	<!-- Header Items -->
+	<header>
+		<!-- Top Header Section -->
+		<nav class="navbar navbar-expand-lg navbar-expand-md navbar-expand-sm navbar-expand-xl bg-dark navbar-dark">
+			<div class="container">
+				<a href="#" class="navbar-brand">LOGO</a>
+				<button type="button" class="navbar-toggler" data-bs-target="#toggle-menu" data-bs-toggle="collapse">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="toggle-menu">
+					<ul class="navbar-nav ms-auto">
+						<li><a href="#" class="nav-link">Home</a></li>
+						<li><a href="#" class="nav-link">Blog</a></li>
+						<li class="dropdown">
+							<a class="nav-link dropdown-toggle" href="" data-bs-toggle="dropdown">Services</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" href="#">Portfolio</a></li>
+								<li><a class="dropdown-item" href="#">My Services</a></li>
+								<li><a class="dropdown-item" href="#">Happy Clients</a></li>
+								<li><a class="dropdown-item" href="#">Footer</a></li>
+							</ul>
+						</li>
+						<li><a href="#" class="nav-link">About</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	</header>
+
+	<!-- Main Menu Items -->
+	<main>
+
+		<!-- Slider Area Item -->
+		<section class="slider">
+			<div class="row">
+				<div class="col-12">
+					<div class="carousel slide" data-bs-ride="carousel" data-bs-interval="1500" id="slides">
+						<div class="carousel-inner">
+							<div class="carousel-item active">
+								<img src="../media/img/aaron-burden-yzgF-AQt1sQ-unsplash.jpg" alt="Image 01">
+								<div class="carousel-caption c-position">
+									<h2>This is fucking title 01</h2>
+									<p>Lorem ipsum dolor sit amet consemnis esse autem ratione as</p>
+									<button class="btn btn-success">Click</button>
+								</div>
+							</div>
+							<div class="carousel-item">
+								<img src="../media/img/igor-kasalovic-tNDvFkxkBHo-unsplash.jpg" alt="Image 02">
+								<div class="carousel-caption">
+									<h2>This is fucking title 02</h2>
+									<p>Lorem ipsum dolor sit amet consemnis esse autem ratione as</p>
+									<button class="btn btn-success">Click</button>
+								</div>
+							</div>
+							<div class="carousel-item">
+								<img src="../media/img/jason-ortego-buF62ewDLcQ-unsplash.jpg" alt="Image 03">
+								<div class="carousel-caption">
+									<h2>This is fucking title 03</h2>
+									<p>Lorem ipsum dolor sit amet consemnis esse autem ratione as</p>
+									<button class="btn btn-success">Click</button>
+								</div>
+							</div>
+							<button type="button" class="carousel-control-prev" data-bs-slide="prev" data-bs-target="#slides">
+								<span class="carousel-control-prev-icon">Prev</span>
+							</button>
+							<button type="button" class="carousel-control-next" data-bs-slide="prev" data-bs-target="#slides">
+								<span class="carousel-control-next-icon">Next</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Card Section for services -->
+		<section class="cards px-4 py-4">
+			<div class="container">
+				<div class="row">
+					<div class="col-4 col-md-4 col-lg-4">
+						<div class="card bg-dark">
+							<div class="card-header">
+								<img class="w-100 py-4" src="../assets/media/images/bs4.jpg" alt="Image">
+								<h1 class="text-light">Asus PRO PJU500</h1>
+								<h4 class="style-h4">Price $400</h4>
+								<p class="text-center text-white py-4">
+									Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque accusamus, amet quisquam mollitia distinctio reiciendis consequatur ducimus officia omnis fuga corrupti labore rem inventore atque, beatae quis! Voluptatum, facere ut!
+								</p>
+								<a href="#" class="btn btn-success">Buy Now</a>
+							</div>
+						</div>
+					</div>
+					<div class="col-4 col-md-4 col-lg-4">
+						<div class="card">
+							<div class="card-header">
+								<h1>Asus PRO PJU500</h1>
+								<h4 class="style-h4">Price $400</h4>
+							</div>
+							<div class="card-body">
+								<p class="text-center text-dark py-4">
+									Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque accusamus, amet quisquam mollitia distinctio reiciendis consequatur ducimus officia omnis fuga corrupti labore rem inventore atque, beatae quis! Voluptatum, facere ut!
+								</p>
+							</div>
+							<div class="card-footer">
+								<a href="#" class="btn btn-success">Buy Now</a>
+							</div>
+						</div>
+					</div>
+					<div class="col-4 col-md-4 col-lg-4">
+						<div class="card">
+							<div class="card-header">
+								<h1>Asus PRO PJU500</h1>
+								<h4 class="style-h4">Price $400</h4>
+							</div>
+							<div class="card-body">
+								<p class="text-center text-dark py-4">
+									Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque accusamus, amet quisquam mollitia distinctio reiciendis consequatur ducimus officia omnis fuga corrupti labore rem inventore atque, beatae quis! Voluptatum, facere ut!
+								</p>
+							</div>
+							<div class="card-footer">
+								<a href="#" class="btn btn-success">Buy Now</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+	</main>
+
+	<!-- Footer item list -->
+	<footer>
+
+	</footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<script src="../assets/bootstrap/bootstrap.bundle.js"></script>
+<script src="../assets/js/myscript.js"></script>
+</body>
+</html>
