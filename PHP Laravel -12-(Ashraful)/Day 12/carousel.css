@@ -1,0 +1,16 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing :border-box;
+    
+}
+
+body{
+    background-color: rgb(214, 219, 214);
+}
+
+.slide img{
+    padding:20px;
+    height:650px;
+    width:100%;
+}
