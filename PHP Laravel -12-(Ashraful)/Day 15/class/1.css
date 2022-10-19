@@ -1,0 +1,120 @@
+:root{
+    --p-color: red;
+    --s-color: black;
+    --t-color: white;
+}
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+body{
+    font-family: 'Poppins', sans-serif;
+}
+#header{
+    height: 100vh;
+    color: white;
+    background-image: url('../../media/images/vueconf-toronto.cb789bc.jpeg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: ;
+}
+.navbar{
+    height: 150px !important;
+}
+.box-logo{
+    height: 80px;
+    width: 150px;
+    background: black;
+    color: white !important;
+    font-size: 35px;
+    display: flex;
+    justify-content: center;
+    padding-top: 1%;
+}
+.header-item{
+    padding-top: 80px;
+    padding-left: 100px;
+    padding-right: 100px;
+}
+.row{
+    display: flex;
+    justify-content: center;
+}
+.frist-element{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+.frist-element > ul{
+    padding: 15px !important;
+    display: flex;
+}
+.frist-element > ul > li{
+    float: left;
+    margin-left: 25px;
+    font-weight: 600;
+}
+.second-element{
+    text-transform: uppercase;
+    text-align: center;
+    justify-content: center;
+    padding-left: 250px;
+    padding-right: 250px;
+    font-weight: 800;
+}
+.third-element{
+    margin-left: 40%;
+    justify-content: center;
+    padding-left: 250px;
+    padding-right: 250px;
+}
+.opacity-mask{
+    background: green;
+    opacity: 80%;
+    height: 100vh;
+    z-index: 1;
+}
+button{
+    border: none;
+    height: 60px;
+    width: 200px;
+    background: palevioletred;
+    color: white;
+    font-weight: 800;
+}
+#join-us, #Schedule{
+    background: rgb(15, 33, 48) !important;
+}
+.section-join{
+    color: white;
+    margin-top: -100px;
+    border: 1px solid seashell;
+    background: rgb(21, 51, 75) !important;
+}
+.image-s > img{
+    opacity: 70%;
+    height: 100%;
+    width: 100%;
+}
+#footer{
+    color: wheat;
+    height: 200px;
+    background: rgb(15, 33, 48) !important;
+    padding: 60px;
+}
+.foot-top > p{
+    text-align: center;
+    padding-top: 60px;
+}
+.foot-bottom > p{
+    text-align: center;
+}
+.card-body{
+    background: transparent !important;
+}
+.card{
+    color: white;
+    background: rgb(15, 33, 48) !important;
+}
