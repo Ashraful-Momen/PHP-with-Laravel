@@ -1,0 +1,14 @@
+{
+    "name": "day-17/day-17",
+    "type": "project",
+    "description": "input_data from user",
+    "keywords": [],
+    "license": "",
+    "require": {},
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "App\\":"app//"
+        }
+    }
+}
