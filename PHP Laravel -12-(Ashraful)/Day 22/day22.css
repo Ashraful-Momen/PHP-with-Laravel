@@ -1,0 +1,13 @@
+*{
+    margin:0px;
+    padding:0px;
+    box-sizing: border-box;
+}
+
+.myclass{
+
+    background-image: linear-gradient(to left,rgb(133, 34, 111),pink)!important;
+}
+.formcolor{
+    background-image: rgba(253, 249, 249, 0.5);
+}
