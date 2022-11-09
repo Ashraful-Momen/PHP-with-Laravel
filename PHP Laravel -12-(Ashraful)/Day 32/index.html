@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Title</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <h3 class="text-center">
+        calculotor: <span class="text-success" id="result"></span>
+        <hr>
+    </h3>
+    <form action="" method="" enctype="" class=" text-dark">
+      <div class="row">
+        <div class="my-3  col-6">
+            Number 1: <input type="number" name="number1" id="fnumber" class="btn btn-danger form-control text-white" >
+            </div>
+           <div class="my-3  col-6">
+            Number 2: <input type="number" name="number2" id="lnumber" class="btn btn-success form-control text-white" >
+           </div>
+      </div>
+       <div class="my-3 form-control col-12">
+        Result  : <input type="number" name="result" id="ans" class="btn btn-warning  rounded-pill form-control" >
+       </div>
+       <div class="text-center" class="my-3">
+        <button type="button" name="operation" value="add" class="btn btn-primary" onclick="add()">+</button>
+        <button type="button" name="operation" value="mul" class="btn btn-primary">*</button>
+        <button type="button" name="operation" value="dev" class="btn btn-primary">/</button>
+        <button type="button" name="operation" value="sub" class="btn btn-primary">-</button>
+       </div>
+    </form>
+    <script>
+        var fnumber= document.getElementById('fnumber');
+        var lnumber= document.getElementById('lnumber');
+        var res= document.getElementById('result');
+        var ans= document.getElementById('ans');
+        let result= "not calculated";
+
+        // console.log(document.getElementById('fnumber'));
+
+        // console.log('fnumber');
+        function add(){
+            
+            // result = fnumber.value + lnumber.value;
+            result = Number(fnumber.value) + Number(lnumber.value);
+            // result.value =result;
+            // console.log(result);
+            res.innerHTML = result;
+            ans.value=result;
+        }
+    </script>
+  <script>
+    // console.log("Hello");
+    // document.write("Hello I'm JS");
+    // console.log(window);
+    // console.log(this);
+    // console.log(self);
+
+    /*Data type*/
+    //string,number,boolean,float,int,double,
+    // console.log(2);
+    // console.log("\n Ashraful");
+    // console.log(true);
+    // console.log(8.66555478);
+    // var x=2;
+    // let y=3;
+    // console.log(x);
+    // console.log(y);
+    //========================================================
+
+    // var a=20;
+    // var b=30.44;
+    // var c= {};
+    // var d= [];
+    // var e=null;
+    // var f='';
+    // var g=undefined;
+    // var h=true;
+
+    // var i = [true,1,2.4,false,'Md.Asshraful ',null,undefined];
+
+    // console.log(typeof(a)+' ');
+    // console.log(typeof(b)+' ');
+    // console.log(typeof(c)+' ');
+    // console.log(typeof(d)+' ');
+    // console.log(typeof(e)+' ');
+    // console.log(typeof(f)+' ');
+    // console.log(typeof(g)+' ');
+    // console.log(typeof(h)+' ');
+    // console.log((i)+ " ");
+    //========================Object as known in python as Dictonary!==========================
+
+    // var MyObject={
+    //     'f_name':  'Md.Ashraful',
+    //     'l_name':  'Momen',
+    //     'roll':  '152-15-5935',
+    //     "class": "size"
+    // };
+
+    // // console.log(MyObject["f_name"]);
+    //  console.log(MyObject.f_name +" "+ MyObject.l_name);
+
+
+
+  </script>
+  <!-- Bootstrap JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+    integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+  </script>
+</body>
+
+</html>
