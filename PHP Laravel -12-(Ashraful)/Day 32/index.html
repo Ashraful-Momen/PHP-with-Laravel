@@ -14,8 +14,9 @@
 </head>
 
 <body>
+    
     <h3 class="text-center">
-        calculotor: <span class="text-success" id="result"></span>
+        calculotor: <span class="text-success text-span" id="ans"></span>
         <hr>
     </h3>
     <form action="" method="" enctype="" class=" text-dark">
@@ -28,13 +29,13 @@
            </div>
       </div>
        <div class="my-3 form-control col-12">
-        Result  : <input type="number" name="result" id="ans" class="btn btn-warning  rounded-pill form-control" >
+        Result  : <input type="number" name="result" id="result" class="btn btn-warning  rounded-pill form-control" >
        </div>
        <div class="text-center" class="my-3">
         <button type="button" name="operation" value="add" class="btn btn-primary" onclick="add()">+</button>
-        <button type="button" name="operation" value="mul" class="btn btn-primary">*</button>
-        <button type="button" name="operation" value="dev" class="btn btn-primary">/</button>
-        <button type="button" name="operation" value="sub" class="btn btn-primary">-</button>
+        <button type="button" name="operation" value="mul" class="btn btn-primary" onclick="mul()">*</button>
+        <button type="button" name="operation" value="dev" class="btn btn-primary" onclick="dev()">/</button>
+        <button type="button" name="operation" value="sub" class="btn btn-primary" onclick="sub()">-</button>
        </div>
     </form>
     <script>
@@ -53,65 +54,38 @@
             result = Number(fnumber.value) + Number(lnumber.value);
             // result.value =result;
             // console.log(result);
-            res.innerHTML = result;
-            ans.value=result;
+            ans.innerHTML = result;
+            res.value=result;
         }
+        function sub(){
+            
+            // result = fnumber.value + lnumber.value;
+            result = Number(fnumber.value) - Number(lnumber.value);
+            // result.value =result;
+            // console.log(result);
+            ans.innerHTML = result;
+            res.value=result;
+        }
+        function mul(){
+            
+            // result = fnumber.value + lnumber.value;
+            result = Number(fnumber.value) * Number(lnumber.value);
+            // result.value =result;
+            // console.log(result);
+            ans.innerHTML = result;
+            res.value=result;
+        }
+        function dev(){
+            
+            // result = fnumber.value + lnumber.value;
+            result = Number(fnumber.value) / Number(lnumber.value);
+            // result.value =result;
+            // console.log(result);
+            ans.innerHTML = result;
+            res.value=result;
+        }
+
     </script>
-  <script>
-    // console.log("Hello");
-    // document.write("Hello I'm JS");
-    // console.log(window);
-    // console.log(this);
-    // console.log(self);
-
-    /*Data type*/
-    //string,number,boolean,float,int,double,
-    // console.log(2);
-    // console.log("\n Ashraful");
-    // console.log(true);
-    // console.log(8.66555478);
-    // var x=2;
-    // let y=3;
-    // console.log(x);
-    // console.log(y);
-    //========================================================
-
-    // var a=20;
-    // var b=30.44;
-    // var c= {};
-    // var d= [];
-    // var e=null;
-    // var f='';
-    // var g=undefined;
-    // var h=true;
-
-    // var i = [true,1,2.4,false,'Md.Asshraful ',null,undefined];
-
-    // console.log(typeof(a)+' ');
-    // console.log(typeof(b)+' ');
-    // console.log(typeof(c)+' ');
-    // console.log(typeof(d)+' ');
-    // console.log(typeof(e)+' ');
-    // console.log(typeof(f)+' ');
-    // console.log(typeof(g)+' ');
-    // console.log(typeof(h)+' ');
-    // console.log((i)+ " ");
-    //========================Object as known in python as Dictonary!==========================
-
-    // var MyObject={
-    //     'f_name':  'Md.Ashraful',
-    //     'l_name':  'Momen',
-    //     'roll':  '152-15-5935',
-    //     "class": "size"
-    // };
-
-    // // console.log(MyObject["f_name"]);
-    //  console.log(MyObject.f_name +" "+ MyObject.l_name);
-
-
-
-  </script>
-  <!-- Bootstrap JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
     integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
   </script>
