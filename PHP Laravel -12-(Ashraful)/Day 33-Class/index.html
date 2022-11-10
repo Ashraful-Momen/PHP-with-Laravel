@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>My Todo with JS</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+        <h1 class="text-center m-5">My Todo App</h1>
+        <div class="col-7">
+            <form class="bg-warning p3 mb-5">
+                <div class="mb-3 text-center">
+                  <label for="task" class="form-label p-3"><b>Add Task</b></label>
+                  <div><input type="task" class="form-control p-2  rounded" id="task" placeholder="add new task"></div>
+                </div>
+               
+                <button type="button" class="btn btn-primary " id="todo-btn" >+</button>
+              </form>
+              <h1>Todo List</h1>
+              <table class="table w-100 bg-success" >
+                <thead>
+                  <tr>
+                    <th scope="col">Task</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="p-5 m-4">
+                    <tr>
+                        <td scope="row">
+                            Finish ecom project before the deadline
+                        </td>
+                        <td>
+                            <button class="button btn-primary">&#9998;</button>
+                            <button class="button btn-danger">&#9003;</button>
+                        </td>
+                    </tr>
+                
+                </tbody>
+              </table>
+
+        </div>
+    </div>
+  </div>
+  <script>
+    var task =document.querySelector('#task');
+    var todobtn =document.querySelector('#todo-btn');
+    // function  addTodo(){
+    //     console.log(task.value);
+    //     localStorage.clear();
+    // }
+    
+    todobtn.addEventListener('click',function(){
+        
+        if(localStorage.getItem('todos')==null){
+            
+            localStorage.setItem('todos','[]');
+
+            var todos= JSON.parse(localStorage.getItem('todos')); 
+            todos.push(task.value);
+            localStorage.setItem('todos',JSON.stringify(todos));
+
+        }
+        else
+        {
+            // localStorage.setItem('todos','[]')
+
+            var todos= JSON.parse(localStorage.getItem('todos')); // if get sting 
+            todos.push(task.value);
+            localStorage.setItem('todos',JSON.stringify(todos));
+
+        }
+        for (todo in todos){
+            //complete todo Apps .
+        }
+    });
+  </script>
+  <!-- Bootstrap JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+    integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+  </script>
+</body>
+
+</html>
