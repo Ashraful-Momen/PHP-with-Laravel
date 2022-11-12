@@ -24,7 +24,7 @@
                   <div><input type="task" class="form-control p-2  rounded" id="task" placeholder="add new task"></div>
                 </div>
                
-                <button type="button" class="btn btn-primary " id="todo-btn" >+</button>
+                <button type="button" class="btn btn-primary btn-holder" id="todo-btn" >+</button>
               </form>
               <h1>Todo List</h1>
               <table class="table w-100 bg-success" >
@@ -34,16 +34,9 @@
                     <th scope="col">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="p-5 m-4">
-                    <tr>
-                        <td scope="row">
-                            Finish ecom project before the deadline
-                        </td>
-                        <td>
-                            <button class="button btn-primary">&#9998;</button>
-                            <button class="button btn-danger">&#9003;</button>
-                        </td>
-                    </tr>
+                <tbody class="p-5 m-4" id="tbody">
+                  
+                    
                 
                 </tbody>
               </table>
@@ -52,22 +45,26 @@
     </div>
   </div>
   <script>
-    var task =document.querySelector('#task');
-    var todobtn =document.querySelector('#todo-btn');
-    // function  addTodo(){
-    //     console.log(task.value);
-    //     localStorage.clear();
-    // }
+    
+    var taskInput =document.querySelector('#task');
+    var todobtn = document.querySelector('#todo-btn');
+    
     
     todobtn.addEventListener('click',function(){
-        
+
+      if(taskInput.value==''){
+        alert('please Give some task: <br>')
+      }
+      else{
         if(localStorage.getItem('todos')==null){
             
             localStorage.setItem('todos','[]');
 
             var todos= JSON.parse(localStorage.getItem('todos')); 
-            todos.push(task.value);
+            todos.push(taskInput.value);
             localStorage.setItem('todos',JSON.stringify(todos));
+            showTodos();
+            taskInput.value="";
 
         }
         else
@@ -75,14 +72,81 @@
             // localStorage.setItem('todos','[]')
 
             var todos= JSON.parse(localStorage.getItem('todos')); // if get sting 
-            todos.push(task.value);
+            todos.push(taskInput.value);
             localStorage.setItem('todos',JSON.stringify(todos));
+            showTodos();
+            taskInput.value="";
 
         }
-        for (todo in todos){
-            //complete todo Apps .
-        }
+      }
     });
+
+
+       function deleteTodo(id){
+        if(confirm("Are You sure for deleting !")); // confirm function return true/false with user intereact!
+        console.log(id);
+        var todos = JSON.parse(localStorage.getItem('todos'));
+        todos.splice(id,1);
+        
+        localStorage.setItem('todos',JSON.stringify(todos));
+        showTodos();
+
+        }
+
+
+        function editTodo(id){
+          var todos = JSON.parse(localStorage.getItem('todos'));
+          taskInput.value=todos[id];
+          // document.querySelector('')
+          var btnHolder = document.querySelector("#btnHolder");
+          btnHolder.innerHTML=`
+          <button class="button btn-success" onClick=" deleteTodo(${id})">Update;</button>
+          
+          `;
+        }
+
+        function updateTodo(id){
+          var todos = JSON.parse(localStorage.getItem('todos'));
+          todos[id]=taskInput.value;
+          localStorage.setItem('todos',JSON.stringify(todos));
+          showTodos();
+        }
+
+
+
+        function showTodos(){
+          var todos = JSON.parse(localStorage.getItem('todos'));
+
+          var display='';
+          for (todo in todos){
+            display += 
+            `
+            
+                    <tr>
+                        <td scope="row">
+                            ${todos[todo]}
+                        </td>
+                        <td>
+                            <button class="button btn-primary" onClick="editTodo(${todo})">&#9998;</button>
+                            <button class="button btn-danger" onClick=" deleteTodo(${todo})">&#9003;</button>
+                        </td>
+                    </tr>
+            
+            
+           `;
+          }
+          console.log(todos);
+          var tbody = document.querySelector('#tbody');
+          tbody.innerHTML = display;
+        }
+
+
+        // function showTodos(){
+        //   var todos
+        // }
+
+        showTodos();
+        
   </script>
   <!-- Bootstrap JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
@@ -95,3 +159,13 @@
 </body>
 
 </html>
+
+<!-- <tr>
+  <td scope="row">
+      Finish ecom project before the deadline
+  </td>
+  <td>
+      <button class="button btn-primary">&#9998;</button>
+      <button class="button btn-danger">&#9003;</button>
+  </td>
+</tr> -->
