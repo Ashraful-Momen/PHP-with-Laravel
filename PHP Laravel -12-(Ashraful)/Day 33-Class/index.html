@@ -24,7 +24,8 @@
                   <div><input type="task" class="form-control p-2  rounded" id="task" placeholder="add new task"></div>
                 </div>
                
-                <button type="button" class="btn btn-primary btn-holder" id="todo-btn" >+</button>
+                <button type="button" class="btn btn-primary " id="todo-btn" >+</button>
+                <span id="btnHolder"></span>
               </form>
               <h1>Todo List</h1>
               <table class="table w-100 bg-success" >
@@ -100,7 +101,7 @@
           // document.querySelector('')
           var btnHolder = document.querySelector("#btnHolder");
           btnHolder.innerHTML=`
-          <button class="button btn-success" onClick=" deleteTodo(${id})">Update;</button>
+          <button class="button btn-success" onClick=" updateTodo(${id})">Update</button>
           
           `;
         }
