@@ -26,10 +26,14 @@
                     <label for="username">User Name:</label>
                     <input type="text" class="form-control" id="username">
                 </div>
+                <div class="mb-3">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
 
                 <div class="mb-3">
                     <label for="phone">Phone:</label>
-                    <input type="number" class="form-control" id="phone">
+                    <input type="number" class="form-control" id="phone" min="12" max='15' required>
 
                 </div>
 
@@ -51,6 +55,7 @@
                         <tr class="">
                             <div>
                                 <th scope="col">Name</th>
+                                <th scope="col">email</th>
                                 <th scope="col">Phone</th>
                             </div>
 
@@ -71,6 +76,7 @@
     </div>
     <script>
         var frist = document.querySelector("#username");
+        var email = document.querySelector("#email");
         var phone = document.querySelector("#phone");
 
         var submitbtn = document.querySelector("#submit");
@@ -79,9 +85,10 @@
             if (localStorage.getItem('reg-user') == null) {
                 localStorage.setItem('reg-user', '[]');
                 var data = JSON.parse(localStorage.getItem('reg-user'));
-                data.push(user = {
+                data.push({
                     'username': username.value,
-                    'phone': phone.value
+                    'phone': phone.value,
+                    'email': email.value,
 
 
                 })
@@ -89,8 +96,9 @@
                 show();
             } else {
                 var data = JSON.parse(localStorage.getItem('reg-user'));
-                data.push(user = {
+                data.push({
                     'username': username.value,
+                    'email': email.value,
                     'phone': phone.value
                 })
                 localStorage.setItem('reg-user', JSON.stringify(data));
@@ -110,6 +118,9 @@
                     <tr>
                         <td scope="row">
                             ${form[index].username}
+                        </td>
+                        <td>
+                            ${form[index].email}
                         </td>
                         <td>
                             ${form[index].phone}
@@ -133,7 +144,7 @@
 
             var data = JSON.parse(localStorage.getItem('reg-user'));
             console.log(data[index]);
-            data.splice(1, index);
+            data.splice(index, 1);
             console.log(data);
             if (index == 0) {
                 data = 0;
@@ -147,6 +158,7 @@
             var data = JSON.parse(localStorage.getItem('reg-user'));
             console.log(data[index]);
             username.value = data[index].username;
+            email.vaule = data[index].email;
             phone.value = data[index].phone;
             var update = document.querySelector('.update');
             update.innerHTML = `
@@ -161,6 +173,7 @@
             var data = JSON.parse(localStorage.getItem('reg-user'));
             // console.log(data[index]);
             data[index].username = username.value;
+            data[index].email = email.value;
             data[index].phone = phone.value;
 
             // console.log(data[index]);
