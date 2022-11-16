@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+     <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <link href="https://c...content-available-to-author-only...r.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <!-- <link href="style1.css" rel="stylesheet"> -->
+  </head>
+  <body>
+    <div class="container">
+    <div id="nav-g">
+      <nav class="navbar navbar-expand-lg bg-light">
+        <ul class="nav justify-content-center">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Active</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled">Disabled</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+ 
+    <div id="nav-h">
+      <nav class="navbar navbar-expand-lg bg-light">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+          <div class="offcanvas-header">
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <ul class="nav justify-content-center">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Active</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled">Disabled</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+ 
+        <div class="row justify-content-center">
+            <div class="col-7">
+                <h1 align="center">
+                    Register
+                </h1>
+                <div id="msg">
+                    <p>
+ 
+                    </p>
+                </div>
+                <form>
+                      <div class="mb-3">
+                        <label for="username1" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username1" aria-describedby="emailHelp">
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                      </div>
+                      <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="exampleInputPassword1">
+                      </div>
+                      <div class="mb-3">
+                        <label for="number1" class="form-label">Number</label>
+                        <input type="number" class="form-control" id="number1">
+                      </div>
+                      <button type="button" id="reg-btn" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-7">
+                <h1 class="m-3 text-center">My Todo App</h1>
+                <div class="bg-warning">
+                    <div class="mb-3">
+                      <label for="task" class="form-label m-1">Add Task</label>
+                      <input type="text" class="form-control m-1 editCol" id="task" aria-describedby="emailHelp" placeholder="Add New Task">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="todo-btn">+</button>
+                </div>
+                    <div>
+                        <h1 class="m-3 text-center">My Todos</h1>
+                        <table class="table w-100 bg-warning sec-1">
+                            <thead>
+                              <tr>
+                                <th scope="col">Tasks</th>
+                                <th scope="col">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody id="forloop">
+                              <!-- <tr class="forloop">
+                                <th scope="row">Finish the ecom project before the deadline!</th>
+                                <td>
+                                    <button class="btn btn-primary">&#9998</button>
+                                    <button class="btn btn-danger">-</button>
+                                </td>
+                              </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+        </div>
+    </div>
+ 
+ 
+    <script src="https://c...content-available-to-author-only...r.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <script>
+ 
+        function myFunction(x) {
+          if (x.matches) { // If media query matches
+            document.getElementById('nav-g').style.display = "none";
+            document.getElementById('nav-h').style.display = "block";
+          } else {
+            document.getElementById('nav-g').style.display = "block";
+            document.getElementById('nav-h').style.display = "none";
+          }
+        }
+ 
+        var mobileWidth = window.matchMedia("(max-width: 760px)");
+        myFunction(mobileWidth); // Call listener function at run time
+        mobileWidth.addListener(myFunction); // Attach listener function on state changes
+ 
+        function showTodos(){
+            var todos = JSON.parse(localStorage.getItem('todos'));
+            var outputHTML = "";
+            for(var i=0; i<todos.length; i++){
+                outputHTML += "<tr>";
+                outputHTML += "<th scope='row'>" + todos[i] + "</th>";
+                outputHTML += "<td>";
+                outputHTML += "<button class='btn btn-primary'>" + "&#9998" + "</button>";
+                outputHTML += "<button class='btn btn-danger'>" + "-" + "</button>";
+                outputHTML += "</td>";
+                outputHTML += "</tr>";
+            }
+            document.getElementById("forloop").innerHTML = outputHTML;
+        }
+        var task = document.querySelector('#task');
+        var todoBtn = document.querySelector('#todo-btn');
+        var name = document.querySelector('#username1');
+        var email = document.querySelector('#exampleInputEmail1');
+        var password = document.querySelector('#exampleInputPassword1');
+        var mobile = document.querySelector('#number1');
+        var regBtn = document.querySelector('#reg-btn');
+ 
+        regBtn.addEventListener('click', function(){
+           if(name.value == null){
+                var outputHTML = "<p id='my-msg'>";
+                outputHTML += "Username must be filled!";
+                outputHTML += "<p>";
+                document.getElementById("msg").innerHTML = outputHTML;
+                document.getElementById("my-msg").classList.add('text-success');
+           }
+        });
+ 
+        todoBtn.addEventListener('click', function(){
+            if(localStorage.getItem('todos') == null){
+                localStorage.setItem('todos', '[]');
+ 
+               var todos = JSON.parse(localStorage.getItem('todos'));
+               todos.push(task.value);
+               localStorage.setItem('todos', JSON.stringify(todos));
+ 
+            }
+            else{
+                var todos = JSON.parse(localStorage.getItem('todos'));
+               todos.push(task.value);
+               localStorage.setItem('todos', JSON.stringify(todos));
+            }
+            showTodos();
+        });
+ 
+        showTodos();
+ 
+    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+</script>
+  </body>
+</html>

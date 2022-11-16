@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Slider</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+
+</head>
+<style>
+    *{
+        margin: 0px;
+        padding:0px;
+        box-sizing: border-box;
+        /* background-color: black; */
+    }
+    .wrapper{
+        margin-left: 0;
+        height: 500px;
+        width: 100%;
+        border: 2px solid;
+        padding:0px;
+        position: relative;
+        overflow: hidden;
+
+    }
+    .wrapper .slide{
+        height: 500px;
+        width: 100%;
+        position: absolute;
+        transition: all .3s ease-in-out;
+    }
+    .wrapper .slide img{
+       width: 100%;
+       height: 100%; 
+       
+    }
+    button, input, optgroup, select, textarea {
+    margin: 0;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;}
+</style>
+
+<body>
+  <header>
+    <!-- place navbar here -->
+  </header>
+  <main>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12"></div>
+                <div class="wrapper">
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=876&q=80" alt="">
+                    </div>
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=874&q=80" alt="">
+                    </div>
+                    <div class="slide">
+                        <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=975&q=80" alt="">
+                    </div>
+                </div>
+                <div align="center">
+                    <button onclick="slidePrev()">&larr;</button>
+                   <button onclick="slideNext()">&rarr;</button>
+               </div>
+        </div  >
+        
+       
+    </div>
+  </main>
+  <script>
+    var counter=0;
+    var slider= document.querySelectorAll('.slide');
+    slider.forEach(function (slide,index){
+        // console.log(i);
+        slide.style.left = `${index * 100}% `;
+    })
+   function slideShow(){
+    slider.forEach(function (slide){
+        if(slider.length==counter){
+            counter=0;
+        }
+        slide.style.transform = `translateX(-${counter * 100}%) `;
+    })
+   }
+   function slidePrev(){
+    counter--;
+    slideShow();
+    
+
+   }
+   function slideNext(){
+    counter ++;
+    slideShow();
+   }
+  </script>
+  <footer>
+    <!-- place footer here -->
+  </footer>
+  <!-- Bootstrap JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+    integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+  </script>
+</body>
+
+</html>
