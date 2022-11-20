@@ -3,6 +3,8 @@
 
 
 
+
+
 git config --global user.name
 
 git config --global user.email
@@ -21,3 +23,25 @@ git remote add origin https://github.com/Ashraful-Momen/test-drive.git
 
 
 git push -u origin master
+====================================
+git config --list --show-origin 
+
+git config --unset --global user.email
+git config --unset --global user.name
+=================sir=================
+branch problem solve: 
+
+1.$ git add .
+2.$ git commit -m "fffffffffff"
+3.$ git branch -M Main
+4.$ git push -u origin Main
+=======================================
+
+
+
+
+
+composer create-project laravel/laravel myfirst-project
+goto install folder
+php artisan serve
+
