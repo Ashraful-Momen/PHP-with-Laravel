@@ -1,0 +1,10 @@
+just paste two line inside ( app.blade.php, guest.blade.php ) instead of @vite like this :
+
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <script src="{{ asset('js/app.js') }}" defer></script>
+    
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+and paste this code inside this folder public/mix-manifest.json
+
+"/js/app.js": "/js/app.js",
+"/css/app.css": "/css/app.css"
