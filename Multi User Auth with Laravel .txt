@@ -1,0 +1,24 @@
+first install jetstream livewire and 
+
+1. user table then add 'rol' column and migrate it .
+2. app -> http -> RouteServiceProvider ->  and rename the route ...
+3. web.route-> create the route with the controller 
+4. goto controller and inside the function write just : 
+			
+class BackendController extends Controller
+{
+    public function index(){
+        $role=Auth::user()->role;  //variable = Auth::modalName->columnName;
+	 if($role=='1'){
+            return view('profile.admin');
+        }
+        elseif($role=='2')
+        {
+            return view('profile.user');
+        }
+        else {
+            return view('dashboard');
+        }
+    }
+}
+5. goto resource -> view -> profile : create multiuser dashboard=> 1.User 2.Admin etc.... 
