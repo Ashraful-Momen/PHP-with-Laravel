@@ -3,34 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Collapsible Content</title>
+  <title>Custom Collapse</title>
   <!-- Add your Bootstrap and JavaScript dependencies here -->
   <!-- For example, you can use the following CDN links for Bootstrap CSS and JS -->
   <!-- Bootstrap CSS v5.3.2 -->
   <link
-  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-  rel="stylesheet"
-  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-  crossorigin="anonymous"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+    crossorigin="anonymous"
   />
 </head>
 <body>
-  <p>
-    <a class="btn btn-primary" href="#collapseExample1" role="button" aria-expanded="true">
-      Link with href
-    </a>
-    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false">
-      Button with data-bs-target
-    </button>
-  </p>
-  <div class="collapse" id="collapseExample1">
+  <div>
+    <button class="btn btn-primary" onclick="showContent('content1')">Button 1</button>
+    <button class="btn btn-primary" onclick="showContent('content2')">Button 2</button>
+  </div>
+  <div id="content1" style="display: none;">
     <div class="card card-body">
-      Some placeholder content for the collapse component. This panel is visible by default but can be hidden when the user activates the relevant trigger.
+      Content for Button 1. This panel is visible when Button 1 is clicked.
     </div>
   </div>
-  <div class="collapse" id="collapseExample2">
+  <div id="content2" style="display: none;">
     <div class="card card-body">
-      Some placeholder content for the collapse component. This panel is visible by default but can be hidden when the user activates the relevant trigger.
+      Content for Button 2. This panel is visible when Button 2 is clicked.
     </div>
   </div>
 
@@ -46,12 +42,23 @@
     crossorigin="anonymous"
   ></script>
   <script>
-    // Run this script after the page loads
-    document.addEventListener('DOMContentLoaded', function () {
-      // Show the collapse content by adding the "show" class
-      var collapseContent1 = document.querySelector('#collapseExample1');
-      collapseContent1.classList.add('show');
-    });
+    function showContent(contentId) {
+      var content = document.getElementById(contentId);
+      content.style.display = 'block';
+
+      // Hide other content divs
+      var allContentDivs = document.querySelectorAll('[id^="content"]');
+      for (var i = 0; i < allContentDivs.length; i++) {
+        if (allContentDivs[i].id !== contentId) {
+          allContentDivs[i].style.display = 'none';
+        }
+      }
+    }
+
+    // Show content for Button 1 by default on page load
+    window.onload = function () {
+      showContent('content1');
+    };
   </script>
 </body>
 </html>
