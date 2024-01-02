@@ -1,0 +1,290 @@
+>>php artisan make:model Book -m | -m for migration table 
+
+==========================================================
+connect Mysql Database: .env 
+================================
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=api_crud
+DB_USERNAME=root
+DB_PASSWORD=
+
+>>> ======================================================
+Database>>>migrations : 
+
+---------------------------
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('books', function (Blueprint $table) {
+            $table->id();
+            $table->string("title");
+            $table->string("author");
+            $table->string("publisher");
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('books');
+    }
+};
+
+>>> php artisan migrate
+======================================================
+app>>model.php 
+=============
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Book extends Model
+{
+    protected $fillable = ['title','author','publisher'];
+    protected $table='books';
+    use HasFactory;
+
+
+    
+}
+===================================================
+---------------------------
+>>>php artisan make:resource BookResource.
+--------------------------------------
+
+app>>http>>Resource
+==========
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class BookResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        //those variable according to migrations variable
+        return [
+            'id'=> $this->id ,
+            'title'=> $this->title,
+            'author' => $this->author,
+            'created_at'=>$this->created_at,
+            'updated_at'=>$this->updated_at,
+        ];
+    }
+}
+===========================================================
+route> api > 
+===============
+
+<?php
+
+use App\Models\Book;
+use Illuminate\Http\Request;
+use App\Http\Resources\BookResource;
+use Illuminate\Support\Facades\Route;
+
+
+Route::get('/books',function(){
+    return BookResource::collection(Book::all());
+});
+
+
+
+
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+
+================================================================
+http://127.0.0.1:8000/api/books
+================================================================
+app>http > providers : 
+-----------------------
+ public function boot(): void
+    {
+        //
+        JsonResource::withoutWrapping(); #for this line show data without { } in apiEndPoint.
+    }
+
+
+================================================================
+>>> php artian make:controller -r | here -r means resource -> create auto crud function in controller.
+================================================================
+
+first check the route  => 
+---------------------------------------------------
+
+Route::get('/books',function(){
+    return BookResource::collection(Book::all());
+});
+
+Route::get('/book/{id}',function($id){
+    return new BookResource(Book::findOrFail($id)); 
+});
+
+
+Route::post('/book',[BookController::class,'store']);
+
+Route::put('/book/{id}',[BookController::class,'update']);
+
+Route::delete('/book/{id}',[BookController::class,'destroy']);
+
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+----------------------------------------------------------
+
+Second  check the route  => 
+----------------------------------------------------------
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Book;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+
+class BookController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+        return Book::all(); 
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+        $input = $request->all();
+        $validator = Validator::make($input , [
+            'title'=>'required',
+            'author'=>'required',
+            'publisher'=>'required',
+        ]);
+
+        //now write below validation error : 
+
+        if($validator->fails()){
+            return $this->sendError('Validator error Sms here',$validator->error());
+        }
+
+        $book = Book::create($input); 
+
+        return response()->json([
+            'success'=>'true',
+            'message'=>'Book Record created successfully',
+            'book'=>$book // here show in api_end point the book.
+        ]);
+
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+        return Book::findOrFail($id);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id)
+    {
+       
+        if (Book::where('id', $id)->exists()) {
+            $book = Book::find($id);
+            $book->title = $request->title;
+            $book->author = $request->author;
+            $book->publisher = $request->publisher;
+            $book->save();
+    
+            return response()->json([
+                'success' => 'true',
+                'message' => 'Book updated successfully',
+                'body' => $book,
+            ],200);
+        } else {
+            return response()->json([
+                'message' => 'Book not found!',
+            ], 404);
+        }
+    }
+    
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+        if (Book::where('id', $id)->exists()) {
+            $book = Book::find($id);
+          
+            $book->delete();
+    
+            return response()->json([
+                'success' => 'true',
+                'message' => 'Book deleted successfully',
+                'body' => $book,
+            ],200);
+        } else {
+            return response()->json([
+                'message' => 'Book not found!',
+            ], 404);
+        }
+    }
+}
