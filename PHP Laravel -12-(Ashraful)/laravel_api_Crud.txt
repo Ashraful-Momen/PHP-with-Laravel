@@ -66,6 +66,8 @@ class Book extends Model
     
 }
 ===================================================
+
+# Django use Serializer for Json output from model , same as Laravel Resource.
 ---------------------------
 >>>php artisan make:resource BookResource.
 --------------------------------------
