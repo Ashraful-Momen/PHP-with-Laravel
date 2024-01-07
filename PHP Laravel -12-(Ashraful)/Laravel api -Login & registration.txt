@@ -1,0 +1,225 @@
+Introduction : 
+In this article you are learn how to create Login and Register API. Laravel’s API can be used in any website or app. Whenever a user has to login or register in a website or app, API is integrated in the frontend for that and how to create that API in Laravel is described in this article.
+Table of content : 
+Create Controller
+Create Routes
+Create collection folder in postman and add api request----------------------------------------------------------
+
+Create Controller : php artisan make:controller RegisterController
+--------------------------------------------------------------------
+app\Http\Controllers\RegisterController.php
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Validator;
+
+use Illuminate\Support\Facades\Hash;
+
+use App\Models\User;
+
+class RegisterController extends Controller
+
+{
+
+    // register api function
+
+    public function register(Request $request) 
+
+    {
+
+        $validator = Validator::make($request->all(),[
+
+            'name'     => 'required',
+
+            'email'    => 'required',
+
+            'password' => 'required'
+
+        ]);
+
+        if($validator->fails()) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => $validator->errors()->first()
+
+            ]);
+
+        }
+
+        $user = User::create([
+
+            'name'     => $request->name,
+
+            'email'    => $request->email,
+
+            'password' => Hash::make($request->password),
+
+        ]);
+
+        $user->createToken('token')->accessToken;
+
+        return response()->json([
+
+            'success' => true,
+
+            'message' => 'User register successfully.'
+
+        ]);
+
+    }
+
+}
+-------------------------------------------------------------------------------
+Create route in api.php file : 
+
+routes\api.php
+--------------------------------------------------------------------------
+<?php
+
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Route;
+
+/*
+
+|--------------------------------------------------------------------------
+
+| API Routes
+
+|--------------------------------------------------------------------------
+
+|
+
+| Here is where you can register API routes for your application. These
+
+| routes are loaded by the RouteServiceProvider within a group which
+
+| is assigned the "api" middleware group. Enjoy building your API!
+
+|
+
+*/
+
+Route::post('register', 'Api\UserController@register');
+=================================================================================================
+Create Controller : php artisan make:controller LoginController
+
+app\Http\Controllers\LoginController.php
+--------------------------------------------------------------
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Validator;
+
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\User;
+
+class LoginController extends Controller
+
+{
+
+    // login api function
+
+    public function login(Request $request) 
+
+    {
+
+        $validator = Validator::make($request->all(),[
+
+            'email'    => 'required',
+
+            'password' => 'required'
+
+        ]);
+
+        if($validator->fails()) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => $validator->errors()->first()
+
+            ]);
+
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if(!$user) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'User not found.'
+
+            ]);
+
+        }
+
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+
+            $user->token = $user->createToken('myApp')->plainTextToken;
+
+            return response()->json([
+
+                'success' => true,
+
+                'message' => 'User login successfully.',
+
+                'data'    => $user
+
+            ]);
+
+        }
+
+    }
+
+}
+-------------------------------------------------------------------------
+Create route in api.php file : 
+routes\api.php
+----------------------------------------------------------------------
+
+<?php
+
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Route;
+
+/*
+
+|--------------------------------------------------------------------------
+
+| API Routes
+
+|--------------------------------------------------------------------------
+
+|
+
+| Here is where you can register API routes for your application. These
+
+| routes are loaded by the RouteServiceProvider within a group which
+
+| is assigned the "api" middleware group. Enjoy building your API!
+
+|
+
+*/
+
+Route::post('login', 'Api\LoginController@login');
