@@ -1,0 +1,384 @@
+>>>php artisan make:model Address -m
+
+----------------------------------------------Address table ----------------------------------------------------
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateAddressesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('addresses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('user_id');
+            $table->string('country');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('addresses');
+    }
+}
+-----------------------------------------------User Table ------------------------------------------------------------
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateUsersTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('users');
+    }
+}
+------------------------------------------------factory()---------------------------------------------------------------------
+>>>php artisan make:factory UserFactory
+
+------------------------------------------------------------------------------------------------------------------------------
+>>> Database>>factories>>UserFactory.php
+------------------------------------------
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+class UserFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'remember_token' => Str::random(10),
+        ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function unverified()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'email_verified_at' => null,
+            ];
+        });
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------------
+route>>>web.route >>>
+----------------------
+Route::get('/user', function(){
+    \App\Models\User::factory()->count(3)->create();
+});
+
+
+------------------------------------
+>>>php artisan migrate
+
+>>> php artisan serve
+
+>>> localhost:8000/user .
+
+>>> then check the database.
+------------------------------------------------------------------------------------------------------------------------------
+web.route=>
+----------------
+Route::get('/user', function(){
+    \App\Models\Address::create([
+        'user_id'=> 1,
+        'country'=>'Bangladesh',
+    ]);
+    \App\Models\Address::create([
+        'user_id'=> 2,
+        'country'=>'India',
+    ]);
+    \App\Models\Address::create([
+        'user_id'=> 1,
+        'country'=>'Canada',
+    ]);
+
+});
+--------------------
+model> Address:
+-------------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Address extends Model
+{
+    use HasFactory;
+
+    protected $fillable =[
+        'user_id','country',
+    ];
+}
+
+------------------------------------------------------------------------------------------------------------------------------
+web.route=>
+--------------
+Route::get('/user', function(){
+    $users = \App\Models\User::all();
+
+    return view('users.index',compact('users'));
+});
+
+------------------------------------------------------------------------------------------------------------------------------
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>User::index</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card text-start">
+                    @foreach ($users as $user)
+                        <div class="card-body">
+                            <h4 class="card-title">{{$user->name}}</h4>
+                            <p class="card-text">Body</p>
+                        </div>
+                    @endforeach
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
+
+------------------------------------------------------------------------------------------------------------------------------
+model-> User =>
+----------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function address(){
+        return $this->HasOne('\App\Models\Address',);  // $this->HasOne('modelName::class', 'foreignKey', 'localKey');
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------------
+MOdel >>> Address :
+--------------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Address extends Model
+{
+    use HasFactory;
+
+    protected $fillable =[
+        'user_id','country',
+    ];
+
+    public function users(){
+        return $this->belongsTo(User::class,'id'); // $this-> belongsTo(ModelName::class, 'foreignKey', 'localKey');
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------------
+web.route=>
+==================
+// --------------------------------------
+Route::get('/user', function(){
+   $address = Address::all();
+
+    return view('users.index',compact('address'));
+});
+
+------------------------------------------------------------------------------------------------------------------------------
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>User::index</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card text-start">
+                    {{-- @foreach ($users as $user)
+                        <div class="card-body">
+                            <h4 class="card-title">{{$user->name}}</h4>
+                            <p class="card-text">{{$user->address}}</p>
+                        </div>
+                    @endforeach --}}
+
+                    @foreach($address as $address)
+                        <h2>{{$address->country}}</h2>
+                        <p>{{$address->users->name}}</p> {{-- here users is the Address model functino -> users()  --}}
+
+                    @endforeach
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
+
+------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------
+create a new user with factory... and create new address . then link / associate each other =>
+------------------------------------------------------------------------------------------------------------------------------
+web.rotue=>
+--------------------------
+Route::get('/user', function () {
+
+    $user = User::factory()->create();
+    $address = new Address([
+        'country' => 'Malaysia',
+    ]);
+
+    $address->user()->associate($user);  //here user() function exits in Address model.
+    $address->save();
+
+    return view('users.index', compact('address'));
+});
+------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------
+
