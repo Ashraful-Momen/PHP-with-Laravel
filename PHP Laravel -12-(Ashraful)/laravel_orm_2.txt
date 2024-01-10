@@ -1,0 +1,60 @@
+
+#one to many relationship.....
+---------------------------------------
+Model => User
+---------------
+
+public function addresses(){
+        return $this->hasMany(Address::class,'user_id','id'); //return $this->hasMany(Address::class,'Address_table_col=>user_id','User_table_col =>id');
+    }
+
+---------------------------------------
+Model => Address
+---------------
+
+ public function user(){
+        return $this->belongsTo(User::class);  // if we can't mention fk then autometicall get 'id' as pk.
+    }
+
+--------------------------------------
+web.route=>
+------------------
+
+Route::get('/check', function(){
+
+    $users = User::with('addresses')->get();
+    // $addresses = Address::with('user')->get();
+
+    // echo "<pre>";
+
+
+    // foreach ($users as $user) {
+    //     dd($user->address->country);
+    // }
+
+
+    // foreach ($addresses as $address) {
+    //     dd($address->user->name);
+    // }
+
+    // $users['1']->addresses()->create([
+    //     'country'=> "Nepal",
+    // ]);
+
+    dd($users['1']);
+
+    return view('users.index', compact('users'));
+});
+--------------------------------------
+index.blade.php =>
+--------------------------------------
+
+
+  @foreach ($users as $user)
+                        <p class="fs-5">{{ $user->name }}</p>
+                        @foreach ($user->addresses as $address)
+                            <p>{{$address->country}}</p>
+                        @endforeach
+                    @endforeach
+----------------------------------------------------------------------
+
