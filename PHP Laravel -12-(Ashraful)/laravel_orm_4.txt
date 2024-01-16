@@ -1,0 +1,127 @@
+get > created_at and updated_at  from the pivot table in many to many relationship =>
+
+===========================================================================================================================
+Post:model =>
+-----------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
+use App\Models\Tag;
+
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ([
+        'user_id','title',
+    ]);
+
+    public function users(){
+        return $this->belongsTo(User::class)->withDefault([
+            'name'=>'Guest User',
+        ]);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','post_id','tag_id')
+        ->withTimestamps();  //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+    }
+}
+
+===========================================================================================================================
+Tag::Model
+=============
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+    protected $fillable =['name'];
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','tag_id','post_id') //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+        ->withTimestamps(); //here use withTimestapms() to show the date and time form the pivot table.
+    }
+}
+
+===========================================================================================================================
+route.web.php =>
+------------------
+
+
+
+Route::get('/tag', function () {
+
+
+
+
+    // $post = Post::with('users', 'tags')->get()->tags;
+    //    $post->tags()->attach([2]); // inter for pivot table
+
+
+
+
+    // return view('users.index',compact('post'));
+
+    // $post = Post::with('users', 'tags')->get();
+    // dd($post);
+    // return view('users.index', compact('post'));
+
+
+    $posts = Post::with('tags')->get();
+
+    foreach ($posts as $post) {
+        $tags = $post->tags;
+
+
+        foreach ($tags as $tag) {
+            $pivotData = $tag->pivot->get();
+            foreach($pivotData as $pivot){
+                // dd($pivot);
+                echo "<pre>";
+                echo $pivot->created_at;
+
+            }
+        }
+    }
+
+
+});
+
+===========================================================================================================================
+#if we want to use extra column in Pivot table like => 'status' , then we have to add post_model =>
+------------------------------------------------------------------------------
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ([
+        'user_id','title',
+    ]);
+
+    public function users(){
+        return $this->belongsTo(User::class)->withDefault([
+            'name'=>'Guest User',
+        ]);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','post_id','tag_id')
+        ->withTimestamps();  //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+        ->withPivot('status'); // add pivot table column in post_tag_pivot table .
+    }
+}
+
+===========================================================================================================================
