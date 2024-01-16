@@ -1,0 +1,255 @@
+#event lister with model =>
+-------------------------------
+#how to add status column value in pivot table =>
+===================================================
+Post::model =>
+----------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
+use App\Models\Tag;
+
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ([
+        'user_id','title',
+    ]);
+
+    public function users(){
+        return $this->belongsTo(User::class)->withDefault([
+            'name'=>'Guest User',
+        ]);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','post_id','tag_id')
+        ->withTimestamps()  //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+        ->withPivot('status'); // this method add => status column value in pivot table, so that we can fetch value in controller ;
+    }
+}
+--------------------------------------------------------------------------------
+web::route=>
+--------------------------------------------------------------------------------
+
+Route::get('/tag', function () {
+
+    //16-01-24: model event listening ----------------------------------------------
+
+    // User::create([
+    //     'name'=> 'ashraful',
+    //     'email'=>'amshuvo64@gamil.com',
+    //     'password'=>'123456',
+    //     'phone'=>'01674317715',
+    // ]);
+
+    // Post::create([
+    //     'title'=> 'post title 1',
+    //     'user_id'=>'1',
+
+    // ]);
+
+    // Tag::create([
+    //     'name'=> 'tag title 1',
+
+    // ]);
+
+    $post = Post::all();
+    $tag = Tag::all();
+
+    // $post->tags()->attach([
+    //     1=>[
+    //         'status'=>'approved',
+    //     ]
+    // ]);
+
+    // foreach ($post as $singlePost) {
+    //     $singlePost->tags()->attach([
+    //         1 => [
+    //             'status' => 'approved',
+    //         ]
+    //     ]);
+    // }
+
+      //fetching time / date / status form pivot table __________________________________
+      $posts = Post::with('tags')->get();
+
+      foreach ($posts as $post) {
+          $tags = $post->tags;
+
+
+          foreach ($tags as $tag) {
+              $pivotData = $tag->pivot->get();
+              foreach($pivotData as $pivot){
+                  dd($pivot);
+                  echo "<pre>";
+                  echo $pivot->status."<br>";
+                  echo $pivot->created_at;
+
+              }
+          }
+      }
+
+
+    //End 16-01-24: model event listening ----------------------------------------------
+
+
+
+});
+------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------::Main Part Start From Here::---------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------
+#for creating listner when create save(),create(),delete() etc event , *** first we need to create a Model for pivot table .
+-----------------------------------------------
+PostTag::model
+----------------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
+class PostTag extends Pivot // **** import the 'Pivot' class first
+{
+    use HasFactory;
+
+    // protected $fillable = [];
+    protected $table = 'post_tag'; // this is the pivot table name .
+
+    //Now write here the Event Listing Function => if create(), save(), deleted(), then this function will be executed....
+
+    public  static function boot(){
+        parent::boot(); // when post_tag created then this boot will be executed .
+
+        static::created(function($item){ //event trigger method.
+            dd("Event Function Fire now .....=> ".$item);
+            echo $item;
+        });
+    }
+}
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Post::model =>
+------------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
+use App\Models\Tag;
+
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ([
+        'user_id','title',
+    ]);
+
+    public function users(){
+        return $this->belongsTo(User::class)->withDefault([
+            'name'=>'Guest User',
+        ]);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','post_id','tag_id')
+        ->using(PostTag::class) // this is the model of PostTag that connect with Post Now For Listing Event.
+        ->withTimestamps()  //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+        ->withPivot('status'); // this method add => status column value in pivot table, so that we can fetch value in controller ;
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------------
+web::route=>
+------------------
+
+
+Route::get('/tag', function () {
+
+    //16-01-24: model event listening ----------------------------------------------
+
+    // User::create([
+    //     'name'=> 'ashraful',
+    //     'email'=>'amshuvo64@gamil.com',
+    //     'password'=>'123456',
+    //     'phone'=>'01674317715',
+    // ]);
+
+    // Post::create([
+    //     'title'=> 'post title 1',
+    //     'user_id'=>'1',
+
+    // ]);
+
+    // Tag::create([
+    //     'name'=> 'tag title 1',
+
+    // ]);
+
+    $post = Post::all();
+    $tag = Tag::all();
+
+
+
+    // foreach ($post as $singlePost) {
+    //     $singlePost->tags()->attach([
+    //         1 => [
+    //             'status' => 'approved',
+    //         ]
+    //     ]);
+    // }
+
+    //fetching time / date / status form pivot table __________________________________
+    //   $posts = Post::with('tags')->get();
+
+    //   foreach ($posts as $post) {
+    //       $tags = $post->tags;
+
+
+    //       foreach ($tags as $tag) {
+    //           $pivotData = $tag->pivot->get();
+    //           foreach($pivotData as $pivot){
+    //               dd($pivot);
+    //               echo "<pre>";
+    //               echo $pivot->status."<br>";
+    //               echo $pivot->created_at;
+
+    //           }
+    //       }
+    //   }
+
+
+    // check the listener: __________________
+
+    foreach ($post as $singlePost) {
+        $singlePost->tags()->attach([
+            1 => [
+                'status' => 'approved',
+            ]
+        ]);
+    }
+
+
+    //End 16-01-24: model event listening ----------------------------------------------
+
+
+
+});
+
+------------------------------------------------------------------------------------------------------------------------------
