@@ -1,0 +1,212 @@
+#HasManyThrough relation
+-------------------------
+1. project  > 2.User > 3.Task
+
+---------------------------------------------------------------------------------------------------------------------
+project::model =>
+--------------------
+<?php
+
+namespace App\Models;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Project extends Model
+{
+    use HasFactory;
+    protected $fillable=['title'];
+    protected $guard=[];
+
+    public function users(){
+        return $this->hasMany(User::class);
+    }
+
+    public function tasks(){
+        return $this->hasManyThrough(Task::class,User::class);
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------
+User::model =>
+------------------
+<?php
+
+namespace App\Models;
+
+use App\Models\Post;
+use App\Models\Task;
+use App\Models\Project;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function address(){
+        return $this->hasOne(Address::class,'user_id');
+    }
+
+    public function addresses(){
+        return $this->hasMany(Address::class,'user_id','id'); //return $this->hasMany(Address::class,'Address_table_col=>user_id','User_table_col =>id');
+    }
+
+    public function posts(){
+        return $this->hasMany(Post::class,'user_id');
+
+    }
+
+    //17-01-24: HasManyThrough / HasOneThrough:
+
+    public function project(){
+        return $this->belongsTo(Project::class);
+    }
+
+    public function tasks(){
+        return $this->hasMany(Task::class);
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------
+Task::model
+---------------
+<?php
+
+namespace App\Models;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Task extends Model
+{
+    use HasFactory;
+
+    protected $fillable=['user_id','title'];
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+
+}
+
+---------------------------------------------------------------------------------------------------------------------
+web::route=>
+-----------------
+
+
+
+Route::get('/project', function () {
+
+    // Project::create([
+    //     'title'=>'Project A'
+    // ]);
+    // Project::create([
+    //     'title'=>'Project 2'
+    // ]);
+
+    // $user1 = User::find('1');
+    // $user2 = User::find('2');
+
+    // $user2=User::create([
+    //     'name'=>'Momen',
+    //     'email'=>'momen@gmail.com',
+    //     'phone'=>'01674317715',
+    //     'password'=>'123456'
+    // ]);
+
+    // Task::create([
+    //     'user_id'=>$user1->id,
+    //     'title'=>'Task Title 1'
+    // ]);
+    // Task::create([
+    //     'user_id'=>$user2->id,
+    //     'title'=>'Task Title 2'
+    // ]);
+    //  Task::create([
+    //     'user_id'=>$user1->id,
+    //     'title'=>'Task Title 3'
+    // ]);
+
+    // ---------------------------------
+
+    //     $project1 =  Project::find('1');
+    // return $project1;
+    // ------------------------------------
+
+    // $project1 =  Project::find('1');
+
+    // return $project1->users;
+
+    //  return $project1->users['0']->tasks;
+    //  return $project1->users['1']->tasks;
+
+    //we can't get data from  project table to task table : if we want then we have to build hasManyThrou relationship....
+
+    // echo "Project task=>".$project1->tasks;
+
+    // ------------------------------------------
+
+    // $project1 = Project::find(1);
+
+    // foreach ($project1->users as $user) {
+    //     echo "Tasks for User :" . $user->name . " in Project Title is => " . $project1->title . ":\n";
+
+    //     foreach ($user->tasks as $task) {
+    //         echo "The task title is=> ".$task->title . "\n";
+    //     }
+    // }
+
+    // ---------------------------------------
+
+    $project1 = Project::find(1);
+
+    // return $project1->users['0']->tasks;
+    return $project1->tasks;
+    return $project1->tasks['0'];
+
+});
+
+---------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
