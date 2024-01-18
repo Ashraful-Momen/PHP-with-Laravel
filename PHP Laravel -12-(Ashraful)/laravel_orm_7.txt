@@ -1,0 +1,18 @@
+in the hasmanythrough relationship if we use many to many relationship then we have to use pivot table.
+
+#project_table => user_table | using , Many to Many relationship => use project_user Pivot table.
+
+-----------------------------------
+and the relationship will be ->
+#project_model belongstoMany User and user_model belongstoMany Project.
+
+-----------------------------------
+for Project_table to Task_table relationship ->  //Project table hasMany relationship with Task::class, through Team::class table.
+
+
+hasmanythrough(Task::class,Team::class,'project_id','user_id','project_table_id','user_id');
+
+->project_id for the Team::class. (pivot table)
+->user_id for Task::clss.
+->project_table_id for the current Project Table.
+->user_id for the Team::class (pivot table)
