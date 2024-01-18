@@ -24,7 +24,8 @@ class Project extends Model
     }
 
     public function tasks(){
-        return $this->hasManyThrough(Task::class,User::class);
+       // return $this->hasManyThrough(Task::class,User::class);  // Project has many relation with Task through Users | $this->hasManyThrough(Task::class,User::class,'user_id','task_id,'project_table_id');
+        return $this->hasManyThrough(Task::class,User::class,'User_id','Project_id','Id');  // Project has many relation with Task through Users | $this->hasManyThrough(Task::class,User::class,'user_id','task_id,'project_table_id');
     }
 }
 
