@@ -1,0 +1,484 @@
+
+
+#Reference : Forgien relationship with Laravel :
+
+	$table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');// here use cascade for removing all when delete the user..
+
+
+#Add blog post text body area with ck editor4:
+			https://cdn.ckeditor.com/
+			1.Add cdn to the blade.page and <script></script>
+			2. add the ID to the <textarea> or insize <script>
+
+#Check the input Form Data with dd:
+		 public function storePost(Request $request){
+		$title = $request->input('title');
+                 $addPost = $request->all();
+                 dd($addPost);}
+--------------------------------------------------------------------------------------------------------------------------------------------------------								
+# error Msg:
+		goto blade file and => <input type="text" class="form-control m-2" id="addCategory" name="title"  placeholder="Enter Post Title">
+                                    @error('title')
+                                    {{$message}}
+                                        
+                                    @enderror
+		for edit error msg = > goto => view =>lan/en=>validation=> 
+									inside the customs array => 
+													  'custom' => ['attribute-name' => ['rule-name' => 'custom-message',],
+    'imagePath' =>[
+        'image' => 'The file must be an Image',
+    ],
+    'desc' =>[
+        'required' => 'The Describtion filed must be required',
+    ]
+        
+    ],
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------								
+#Form data if not send then the input field value= data with session not gone....=><textarea id="editor" name="desc" value="">{{old('desc')}}</textarea>
+
+										=><input type="text" class="form-control m-2" id="addCategory" name="title" value="{{old('title')}}" >
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------								
+#File Upload : goto controller then =>
+	=>$request->file('imagePath')->store('PostImage','public');
+=>$image = 'Storage/'.$request->file('imagePath')->store('PostImage','public'); 
+--------------------------------------------------------------------------------------------------------------------------------------------------------								
+#Flash SMS=> 
+
+		=> return redirect()->back()->with('msg','post created successfully!!!');
+		=> <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>{{session('msg')}}</strong> 
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>	
+--------------------------------------------------------------------------------------------------------------------------------------------------------	
+#ORM with Modal => check the orm relaship with the command => 1> php artisan tinker   2> $post = App\Models\Post::find(1) 3.$post->user 4.$post->category  ....
+
+goto 	Models(Post)=> 
+
+class Post extends Model
+{
+    use HasFactory;
+
+    //we have a post and it belongs to a user: 
+    public function user()
+    {
+        return $this->belongsTo(User::class); //this = Post Model 
+    }
+}
+
+------------------------------------------
+goto 	Models(user) => 
+
+  public function posts(){
+        //we have user and a user hasMany Posts:
+        
+        return $this->hasMany(Post::class);
+    }
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+# for link the image in public folder : php artisan storage:link 	
+------------------------------------------------------------------
+# Add log in system for any Route = > Route::get('/addPost',[PostController::class,'addPost'])->name('addPost')->middleware('auth');
+
+=> add login system for the Route =>
+ @guest
+            <li><a  href="{{route('login')}}">Login</a></li>
+            <li><a  href="{{route('register')}}">Register</a></li>
+@endguest
+
+#Only loged in user can see the Route=>
+
+            @auth
+            <li><a class="{{Request::routeIs('dashboard')? 'active': ''}}" href="{{route('dashboard')}}">Dashboard or Profile</a></li>
+            
+            @endauth
+------------------------------------------------------------------------------------------------------------------------------------------------------
+#   generate unique slug = > 
+
+$post_id = Post::latest()->take(1)->first()->id;
+$slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title))) .'-'. $post_id;
+
+----------------------------------------------------------------------------------------------
+#to remove <p><\p> tag from blog describtion ...= > {!! $post->desc!!}
+----------------------------------------------------------------------------------------------
+#specific user can edit/delete their post ... another user can't do that = >
+ 		@auth
+                        @if (auth()->user()->id === $post->user->id)
+                            <div class="post-buttons">
+                                <a href="{{ route('blog.edit', $post) }}">Edit</a>
+                                <form action="{{ route('blog.destroy', $post) }}" method="post">
+                                    @csrf
+                                    @method('delete')
+                                    <input type="submit" value=" Delete">
+                                </form>
+                            </div>
+                        @endif
+                    @endauth
+
+--------------------------------------------------------------------------------------------------
+ public function editPost(Post $post){ //Post is Model and $post is route paremeter.
+            // dd($post->title);
+        return view('backend.post.editPost',compact('post'));
+
+
+    }
+------------------------------------------------------------------------------------------
+  #if user not loggedin then get 403 forbidden error =>
+public function editPost(Post $post)
+    { //Post is Model and $post is route paremeter.
+        // dd($post->title);
+        if (auth()->user()->id !== $post->user->id) {
+            abort(403);
+        }
+        return view('backend.post.editPost', compact('post'));
+    }
+------------------------------------------------------------------------------------------
+#search => name = variable , can get cz the inside the search bar use it , then use those function inside the controller:
+
+  public function index(Request $request){
+        $user = User::get();
+    //    dd($user);
+        if($request->search){
+            $posts = Post::where('title','like','%'.$request->search.'%')
+            ->orwhere('desc','like','%'.$request->search.'%')->latest()->get();
+            
+            // $posts = User::where('name','like','%'.$request->search.'%')
+            // ->orwhere('email','like','%'.$request->search.'%')->get();
+
+            // dd($posts);
+            
+        }
+       else{
+        $posts = Post::latest()->get();
+        // $posts = User::get();
+        // dd($posts);
+        
+       }
+        
+        return view('frontend/blog',compact('posts'));
+    }
+   
+}
+=> If the search content is empty then => use = > that blog controller page and find where data send ...
+
+@forelse()
+
+@empty
+<p> error message<\p>
+
+@elseforelse 
+=======================================================================================================
+
+#pagination = > Post::painate(4)
+
+
+#pagination show = > {{$dataRender_varible->links()}}
+
+***need more than 4 post for pagination showing ....
+=====================================================================================================
+#include (foldername.file_blade.php);
+ session()->flash('message', 'Post successfully updated.');
+#show the flash msg: 
+{{Session::get('msg')}}
+========================================================================================================
+
+#category combined with post *** 
+
+post table -> reference ->category Table ....
+
+so that in the migration file .... 
+
+*first category table and 
+* second serials Post table ...  
+=================================================================================================
+
+** show product with category ways = >
+
+1st => show all the product inside the bolg all post page:
+
+  <div class="categories">
+            <ul>
+              @foreach ($category as $c)
+              <li><a href="{{route('Blog', ['category' => $c->name])}}">{{$c->name}}</a></a></li> // if click the category then the route pass category -> name as ... variable (...?Category= 'home or sports or phone etc');
+              @endforeach
+               
+                
+            </ul>
+        </div>
+
+2nd => goto the blog post controller and seletec the queiry =>
+
+ elseif($request->category){
+            $posts = Category::where('name', $request->category)->firstOrFail()->posts()->paginate(4);  // if the category table column name == $request->category(name) then take post in first as paginate with 4 and return with compact ($posts) to see all same category posts in Blog post
+        }
+
+=================================================================================================
+**Show the related post according to category = > 
+
+
+first goto singleBlogPost controller then write the query is =>
+
+1.
+  public function show($slug){
+        // dd($id);
+        $post = Post::where('slug',$slug)->first();
+
+        $category = $post->category; // here post connect with category table /// problem aro valo kore bujte hobe ....
+
+       $relatedPost = $category->posts()->where('id', '!=', $post->id)->latest()->take(3)->get(); // related post -> category connect with posts Model function and get latest 3 post in the page ... then send with the compact variable...
+
+        // dd($relatedPost);
+
+        return view('frontend/single-blog-post',compact('post','relatedPost'));
+    }
+---------------------------------related Post for frontend----------------------------------------------------------------
+    @foreach ($relatedPost as $r )
+      <a href="">
+        <div class="recommended-card">
+          <img src="{{asset($r->imagePath)}}" alt="image not found" loading="lazy" />
+          <a href="{{ route('AllPost', $r->slug) }}"><h4>
+            {{$r->title}}
+          </h4></a>
+        </div>
+      </a>
+      @endforeach
+=====================================================================================================
+#Backend Search for User =>
+
+  <form action="{{route('manageUser')}}" method="get" class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            @csrf
+            <div class="input-group">
+                <input class="form-control" name="search" type="search" value="{{$search}}" placeholder="Name,Phone or Email" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="submit"><i class="fas fa-search"></i></button>
+                <a href="{{route('manageUser')}}" class="">
+                    
+                    <button class="btn btn-success ms-2"  name="search" type="search" id="btnNavbarSearch" type="submit">Reset</button>
+                </a>
+            </div>
+        </form>
+
+and controller = >
+
+ public function index(Request $request)
+    {
+        // dd($request->search);
+
+        $search = $request['search'] ?? "";
+        $userData = User::all();
+
+        if($request->search !==null){
+            $userData = User::where('name','like','%'.$request->search.'%')
+            ->orwhere('mobile','like','%'.$request->search.'%')
+            ->orwhere('email','like','%'.$request->search.'%')
+            ->orwhere('alter_mobile','like','%'.$request->search.'%')
+            ->orwhere('user_id','like','%'.$request->search.'%')->latest()->get();
+ }
+       else{
+        
+        $userData = User::all();
+        
+        
+       }
+  
+        return view('backend.user.manageUser', compact('userData','search'))->with('msg', 'Kico likbo na ekon !');
+    }
+===========================================================================================================
+#upload Image: 
+----------------------
+ $post = new Post();
+
+        $post->category_id = $categoryId;
+        $post->title = $title;
+        $post->desc = $desc;
+        $post->slug = $slug;
+        $post->user_id = $user;
+        // $post->imagePath = $imagePath; 
+
+        //image function from MyGit
+        $image = $request->imagePath;
+
+
+        if ($image) {
+            $folder = 'Post_Image/';
+            $ImageName = time() . $image->getClientOriginalName();
+            $image->move($folder, $ImageName);
+            // $post->imagePath = $folder . $ImageName;
+            $post->imagePath =  $ImageName;
+            $post->save();
+        }
+
+        $post->save();
+
+        return redirect()->back()->with('msg', 'post created successfully!!!');
+
+
+
+#delete post : 
+--------------------------
+ public function destroy($post){
+
+        $post = Post::find($post);
+
+        $deleteOldImg = 'Post_Image/'.$post->imagePath;
+        // $deleteOldImg = $post->imagePath;
+
+       
+
+        if (File::exists(($deleteOldImg)))
+        {
+            // dd($deleteOldImg);
+            
+            File::delete($deleteOldImg);
+        }
+
+        $post->delete();
+
+      
+        return redirect()->back()->with('success', 'Image deleted successfully!');
+    }
+=============================================================================================
+#limit String: 
+------------
+Illuminate\Support\Str;
+
+<p>
+    {{ Str::limit($your_string, 50) }}
+</p>
+-----------------------------------string limit in Model-------------------------
+
+use Illuminate\Support\Str;
+
+class Product
+{
+    const LIMIT = 50;
+
+    protected $fillable = [
+        ..., 'description'
+    ]
+
+    public function limit()
+    {
+        return Str::limit($this->description, YourClass::LIMIT )
+    }
+}
+-----------------------------------String limit in Controller -----------------------------------
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Product;
+
+class ProductController extends Controller
+{
+    public function show($id)
+    {
+        $product = User::findOrFail($id);
+        $product->description = Str::limit($product->description, 50);
+        return view('user.profile', compact('product'));
+    }
+}
+----------------------------------------------------Mastering Content--------------------------------------------------
+  <script src="{{asset('/')}}frontendLast//assests/js/menu.js">
+----------------------------------------------------------------------------------------------------------------------
+php artisan route:list
+---------------------------------------------------------------------------------------------------------------------
+# Authenticated User can Edit and Delete Post in Frontend Page....
+
+  @forelse ($posts as $p)
+                <div class="card-blog-content">
+                    @auth
+                        @if (auth()->user()->id === $p->user->id)
+                            <div class="post-buttons">
+                                <a href="{{ route('editPost', $p) }}">Edit</a>
+
+                                <form action="{{ route('destroyPost', $p) }}" method="post">
+
+                                    @csrf
+                                    @method('delete')
+                                    <input type="submit" value=" Delete">
+                                </form>
+                            </div>
+                        @endif
+                    @endauth
+                    <a href="{{ route('AllPost', $p->slug) }}">
+                    <img src="{{ asset('Post_Image/'.$p->imagePath) }}" class="rounded" alt="pic path not found">
+
+                    <p>
+                        {{ $p->created_at->diffForHumans() }}
+                        <span>Written By {{ $p->user->name }}</span>
+                    </p>
+                    <h4>
+                        {{ $p->title }}
+                    </h4>
+                    </a>
+                </div>
+            @empty
+                <p>Sorry the content not found!!!</p>
+            @endforelse
+------------------------------------------------------------------------------------------------------------
+#Responsive Card show with laravel Loop  ==>
+
+<!-- card section -->
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                @forelse ($posts as $p)
+                <div class="col-md-3 border-end p-0 text-center ">
+                    
+                        <div class="card-body  text-center">
+
+                            <a href="{{ route('AllPost', $p->slug) }}">
+                                <img width="250px" height="200px" src="{{ asset('Post_Image/' . $p->imagePath) }}" class=""
+                                    alt="pic path not found">
+                                <p class="">
+                                    {{ $p->created_at->diffForHumans() }}<span class="">Written By {{ $p->user->name }}</span>
+                                </p>
+                                <h4>
+                                    {{ $p->title }}
+                                </h4>
+                                <p>{!!$p->desc!!}</p>
+                            </a>
+                        </div>
+                  
+                </div>
+                @empty
+                <p>Sorry the content not found!!!</p>
+            @endforelse
+            </div>
+        </div>
+    </section>
+-------------------------------------------------------------------------------------------------------
+#Image Upload=>
+
+//file upload:
+        // $request->file('imagePath')->store('PostImage','public'); 
+        // $imagePath = 'storage/' . $request->file('imagePath')->store('PostImage', 'public');
+===========================================================================================================
+#only admin can edit user data in manage user blade : 
+
+ @auth
+          @if(Auth::user()->role === '1')
+            <th class="ms-auto" >Action</th>
+          
+          @endif
+  @endauth
+-----------------------------------------------------------------------
+    		@auth
+                        @if (Auth::user()->role === '1')
+                            <div class="post-buttons">
+                                
+                                <form action="" method="post">
+
+                                    @csrf
+                                    <td >
+                                      <a href="{{route('editUser', $data->id)}}" class="btn btn-primary">Edit</a>
+                                      <a href="{{route('deleteUser',$data->id)}}" class="btn btn-danger">Delete</a>
+                                  </td>
+                                </form>
+                            </div>
+                        @endif
+                    @endauth
+==============================================================================================
+
+#String limit in Blade file : 
+
+ <p> {{Str::limit($r->desc,'150','.......')}} </p>
