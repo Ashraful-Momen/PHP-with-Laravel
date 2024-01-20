@@ -1,0 +1,133 @@
+#Many to Many relationship : POST , TAG   and another pivot_table (include post+tag):
+-----------------------------------------------------------------------------------------
+to connect post with tag as many to many relationship we need extra 1 table, it's name is pivot_table; ANd table name is ('post_tag').
+in this pivot_table we need to store , post_id and tag_id.
+-----------------------------------------------------------------------------------------
+Post::model make relationship with Tags table =>
+-------------------------------------------------
+ public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','post_id','tag_id');  //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+    }
+
+--------------------------------------------------------------------------------------------------------------------------------------
+for save data in model => user attach() alternative of save(), and for deleting dittach(). example =>  $post->tags()->attach([1,2,3]);
+--------------------------------------------------------------------------------------------------------------------------------------
+Post::model full =>
+--------------------------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
+use App\Models\Tag;
+
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ([
+        'user_id','title',
+    ]);
+
+    public function users(){
+        return $this->belongsTo(User::class)->withDefault([
+            'name'=>'Guest User',
+        ]);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','post_id','tag_id');  //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+    }
+}
+
+-----------------------------------------------------------------------------------------
+Tag::model =>
+------------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+    protected $fillable =['name'];
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','tag_id','post_id');  //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+    }
+}
+
+-----------------------------------------------------------------------------------------
+Route::web->
+------------------
+Route::get('/tag',function(){
+   $post = Post::with('users','tags')->first();
+   $tag = Tag::first();
+
+
+//    dd($tag);
+//    dd($post);
+
+//    $post->tags()->attach([1,2,3]);
+
+
+
+    // return view('users.index',compact('post'));
+
+    $post = Post::with('users', 'tags')->get();
+    return view('users.index', compact('post'));
+});
+
+-----------------------------------------------------------------------------------------
+index.blade.php=>
+---------------------
+
+                    @foreach ($post as $post)
+
+                        <h3 class="fs-5">{{ $post->title }}</h3>
+                        <h5 class="fs-5">{{ $post->users->name }}</h5>
+
+                        @foreach ($post->tags as $tag )
+                        <h6 class="fs-5">{{ $tag->name }}</h6>
+                        <br>
+                        @endforeach
+
+                        <br>
+
+
+                    @endforeach
+
+
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+
+we getting error if we want to access data this is => those method only for hasone relationship
+-----------------------------------------------------------
+foreach ($users as $user) {
+
+        dd($user->posts->title);
+    }
+-----------------------------------------------------------
+**** but if we want to access this data as same style =>
+-----------------------------------------------------------
+ // use for hasMany
+    foreach ($users as $user) {
+        foreach ($user->posts as $post) {
+            echo($post->title."</br>");
+        }
+    }
+-----------------------another way------------------------------------
+
+ foreach ($users as $user) {
+        dd($user->posts->pluck('title')->toArray());
+    }
+----------------------------------------------------------------------
