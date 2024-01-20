@@ -1,0 +1,98 @@
+// when input button checked click by user , then send to request -> hospital_card_fess checked or teli_medicine card is checked pass pass 1 value
+
+
+-----------------------------------------------------------------------------
+@extends('frontend.layouts.app')
+@section('title', 'Dashboard')
+@push('css')
+    <!-- Your CSS styles here -->
+@endpush
+
+@section('content')
+    <!-- Start Page Title Area -->
+    <div class="page-title-area page-title-bg1">
+        <!-- Your page title content here -->
+    </div>
+    <!-- End Page Title Area -->
+
+    <!-- Start Pricing Area -->
+    <section class="pricing-area ptb-20 pb-70">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                    @include('frontend.partials.customer_dashboard_sidebar')
+                </div>
+
+                <div class="col-lg-9 col-md-9 col-sm-9 rounded">
+                    <!-- Your existing code here -->
+
+                    {{-- insurance List --}}
+                    @foreach ($life_health as $life_health)
+                        <div class="row shadow-lg mx-1 my-5">
+                            <!-- ... -->
+
+                            <!-- select option for hospital & teli card -->
+                            <div class="card-body col-lg-2 col-md-12 col-sm-12 text-center col-6 mx-auto d-flex justify-content-center align-items-center">
+                                <div class="text-center">
+                                    <p class="text-dark p-2 my-2 d-inline thead fw-bold text-decoration-underline">
+                                        Additional Features:
+                                    </p>
+
+                                    <div class="text-start ms-1">
+                                        <a>
+                                            <p class="fw-bold text-dark">
+                                                <input type="checkbox" name="hospital_card_fee" id="hospital_card_{{ $life_health->id }}">
+                                                Hospital Card {{ $life_health->hospital_card_fee }} Tk
+                                            </p>
+                                        </a>
+                                        <a>
+                                            <p class="fw-bold text-dark">
+                                                <input type="checkbox" name="telmedi_card_fee" id="telmedi_card_{{ $life_health->id }}">
+                                                TeliMedi Service {{ $life_health->teli_medicine_fee }} Tk
+                                            </p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End select option for hospital & teli card -->
+
+                            <!-- Add to cart -->
+                            <div class="col-lg-2 col-md-12 col-sm-12 text-center col-6 mx-auto d-flex justify-content-center align-items-center">
+                                <div>
+                                    <a href="{{ route('life_health.details', $life_health->id) }}">
+                                        <button class="btn btn-secondary p-2 my-2 me-1 d-inline tbody">More Details</button>
+                                    </a>
+
+                                    <form action="{{ route('addTo_cart', $life_health->id) }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="hospital_card" value="0" id="hidden_hospital_card_{{ $life_health->id }}">
+                                        <input type="hidden" name="teli_medicine" value="0" id="hidden_teli_medicine_{{ $life_health->id }}">
+
+                                        <button type="submit" class="btn btn-danger p-2 my-2 ms-1 d-inline tbody" onclick="setHiddenValues({{ $life_health->id }})">Add To Cart</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- End Add to cart -->
+                        </div>
+                    @endforeach
+
+                    <!-- End insurance List -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Pricing Area -->
+
+    <script>
+        function setHiddenValues(planId) {
+            const hospitalCardCheckbox = document.getElementById(`hospital_card_${planId}`);
+            const teliMediCheckbox = document.getElementById(`telmedi_card_${planId}`);
+
+            const hiddenHospitalCardInput = document.getElementById(`hidden_hospital_card_${planId}`);
+            const hiddenTeliMediInput = document.getElementById(`hidden_teli_medicine_${planId}`);
+
+            hiddenHospitalCardInput.value = hospitalCardCheckbox.checked ? '1' : '0';
+            hiddenTeliMediInput.value = teliMediCheckbox.checked ? '1' : '0';
+        }
+    </script>
+@stop
