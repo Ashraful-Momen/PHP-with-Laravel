@@ -1,0 +1,72 @@
+now write down a controller and route . if user click active button then show the content or click inactive then not show the content . 
+ChatGPT
+Certainly! To implement the functionality where clicking the "Active" button will show the content, and clicking the "Inactive" button will not show the content, you can create a controller method and define a route. I'll provide a basic example assuming you are using Laravel:
+
+Create a controller using Artisan command:
+bash
+Copy code
+php artisan make:controller LifeAndHealthInsuranceController
+Open the newly created controller (LifeAndHealthInsuranceController.php) and add a method for handling the button clicks:
+php
+Copy code
+// app/Http/Controllers/LifeAndHealthInsuranceController.php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class LifeAndHealthInsuranceController extends Controller
+{
+    public function toggleStatus(Request $request, $id)
+    {
+        // Assuming you have a model named LifeAndHealthInsurance
+        $lhInsurance = \App\Models\LifeAndHealthInsurance::find($id);
+
+        if ($lhInsurance) {
+            // Toggle the active_status
+            $lhInsurance->active_status = ($lhInsurance->active_status == "1") ? "0" : "1";
+            $lhInsurance->save();
+        }
+
+        return redirect()->back(); // Redirect back to the previous page
+    }
+}
+Replace \App\Models\LifeAndHealthInsurance with the actual namespace and class name of your LifeAndHealthInsurance model.
+
+Define a route in the web.php routes file:
+php
+Copy code
+// routes/web.php
+
+use App\Http\Controllers\LifeAndHealthInsuranceController;
+
+Route::post('/life-and-health/toggle-status/{id}', [LifeAndHealthInsuranceController::class, 'toggleStatus'])
+    ->name('life-and-health.toggle-status');
+Make sure to replace life-and-health with your actual route prefix if you have any.
+
+In your Blade template where you have the "Active" and "Inactive" buttons, update the buttons to include a form that submits a POST request to the route:
+blade.php
+Copy code
+<td>
+    <form action="{{ route('life-and-health.toggle-status', $lh->id) }}" method="post">
+        @csrf
+        <button type="submit" class="btn btn-{{ $lh->active_status == "1" ? 'success' : 'warning' }} btn-sm">
+            {{ $lh->active_status == "1" ? 'Active' : 'Inactive' }}
+        </button>
+    </form>
+</td>
+This form will submit a POST request to the toggleStatus method in the controller when the button is clicked.
+
+Now, when the user clicks the "Active" button, it will toggle the active_status of the corresponding record, and the content will be shown or hidden based on the status.
+
+
+
+
+------------------------------------Active and inactive button show-----------------------------------------------
+<td>
+    @if($lh->active_status == "1")
+        <button class="btn btn-success btn-sm">Active</button>
+    @else
+        <button class="btn btn-warning btn-sm">Inactive</button>
+    @endif
+</td>
