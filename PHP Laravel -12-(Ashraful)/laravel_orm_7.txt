@@ -16,3 +16,342 @@ hasmanythrough(Task::class,Team::class,'project_id','user_id','project_table_id'
 ->user_id for Task::clss.
 ->project_table_id for the current Project Table.
 ->user_id for the Team::class (pivot table)
+=========================================== Main Part From Here ================================================================
+
+User:: table =>
+---------------------
+
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateUsersTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('project_id')->nullable();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('users');
+    }
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------
+project_user ::pivot table=>
+-------------------------------
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateProjectUserTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('project_user', function (Blueprint $table) {
+            $table->bigInteger('project_id');
+            $table->bigInteger('user_id');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('project_user');
+    }
+
+
+}
+
+---------------------------------------------------------------------------------------------------------------------------
+Project Model =>
+-----------------
+<?php
+
+namespace App\Models;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Project extends Model
+{
+    use HasFactory;
+    protected $fillable=['title'];
+    protected $guard=[];
+
+    // public function users(){
+    //     return $this->hasMany(User::class);
+    // }
+
+    public function tasks(){
+        return $this->hasManyThrough(Task::class,User::class);
+    }
+
+
+    //21-01-24-------------------
+    public function users(){
+        return $this->belongsToMany(User::class);
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------
+User::model =>
+---------------
+<?php
+
+namespace App\Models;
+
+use App\Models\Post;
+use App\Models\Task;
+use App\Models\Project;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function address(){
+        return $this->hasOne(Address::class,'user_id');
+    }
+
+    public function addresses(){
+        return $this->hasMany(Address::class,'user_id','id'); //return $this->hasMany(Address::class,'Address_table_col=>user_id','User_table_col =>id');
+    }
+
+    public function posts(){
+        return $this->hasMany(Post::class,'user_id');
+
+    }
+
+    //17-01-24: HasManyThrough / HasOneThrough:
+
+    // public function project(){
+    //     return $this->belongsTo(Project::class);
+    // }
+
+    public function tasks(){
+        return $this->hasMany(Task::class);
+    }
+
+    //21-01-24------------------------------------
+    public function projects(){
+        return $this->belongsToMany(Project::class);
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------
+route::get =>
+-------------------
+
+Route::get('/project', function () {
+
+    //21-01-24----------------orm 7 main part here -------------------------------
+
+        // $project1 = Project::create([
+        //     'title'=>'project A',
+        // ]);
+        // $project2 = Project::create([
+        //     'title'=>'project B',
+        // ]);
+
+        // $user1 = User::create([
+        //     'name'=>'Ashraful',
+        //     'email'=>'amshuvo64@gmail.com',
+        //     'password'=>Hash::make('password'),
+        // ]);
+
+        // $user2 = User::create([
+        //     'name'=>'Momen',
+        //     'email'=>'momen@gmail.com',
+        //     'password'=>Hash::make('password'),
+        // ]);
+        // $user3 = User::create([
+        //     'name'=>'Shuvo',
+        //     'email'=>'shuvo@gmail.com',
+        //     'password'=>Hash::make('password'),
+        // ]);
+
+        // $project1->users()->attach([$user1->id, $user2->id, $user3->id]);
+        // $project2->users()->attach([$user1->id, $user3->id]);
+
+        //--------------------------------------------------------
+
+        // $project1 = Project::find(1);
+
+        // return $project1->users;
+
+        //--------------------------------------------------------
+
+            //  $project2 = Project::find(2);
+
+            // return $project2->users;
+
+        //--------------------------------------------------------
+
+        // $user1 = User::find(1);
+
+        // return $user1->projects;
+        //--------------------------------------------------------
+
+        // $user2 = User::find(3);
+
+        // return $user2->projects;
+
+        //--------------------------------------------------------
+
+        // $user2 = User::find(3);
+
+        // return $user2->projects;
+
+
+
+
+    //21-01-24-----------------------------------------------
+
+
+
+});
+
+---------------------------------------------------------------------------------------------------------------------------
+#now create a Team model for pivot table
+------------------------------------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
+class Team extends Pivot
+{
+    use HasFactory;
+
+    protected $table = 'project_user';
+}
+
+---------------------------------------------------------------------------------------------------------------------------
+project:: model =>
+-------------------
+
+<?php
+
+namespace App\Models;
+
+use App\Models\Team;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Project extends Model
+{
+    use HasFactory;
+    protected $fillable=['title'];
+    protected $guard=[];
+
+    // public function users(){
+    //     return $this->hasMany(User::class);
+    // }
+
+    // public function tasks(){
+    //     return $this->hasManyThrough(Task::class,User::class);
+    // }
+
+
+    //21-01-24------------------------------------------------------------
+    public function users(){
+        return $this->belongsToMany(User::class);
+    }
+
+    public function tasks(){
+        return $this->hasManyThrough(
+            Task::class,
+            Team::class,
+            'project_id',// for the pivot table
+            'user_id',// FK,for the Task table
+            'id',// for the current table
+            'user_id',//fk for the pivot table .
+        );
+    }
+
+    #### in the same way we can implement HasOneThrough.....
+
+
+}
+
+---------------------------------------------------------------------------------------------------------------------------
