@@ -1,0 +1,251 @@
+polymorphic relationship :
+----------------------------
+
+#if multiple model need one common feature like comments/order/cart then  we use polymorphic relationship.
+
+post =>
+video =>
+movies =>
+........
+........
+ those all model/table need comments feature's which is common for all.
+
+
+comments=>
+----------
+    user_id //fk.
+
+    comment_body
+
+    comment_id
+    comment_type / commentable => post/video/movies (etc model_type.)
+
+    **** morphs('commentable') , we can use alternative (comment_id/comment_type).
+
+========================================================================================================================
+>>>php artisan make:model Video -m
+>>>php artisan make:model Comment -m
+------------------------------------------------------------------------------------------------------------------------
+video::table =>
+-----------------------
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateVideosTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('videos', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('title');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('videos');
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
+comment: table=>
+--------------
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateCommentsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('comments', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->bigInteger('user_id');
+            $table->text('body');
+            // $table->bigInteger('commentable_id');
+            // $table->string('commentable_type');
+            $table->morphs('commentable'); //morphs => commentable_id+commentable_type.
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('comments');
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
+>>> php artisan migrate:fresh
+------------------------------------------------------------------------------------------------------------------------
+comment::model
+----------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Comment extends Model
+{
+    use HasFactory;
+
+    protected $guarded=[];
+
+    public function commentable(){
+        return $this->morphTo(); // for one to one use 'morphTo'.
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
+post::model
+---------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
+use App\Models\Tag;
+
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $guarded=[];
+
+    protected $fillable = ([
+        'user_id','title',
+    ]);
+
+    public function users(){
+        return $this->belongsTo(User::class)->withDefault([
+            'name'=>'Guest User',
+        ]);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','post_id','tag_id')
+        ->using(PostTag::class) // this is the model of PostTag that connect with Post Now For Listing Event.
+        ->withTimestamps()  //$this->belogsToMany('Model_Tag::class','Pivot_table_name','primarykey_post_it','foreign_key_tag_id')
+        ->withPivot('status'); // this method add => status column value in pivot table, so that we can fetch value in controller ;
+    }
+
+    //22-01-24----------------------------------------------------
+
+    public function comments(){
+        return $this->morphMany(Comment::class,'commentable'); //this 'commentable' comes from comment_table morphs('commentable');
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
+comment::model
+--------------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Comment extends Model
+{
+    use HasFactory;
+
+    protected $guarded=[];
+
+    public function commentable(){
+        return $this->morphTo(); // for one to one use 'morphTo'.
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+route::web->
+------------
+
+:get('/comments',function(){
+
+    // $user = User::create([
+    //     'name'=>'Ashraful',
+    //     'email'=>'ashraful@gmail.com',
+    //     'password'=>Hash::make('password')
+    // ]);
+
+    // $post = Post::create([
+    //     'user_id'=> $user->id,
+    //     'title'=>'Post title'
+    // ]);
+
+    // $post->comments()->create([
+    //     'user_id'=>$user->id,
+    //     'body'=>'comment for post'
+    // ]);
+
+    //---------------------------------
+    // $post = Post::find(1);
+
+
+    // $post->comments()->create([
+    //     'user_id'=>'1',
+    //     'body'=>'2nd comment for post'
+    // ]);
+
+
+
+
+    //---------------------------------
+    // $post = Post::find(1);
+    // return $post->comments;
+
+    //---------------------------------
+    // $comment = Comment::find(1);
+    // return $comment->commentable;
+
+    //---------------------------------
+    $comment = Comment::find(1);
+    return $comment->subjects; //change the function name in comment model
+
+    //---------------------------------------------
+    //---------------------------------------------
+    //---------------------------------------------
+    same for the video 
+
+
+
+
+
+
+
+});
