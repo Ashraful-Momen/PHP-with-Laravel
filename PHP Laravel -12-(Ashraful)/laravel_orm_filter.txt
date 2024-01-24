@@ -1,0 +1,68 @@
+#if policyData Table  the all column 'form_status' value ==1 . then return $allFOrmStatusOne (which help me to show a button).
+
+$allFormStatusOne = $policyData->every(fn($item) => $item->form_status == 1);
+
+
+#all data copy one table to another table -> 
+------------------------------------------------
+
+ #shortcut method ....................................................................................
+
+        // DB::table('life_and_health_child_orders')->insert(DB::table('policy_providers')->select('*')->get()->toArray());
+
+        // Copy all columns from 'policy_providers' to 'policy_datas'
+        // $dataToInsert = DB::table('policy_datas')->select('*')->get()->toArray();
+        $dataToInsert = DB::table('policy_datas')->select(
+            'order_parent_id',
+            'form_status',
+            'cart_id',
+            'product_id',
+            'customer_id',
+            'Pname',
+            'image',
+            'duration',
+            'discount',
+            'price',
+            'hospital_card_fee',
+            'teli_medicine_fee',
+            'before_discount_price',
+            'after_discount_price',
+            'o_name',
+            'o_gender',
+            'o_phone',
+            'o_email',
+            'o_DOB',
+            'o_id_type',
+            'o_id_number',
+            'o_id_file',
+            'relation_with_nominee',
+            'n_name',
+            'n_gender',
+            'n_phone',
+            'n_email',
+            'n_DOB',
+            'n_id_type',
+            'n_id_number',
+            'n_id_file'
+        )->get()->toArray();
+
+
+        // dd($dataToInsert);
+
+        // Now, insert the data into 'policy_datas' table
+        // $check_children = DB::table('life_and_health_child_orders')->insert($dataToInsert);
+
+
+
+        // $check_children = LifeAndHealthChildOrder::all();
+
+        // Convert each object in $dataToInsert to an array
+        $dataToInsertArray = array_map(function ($record) {
+            return (array) $record;
+        }, $dataToInsert);
+
+        // Now, insert the data into 'life_and_health_child_orders' table
+        $check_children=DB::table('life_and_health_child_orders')->insert($dataToInsertArray);
+
+
+        dd($check_children);
