@@ -1,0 +1,382 @@
+Many to Many polymorphic relationship: post have many tag and tag has many post . similar Vide<->Tag.
+-----------------------------------------
+
+Post =>
+
+Video =>
+
+etc model relationship with Tag model......
+
+Tag =>
+
+----------------------------------------------------------
+taggable_table =>
+        tag_id
+        taggable_id (it would be POST/Video tag_id /etc model_id-fk)
+        taggable_type (App\post or App\Vide or etc model)
+
+
+
+
+
+================================================Main Part =======================================================
+
+=> php artisan make:migration create_taggables_table --create=taggables
+------------------------------------------------------------------------------------------------------------------
+taggable_table
+---------------
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateTaggablesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('taggables', function (Blueprint $table) {
+
+            $table->bigInteger('tag_id');
+            $table->bigInteger('taggable_id'); //for video_id or post_id models
+            $table->string('taggable_type'); //for App\video or App\post models
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('taggables');
+    }
+}
+
+
+------------------------------------------------------------------------------------------------------------------
+
+Post::model =>
+----------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
+use App\Models\Tag;
+
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $guarded=[];
+
+    protected $fillable = ([
+        'user_id','title',
+    ]);
+
+    public function users(){
+        return $this->belongsTo(User::class)->withDefault([
+            'name'=>'Guest User',
+        ]);
+    }
+
+
+
+    //22-01-24----------------------------------------------------
+
+    public function comments(){
+        return $this->morphMany(Comment::class,'commentable'); //this 'commentable' comes from comment_table morphs('commentable');
+    }
+
+    //24-01-24---------------------------------------------------
+    public function tags(){
+        return $this->morphToMany(Tag::class,'taggable'); // user here 'taggable' , which is indicate taggable_id,taggable_type.
+    }
+
+}
+
+
+------------------------------------------------------------------------------------------------------------------
+web::route=>
+----------------
+
+Route::get('/taggable',function(){
+
+
+    // 24-01-24------------------------------
+    // $user1 = User::create([
+    //     'name'=>'Ashraful',
+    //     'email'=>'ashraful@gmail.com',
+    //     'password'=>Hash::make('password'),
+    // ]);
+
+    // $post1 = Post::create([
+    //     'user_id'=>$user1->id,
+    //     'title'=>'post title 1'
+
+    // ]);
+
+    // ------------------------------------
+
+    // $post1 = Post::find(1);
+
+    // //create taggable id/type in taggables tabel.
+    // $post1->tags()->create([
+    //    'name' => 'Laravel',
+    // ]);
+
+    //------------------------------------
+
+    // $tag = Tag::create([
+
+    //     'name'=>'PHP',
+
+    // ]);
+
+    // $post = Post::find(1);
+
+    // $post->tags()->attach($tag);
+
+    //------------------------------------
+
+
+
+    // $post = Post::find(1);
+
+    // return dd($post->tags);
+
+    //--------------------------------------
+
+
+});
+
+------------------------------------------------------------------------------------------------------------------
+Video::model =>
+-----------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Video extends Model
+{
+    use HasFactory;
+
+      //22-01-24----------------------------------------------------
+
+      protected $guarded=[];
+
+      public function comments(){
+        return $this->morphMany(Comment::class,'commentable'); //this 'commentable' comes from comment_table morphs('commentable');
+    }
+
+     //24-01-24---------------------------------------------------
+     public function tags(){
+        return $this->morphToMany(Tag::class,'taggable'); // user here 'taggable' , which is indicate taggable_id,taggable_type.
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------
+web::route=>
+----------------
+Route::get('/taggable',function(){
+
+
+    // 24-01-24------------------------------
+    // $user1 = User::create([
+    //     'name'=>'Ashraful',
+    //     'email'=>'ashraful@gmail.com',
+    //     'password'=>Hash::make('password'),
+    // ]);
+
+    // $post1 = Post::create([
+    //     'user_id'=>$user1->id,
+    //     'title'=>'post title 1'
+
+    // ]);
+
+    // ------------------------------------
+
+    // $post1 = Post::find(1);
+
+    // //create taggable id/type in taggables tabel.
+    // $post1->tags()->create([
+    //    'name' => 'Laravel',
+    // ]);
+
+    //------------------------------------
+
+    // $tag = Tag::create([
+
+    //     'name'=>'PHP',
+
+    // ]);
+
+    // $post = Post::find(1);
+
+    // $post->tags()->attach($tag);
+
+    //------------------------------------
+
+
+
+    // $post = Post::find(1);
+
+    // return dd($post->tags);
+
+    //--------------------------------------
+    #for the video model :
+    //--------------------------------------
+
+    // $video = Video::create([
+
+    //     'title' => 'video title1',
+    // ]);
+
+    // $tag = Tag::find(1);
+
+    // $video->tags()->attach($tag);
+    //--------------------------------------
+
+    // $video = Video::find(1);
+
+
+    // return $video->tags;
+
+
+});
+------------------------------------------------------------------------------------------------------------------
+Tag::models =>
+-----------------
+<?php
+
+namespace App\Models;
+
+use App\Models\Post;
+use App\Models\Video;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+    protected $fillable =['name'];
+
+
+// 24-01-24 ----------------------------------
+
+  public function posts(){
+    return $this->morphedByMany(Post::class,'taggable');
+  }
+  public function videos(){
+    return $this->morphedByMany(Video::class,'taggable');
+  }
+}
+
+------------------------------------------------------------------------------------------------------------------
+
+web::route=>
+-----------------
+
+Route::get('/taggable',function(){
+
+
+    // 24-01-24------------------------------
+    // $user1 = User::create([
+    //     'name'=>'Ashraful',
+    //     'email'=>'ashraful@gmail.com',
+    //     'password'=>Hash::make('password'),
+    // ]);
+
+    // $post1 = Post::create([
+    //     'user_id'=>$user1->id,
+    //     'title'=>'post title 1'
+
+    // ]);
+
+    // ------------------------------------
+
+    // $post1 = Post::find(1);
+
+    // //create taggable id/type in taggables tabel.
+    // $post1->tags()->create([
+    //    'name' => 'Laravel',
+    // ]);
+
+    //------------------------------------
+
+    // $tag = Tag::create([
+
+    //     'name'=>'PHP',
+
+    // ]);
+
+    // $post = Post::find(1);
+
+    // $post->tags()->attach($tag);
+
+    //------------------------------------
+
+
+
+    // $post = Post::find(1);
+
+    // return dd($post->tags);
+
+    //--------------------------------------
+    #for the video model :
+    //--------------------------------------
+
+    // $video = Video::create([
+
+    //     'title' => 'video title1',
+    // ]);
+
+    // $tag = Tag::find(1);
+
+    // $video->tags()->attach($tag);
+    //--------------------------------------
+
+    // $video = Video::find(1);
+
+
+    // return $video->tags;
+
+
+
+
+
+    // ----------------------------------------
+    // now check the relationship from the Tag moddels
+    // ----------------------------------------
+
+    // $tag = Tag::find(1);
+
+    // dd($tag->videos);
+
+    // ----------------------------------------
+
+    // $tag = Tag::find(2);
+
+    // dd($tag->posts);
+
+
+});
+
+------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------
+
