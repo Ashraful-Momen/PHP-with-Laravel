@@ -1,0 +1,36 @@
+"""
+GET /nagad/callback/?merchant=683002007104225&order_id=Nfpi5UdDJ9&payment_ref_id=MDEyODExMTM1MzcyNy42ODMwMDIwMDcxMDQyMjUuTmZwaTVVZERKOS5iYjE0ZTk2YmMwZDVlZmFiZmQ ▶
+Accept:                    text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0 ▶
+Accept-Encoding:           gzip, deflate, br
+Accept-Language:           en-US,en;q=0.9,bn-BD;q=0.8,bn;q=0.7
+Connection:                keep-alive
+Cookie:                    _ga=GA1.1.1711606195.1706328032; XSRF-TOKEN=eyJpdiI6Ik1hcmxRQkhnUDlpQTllakNNemgzclE9PSIsInZhbHVlIjoiYWFvYXNlZWRoSmhpOHRtNmtCWXltQjE3U ▶
+Dnt:                       1
+Host:                      127.0.0.1:8000
+Sec-Ch-Ua:                 "Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"
+Sec-Ch-Ua-Mobile:          ?0
+Sec-Ch-Ua-Platform:        "Windows"
+Sec-Fetch-Dest:            document
+Sec-Fetch-Mode:            navigate
+Sec-Fetch-Site:            cross-site
+Sec-Fetch-User:            ?1
+Upgrade-Insecure-Requests: 1
+User-Agent:                Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
+Cookie: _ga=; XSRF-TOKEN=TpAv0hCSenYT7SXXEGkoB1o4atfAZ4ZYPL7N3nqO; instasure_session=pCc8FD7pLJ7HaLuGqewW4CUqRICgi8wEDFGMWOd2
+
+"""
+
+--------------------------------------------------------------------Different 'payment_ref_id' from the table col-------------------------------------------------------
+$pgw_response = $orderPay->pgw_json;
+
+        // Extract the query string from the URL
+        $queryString = parse_url($pgw_response, PHP_URL_QUERY);
+
+        // Parse the query string into an associative array
+        parse_str($queryString, $queryArray);
+
+        // Get the value of payment_ref_id
+        $paymentRefId = $queryArray['payment_ref_id'] ?? null;
+
+        // Output the payment_ref_id
+        dd($paymentRefId);
