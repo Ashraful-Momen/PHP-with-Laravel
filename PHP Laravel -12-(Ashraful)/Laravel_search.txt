@@ -1,0 +1,42 @@
+  //-------------------------------------Life and Health Search options-------------------------------------------------
+    Route::get('/search', [life_and_health::class, 'search'])->name('search');
+
+------------------------------------------------controller--------------------------------------------------------------
+
+
+  #packages Search options --------------------------------------------------------
+
+    public function search(Request $request)
+    {
+        $query = LifeAndHealth::query();
+
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where('Pname', 'like', "%{$searchTerm}%")
+                  ->orWhere('duration', 'like', "%{$searchTerm}%")
+                  ->orWhere('price', 'like', "%{$searchTerm}%")
+                  ->orWhere('yearly_fee', 'like', "%{$searchTerm}%")
+                  ->orWhere('half_yearly_fee', 'like', "%{$searchTerm}%")
+                  ->orWhere('quarterly_fee', 'like', "%{$searchTerm}%")
+                  ->orWhere('monthly_fee', 'like', "%{$searchTerm}%")
+                  ->orWhere('discount', 'like', "%{$searchTerm}%")
+                  ->orWhere('life_coverage_amount', 'like', "%{$searchTerm}%")
+                  ->orWhere('hospital_coverage_amount', 'like', "%{$searchTerm}%");
+        }
+
+        $life_health = $query->get();
+
+        return view('frontend.pages.life_and_health', compact('life_health'));
+    }
+
+---------------------------------------------------------php blade ---------------------------------------------------------------------------
+
+<div class="container-fluid d-flex justify-content-center">
+                                <form class="d-flex mx-2" action="{{ route('search') }}" method="GET">
+                                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                                        name="search">
+                                    <button class="btn btn-outline-success text-dark" type="submit">Search</button>
+                                </form>
+                                <br>
+
+                            </div>
