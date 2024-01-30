@@ -1,0 +1,96 @@
+
+            $all_order = OrderParent::where('payment_status', 'Complete')->first();
+
+            if ($all_order) {
+                $ref_id = $all_order->order_ref_id;
+                $dataToInsert = LifeAndHealthChildOrder::where('order_parent_id', $ref_id)->select(
+                    'order_parent_id',
+                    'form_status',
+                    'cart_id',
+                    'product_id',
+                    'customer_id',
+                    'Pname',
+                    'image',
+                    'duration',
+                    'discount',
+                    'price',
+                    'hospital_card_fee',
+                    'teli_medicine_fee',
+                    'before_discount_price',
+                    'after_discount_price',
+                    'o_name',
+                    'o_gender',
+                    'o_phone',
+                    'o_email',
+                    'o_DOB',
+                    'o_id_type',
+                    'o_id_number',
+                    'o_id_file',
+                    'relation_with_nominee',
+                    'n_name',
+                    'n_gender',
+                    'n_phone',
+                    'n_email',
+                    'n_DOB',
+                    'n_id_type',
+                    'n_id_number',
+                    'n_id_file'
+                )->get()->toArray();
+
+
+                // Convert each object in $dataToInsert to an array
+                $dataToInsertArray = array_map(function ($record) {
+                    return (array) $record;
+                }, $dataToInsert);
+------------------------------------------Table to table data copy Main -----------------------------------------------
+   //--------------------------------Copy all data form policy data table to lifeAndHealChild Table-------------------------------
+
+        $dataToInsert = DB::table('policy_datas')->select(
+            'order_parent_id',
+            'form_status',
+            'cart_id',
+            'product_id',
+            'customer_id',
+            'Pname',
+            'image',
+            'duration',
+            'discount',
+            'price',
+            'hospital_card_fee',
+            'teli_medicine_fee',
+            'before_discount_price',
+            'after_discount_price',
+            'o_name',
+            'o_gender',
+            'o_phone',
+            'o_email',
+            'o_DOB',
+            'o_id_type',
+            'o_id_number',
+            'o_id_file',
+            'relation_with_nominee',
+            'n_name',
+            'n_gender',
+            'n_phone',
+            'n_email',
+            'n_DOB',
+            'n_id_type',
+            'n_id_number',
+            'n_id_file'
+        )->get()->toArray();
+
+
+        // Now, insert the data into 'policy_datas' table
+
+        // Convert each object in $dataToInsert to an array
+        $dataToInsertArray = array_map(function ($record) {
+            return (array) $record;
+        }, $dataToInsert);
+
+        // Now, insert the data into 'life_and_health_child_orders' table
+        $check_children = DB::table('life_and_health_child_orders')->insert($dataToInsertArray);
+
+
+        // after all data copy to child_lf_order_table then delete all data form Policy data ....
+
+        PolicyData::truncate();
