@@ -54,5 +54,36 @@ class Test extends Controller
 Test::test3();  
 
 
+----------------------------------------------another way ---------------------------------------------
+
+class Test extends Controller
+{
+    public static function test()
+    {
+        $check = 'echo "Hello";';
+        eval($check);
+    }
+}
+
+Test::test();
+---------------------------------------------if not static function then -------------------------------------
+
+class Test extends Controller
+{
+    public function testMethod()
+    {
+        $check = function () {
+            echo "Hello";
+        };
+
+        $instance = new Test();
+        call_user_func([$instance, 'testMethod']);
+    }
+}
+
+$test = new Test();
+$test->testMethod();
+
+
 
 
