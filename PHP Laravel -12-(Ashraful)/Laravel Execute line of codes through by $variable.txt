@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Test2;
+
+class Test extends Controller
+{
+    //
+
+    public static function test()
+    {
+    
+
+
+        // solved codes _____________________________________________________
+        // $name = "Ashraful";
+        // $methodName = 'Test2::test2';
+        // $methodName($name);
+
+        // $response = "Ashraful";
+        // $path = "App\Http\Controllers\Test2";
+        // $test = "$path::test2";
+        // $test($response);
+
+
+        // $response_name= "Md.Ashraful Momen";
+        // $array = [
+        //     'name' => "Ashraful",
+        //     'phone' => "01674317565",
+        // ];
+        // $path = 'App\Http\Controllers\Test2';
+        // $check = "$path::test2";
+        // $check($response_name);
+
+
+        // $check = 'print("Hello")'; 
+        // eval($check);
+          
+
+
+    }
+
+    public static function test3()
+    {
+        $check = 'echo "Hello";';
+        eval($check);
+    }
+
+    
+}
+
+Test::test3();  
+
+
+
+
