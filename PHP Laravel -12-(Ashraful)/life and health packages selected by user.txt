@@ -1,0 +1,472 @@
+@extends('frontend.layouts.app')
+@section('title', 'Dashboard')
+@push('css')
+    <style>
+        .single-pricing-box .pricing-header.bg2 {
+            background-image: url(https://t4.ftcdn.net/jpg/01/19/11/55/360_F_119115529_mEnw3lGpLdlDkfLgRcVSbFRuVl6sMDty.jpg);
+        }
+
+        .ptb-100 {
+            padding-top: 25px;
+            padding-bottom: 100px;
+        }
+
+        .single-pricing-box {
+            padding-bottom: 19px;
+        }
+
+        .single-pricing-box .pricing-header {
+            background-color: #002e5b;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            padding-top: 25px;
+            padding-bottom: 25px;
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        @media only screen and (max-width: 767px) {
+            .page-title-area {
+                height: -14%;
+                padding-top: 214px;
+                padding-bottom: 32px;
+            }
+        }
+
+        .src-image {
+            display: none;
+        }
+
+        .card2 {
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+            padding: 0;
+            color: #fff;
+
+        }
+
+        .card2 .header-bg {
+            /* This stretches the canvas across the entire hero unit */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            border-bottom: 1px #FFF solid;
+            /* This positions the canvas under the text */
+            z-index: 1;
+        }
+
+        .card2 .avatar {
+            position: relative;
+            z-index: 100;
+        }
+
+        .card2 .avatar img {
+            width: 100px;
+            height: 100px;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            border: 5px solid rgba(0, 0, 30, 0.8);
+        }
+
+        #hoverMe {
+            border-bottom: 1px dashed #e5e5e5;
+            text-align: left;
+            padding: 13px 20px 11px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #002e5b;
+
+        }
+
+        #hoverMe:hover {
+            border-left: 3px solid #002e5b;
+            background-color: #ebebeb;
+            color: #002e5b;
+
+        }
+
+        .text-white a {
+            color: #fff !important;
+        }
+    </style>
+@endpush
+
+
+
+@section('content')
+    <!-- Start Page Title Area -->
+    <div class="page-title-area page-title-bg1">
+        <div class="d-table">
+            <div class="d-table-cell">
+                <div class="container">
+                    <div class="page-title-content">
+                        <h2>Dashboard</h2>
+                        <ul>
+                            <li><a href="{{ url('/') }}">Home</a></li>
+                            <li>Dashboard - Life and Health Insurance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Page Title Area -->
+
+    <!-- Start Pricing Area -->
+    <section class="pricing-area ptb-20 pb-70">
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-lg-2 col-md-2 col-sm-2 ">
+                    @include('frontend.partials.customer_dashboard_sidebar')
+                </div>
+
+
+
+                {{-- Search and Discount box  --}}
+                <div class="col-lg-9 col-md-9 col-sm-9  rounded ">
+                    <div class="my-1 shadow-lg  text-center">
+                        <nav class="navbar navbar-light shadow-lg my-4 p-5   w-100 float-end ">
+                            <div class="container-fluid d-flex justify-content-center">
+                                <form class="d-flex mx-2" action="{{ route('search') }}" method="GET">
+                                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                                        name="search">
+                                    <button class="btn btn-outline-success text-dark" type="submit">Search</button>
+                                    <button class="btn btn-outline-info text-dark ms-2" type="submit">Refresh</button>
+                                </form>
+                                <br>
+
+                            </div>
+
+                            <div class="container-fluid d-flex justify-content-center mt-5">
+                                <p class="text-danger text-center">
+                                    Search : "Package Name, Amount , Coverage-Amount , Duration, Frequency Amount also "
+                                </p>
+                                @if (Session::has('msg'))
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <strong>{{ session('msg') }}</strong>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                    </div>
+                                @endif
+
+                            </div>
+                        </nav>
+
+                    </div>
+
+                    @foreach ($life_health as $life_health)
+                        {{-- for desktop version  --}}
+
+                        <div class="d-none d-md-block d-lg-block">
+
+
+                            <div class="row shadow-lg mx-1 my-5">
+                                <div class="col-lg-2 col-md-3 col-sm-12 ">
+                                    <div class=" d-flex justify-content-center align-items-center  ">
+                                        <img style="height: 100px; width: 100px;"
+                                            class="img-fluid rounded img-thumbnail mt-3 "
+                                            src="{{ asset('images/packages/' . $life_health->image) }}"
+                                            alt="Image not Found" />
+                                        {{-- <p class=" text-dark p-1"> Green Delta Insurance</p> --}}
+
+
+                                        <p class=" text-dark p-2 my-2 me-1 d-inline thead fw-bold ">
+                                            {{ $life_health->Pname }}
+                                        </p>
+                                        <br>
+
+                                    </div>
+
+
+
+                                    <!-- <p class=" d-block  d-md-none d-lg-none     float-end">৳490 / Year</p> <br> -->
+
+
+                                </div>
+                                <div class=" col-lg-4 col-md-12 col-sm-12  ">
+                                    <table class="  table  border-0 text-center mx-auto">
+                                        <thead class="text-center">
+                                            <tr>
+
+                                                <th scope="col">Life Coverage</th>
+                                                <th scope="col">Health Coverage</th>
+                                                {{-- <th scope="col">Monthly</th>
+                                                <th scope="col">Quarterly</th>
+                                                <th scope="col">Half Yearly</th>
+                                                <th scope="col">Yearly</th> --}}
+                                                <th scope="" class="text-dark">
+                                                    <label>
+                                                        <input  type="radio" name="billing_frequency_{{ $life_health->id }}" value="monthly" > Monthly
+                                                    </label>
+                                                </th>
+                                                <th scope="" class="text-dark">
+                                                    <label>
+                                                        <input  type="radio" name="billing_frequency_{{ $life_health->id }}" value="quarterly"> Quarterly
+                                                    </label>
+                                                </th>
+                                                <th scope="" class="text-dark">
+                                                    <label>
+                                                        <input  type="radio" name="billing_frequency_{{ $life_health->id }}" value="half_yearly"> Half-Yearly
+                                                    </label>
+                                                </th>
+                                                <th scope="" class="text-dark">
+                                                    <label>
+                                                        <input checked type="radio" name="billing_frequency_{{ $life_health->id }}" value="yearly"> Yearly
+                                                    </label>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="rounded ">
+                                            <tr class=" ">
+
+                                                <th scope="" class=" text-dark">
+                                                    {{ $life_health->life_coverage_amount }} </th>
+                                                <th scope="" class=" text-dark">
+                                                    {{ $life_health->hospital_coverage_amount }} </th>
+                                                <th scope=""class=" text-dark">{{ $life_health->monthly_fee }}
+                                                </th>
+                                                <th scope=""class=" text-dark">
+                                                    {{ $life_health->quarterly_fee }}</th>
+                                                <th scope=""class=" text-dark">
+                                                    {{ $life_health->half_yearly_fee }}</th>
+                                                <th scope=""class=" text-dark">{{ $life_health->yearly_fee }}
+                                                </th>
+
+
+
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
+
+                                {{-- Discount  --}}
+                                <div
+                                    class="col-lg-2 col-md-12 col-sm-12    text-center   col-6 mx-auto d-flex justify-content-center align-items-center ">
+                                    <div class="text-start">
+                                        <h5 class="text-danger d-inline">Price: {{ $life_health->price }} TK <br>Discount:
+                                            {{ $life_health->discount }}%</h5>
+                                    </div>
+
+                                </div>
+                                {{-- End Discount  --}}
+                                {{-- select option for hopistal & teli card  --}}
+
+
+                                <div
+                                    class="  card-body col-lg-2 col-md-12 col-sm-12    text-center   col-6 mx-auto d-flex justify-content-center align-items-center ">
+                                    <div class="text-center ">
+                                        <p class=" text-dark p-2  my-2  d-inline thead fw-bold text-decoration-underline ">
+                                            Additional Features:
+                                        </p>
+
+                                        <div class="text-start ms-1">
+                                            <a>
+                                                <p class="fw-bold text-dark">
+                                                    <input type="checkbox" name="hospital_card_fee"
+                                                        id="hospital_card_{{ $life_health->id }}">
+                                                    Hospital Card {{ $life_health->hospital_card_fee }} Tk
+                                                </p>
+                                            </a>
+                                            <a>
+                                                <p class="fw-bold text-dark">
+                                                    <input type="checkbox" name="telmedi_card_fee"
+                                                        id="telmedi_card_{{ $life_health->id }}">
+                                                    TeliMedi Service {{ $life_health->teli_medicine_fee }} Tk
+                                                </p>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                {{-- End  select option for hopistal & teli card  --}}
+
+                                {{--  Add to card  --}}
+                                <div
+                                    class="col-lg-2 col-md-12 col-sm-12    text-center   col-6 mx-auto d-flex justify-content-center align-items-center ">
+
+                                    <div class="">
+
+                                        <a href="{{ route('life_health.details', $life_health->id) }}">
+                                            <button class="btn btn-secondary  p-2  my-2 me-1 d-inline tbody">More
+                                                Details</button>
+                                        </a>
+
+                                        {{-- <form action="{{ route('addTo_cart', $life_health->id) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="hospital_card" value="0"
+                                                id="hidden_hospital_card_{{ $life_health->id }}">
+                                            <input type="hidden" name="teli_medicine" value="0"
+                                                id="hidden_teli_medicine_{{ $life_health->id }}">
+
+                                            <button type="submit" class="btn btn-danger p-2 my-2 ms-1 d-inline tbody"
+                                                onclick="setHiddenValues({{ $life_health->id }})">Add To Cart</button>
+                                        </form> --}}
+
+                                        <form action="{{ route('addTo_cart', $life_health->id) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="hospital_card" value="0" id="hidden_hospital_card_{{ $life_health->id }}">
+                                            <input type="hidden" name="teli_medicine" value="0" id="hidden_teli_medicine_{{ $life_health->id }}">
+
+                                            <!-- Add this hidden input for billing frequency -->
+                                            {{-- <input type="hidden" name="billing_frequency" id="hidden_billing_frequency" value="monthly"> --}}
+                                            <input type="hidden" name="billing_frequency" id="hidden_billing_frequency_{{ $life_health->id }}" value="monthly">
+
+
+                                            <button type="submit" class="btn btn-danger p-2 my-2 ms-1 d-inline tbody" onclick="setHiddenValues({{ $life_health->id }})">Add To Cart</button>
+                                        </form>
+
+
+
+                                    </div>
+
+                                </div>
+
+                                {{-- End Add to card  --}}
+
+
+                            </div>
+
+                        </div>
+
+                        {{-- end desktop version  --}}
+
+                        {{-- for mobile version  --}}
+                        <div class="container d-block d-md-none d-lg-none mt-5">
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                                <div class="col">
+                                    <div class="card shadow">
+                                        <img src="{{ asset('images/packages/' . $life_health->image) }}"
+                                            class="card-img-top" alt="Image not Found">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ $life_health->Pname }}</h5>
+                                            <ul class="list-unstyled">
+                                                <li class="text-dark">Life Coverage:
+                                                    {{ $life_health->life_coverage_amount }}</li>
+                                                <li class="text-dark">Health Coverage:
+                                                    {{ $life_health->hospital_coverage_amount }}</li>
+                                                <li class="text-dark">Monthly: {{ $life_health->monthly_fee }}</li>
+                                                <li class="text-dark">Quarterly: {{ $life_health->quarterly_fee }}</li>
+                                                <li class="text-dark">Half Yearly: {{ $life_health->half_yearly_fee }}
+                                                </li>
+                                                <li class="text-dark">Yearly: {{ $life_health->yearly_fee }}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer text-center">
+                                            <h5 class="text-danger d-inline">Price: {{ $life_health->price }} TK
+                                                <br>Discount: {{ $life_health->discount }}%
+                                            </h5>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            <p class="text-dark p-2 my-2 d-inline thead fw-bold text-decoration-underline">
+                                                Additional Features:</p>
+                                            <div class="text-start ms-1">
+                                                <a>
+                                                    <p class="fw-bold text-dark">
+                                                        <input type="checkbox" name="hospital_card_fee"
+                                                            id="hospital_card_{{ $life_health->id }}">
+                                                        Hospital Card {{ $life_health->hospital_card_fee }} Tk
+                                                    </p>
+                                                </a>
+                                                <a>
+                                                    <p class="fw-bold text-dark">
+                                                        <input type="checkbox" name="telmedi_card_fee"
+                                                            id="telmedi_card_{{ $life_health->id }}">
+                                                        TeliMedi Service {{ $life_health->teli_medicine_fee }} Tk
+                                                    </p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer text-center">
+                                            <a href="{{ route('life_health.details', $life_health->id) }}"
+                                                class="btn btn-secondary">More Details</a>
+                                            {{-- <form action="{{ route('addTo_cart', $life_health->id) }}" method="POST"
+                                                class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="hospital_card" value="0"
+                                                    id="hidden_hospital_card_{{ $life_health->id }}">
+                                                <input type="hidden" name="teli_medicine" value="0"
+                                                    id="hidden_teli_medicine_{{ $life_health->id }}">
+                                                <button type="submit" class="btn btn-danger">Add To Cart</button>
+                                            </form> --}}
+
+                                            <form action="{{ route('addTo_cart', $life_health->id) }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="hospital_card" value="0" id="hidden_hospital_card_{{ $life_health->id }}">
+                                                <input type="hidden" name="teli_medicine" value="0" id="hidden_teli_medicine_{{ $life_health->id }}">
+
+                                                <!-- Add this hidden input for billing frequency -->
+                                                <input type="hidden" name="billing_frequency" id="hidden_billing_frequency" value="monthly">
+
+                                                <button type="submit" class="btn btn-danger p-2 my-2 ms-1 d-inline tbody" onclick="setHiddenValues({{ $life_health->id }})">Add To Cart</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- end mobile version  --}}
+                    @endforeach
+
+                    {{-- End insurance List  --}}
+
+                </div>
+
+
+            </div>
+    </section>
+    <!-- End Pricing Area -->
+
+    {{-- <script>
+        function setHiddenValues(planId) {
+            const hospitalCardCheckbox = document.getElementById(`hospital_card_${planId}`);
+            const teliMediCheckbox = document.getElementById(`telmedi_card_${planId}`);
+
+            const hiddenHospitalCardInput = document.getElementById(`hidden_hospital_card_${planId}`);
+            const hiddenTeliMediInput = document.getElementById(`hidden_teli_medicine_${planId}`);
+
+            hiddenHospitalCardInput.value = hospitalCardCheckbox.checked ? '1' : '0';
+            hiddenTeliMediInput.value = teliMediCheckbox.checked ? '1' : '0';
+
+            console.log(hospitalCardCheckbox.checked);
+        }
+    </script> --}}
+
+    <script>
+        function setHiddenValues(planId) {
+            const hospitalCardCheckbox = document.getElementById(`hospital_card_${planId}`);
+            const teliMediCheckbox = document.getElementById(`telmedi_card_${planId}`);
+            const billingFrequencyInputs = document.getElementsByName(`billing_frequency_${planId}`);
+
+            const hiddenHospitalCardInput = document.getElementById(`hidden_hospital_card_${planId}`);
+            const hiddenTeliMediInput = document.getElementById(`hidden_teli_medicine_${planId}`);
+            let selectedBillingFrequency = '';
+
+            for (const input of billingFrequencyInputs) {
+                if (input.checked) {
+                    selectedBillingFrequency = input.value;
+                    break;
+                }
+            }
+
+            hiddenHospitalCardInput.value = hospitalCardCheckbox.checked ? '1' : '0';
+            hiddenTeliMediInput.value = teliMediCheckbox.checked ? '1' : '0';
+
+            // Add the selected billing frequency to the form
+            document.getElementById(`hidden_billing_frequency_${planId}`).value = selectedBillingFrequency;
+        }
+    </script>
+
+
+
+
+@stop
