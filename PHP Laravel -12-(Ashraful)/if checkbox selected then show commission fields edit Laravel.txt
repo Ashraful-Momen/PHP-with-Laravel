@@ -1,0 +1,60 @@
+
+---------------------------------------------------Controller --------------------------------------------------------
+public function edit($id)
+    {
+        $dealerDetails = Dealer::find($id);
+
+        if (!$dealerDetails) {
+            Toastr::error('Requested item not found', 'Invalid Request');
+            return redirect()->route('admin.parent-dealers.index');
+        }
+
+        $categories = Category::all();
+
+        $cat_all = json_decode($dealerDetails->category_comission, true) ?? [];
+
+        // dd($categories);
+        $business_settings = BusinessSetting::all();
+        $brands = Brand::where('status', 1)->get();
+
+        // Decode the category_comission string into an array
+        $selectedCategories = json_decode($dealerDetails->category_comission, true) ?? [];
+
+        // Assuming $dealerDetails->category_comission is a JSON string
+        $categoryCommissions = json_decode($dealerDetails->category_comission, true) ?? [];
+
+        return view('backend.admin.parent_dealers.edit', compact('cat_all','dealerDetails', 'categories', 'business_settings', 'brands', 'selectedCategories', 'categoryCommissions'));
+    }
+
+----------------------------------------------------Blade edit -------------------------------------------------------------
+
+ <!-- /.form-group -->
+                                 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+                                 <div class="form-group col-md-3">
+                                    <label>Categories and Commissions<small class="text-danger"> (required)</small></label>
+
+                                    @foreach ($cat_all as $categoryId => $categoryName)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="categories[]" id="category{{ $categoryId }}"
+                                                class="form-check-input category-checkbox" value="{{ $categoryId }}">
+                                            <label for="category{{ $categoryId }}" class="form-check-label">
+                                                {{ $categoryName }} - Commission
+                                                <input type="text" name="commissions[{{ $categoryId }}]"
+                                                    class="form-control commission-input"
+                                                    placeholder="Enter commission percentage" disabled>
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+
+                                 <script>
+                                     $(document).ready(function() {
+                                         $('.category-checkbox').change(function() {
+                                             var commissionInput = $(this).closest('.form-check').find('.commission-input');
+                                             commissionInput.prop('disabled', !this.checked);
+                                         });
+                                     });
+                                 </script>
+                                 <!-- /.form-group -->
