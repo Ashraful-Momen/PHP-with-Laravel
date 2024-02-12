@@ -1,4 +1,19 @@
-----------------------------------------------------optimize sql query--------------------------------------------------------------------------
+
+
+
+
+----------------------------------------------------optimize sql query----------------------------------------------------------------------------
+
+#find() => use find method for 1 row of a table.
+
+#get() => use get method for multiple row of table , User::where('col_name','match_col')->get()
+
+#first() => use get method for single row of table , User::where('col_name','match_col')->first(); // if match then just get 1 row ...
+
+
+
+
+==================================================================================================================================================
 
  $addresses = Address::with('user')->get(); | here 'user' is the function inside Address model ....
 ======================================================Django alternative only()-> laravel select(col_name,col_name)==============================
