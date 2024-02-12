@@ -1,4 +1,21 @@
+----------------------------------------------------optimize sql query--------------------------------------------------------------------------
 
+ $addresses = Address::with('user')->get(); | here 'user' is the function inside Address model ....
+======================================================Django alternative only()-> laravel select(col_name,col_name)==============================
+Route::get('/check', function(){
+    $users = User::select('id', 'name')->get();
+
+    echo "<pre>";
+
+    foreach ($users as $user) {
+        dd($user->id, $user->name);
+    }
+
+    return view('users.index', compact('users'));
+});
+======================================================Django alternative differ()-> laravel lazy()==============================
+$user = User::find(1);
+$addresses = $user->address()->lazy()->get();
 ===================================================================ORM filter method============================================================================================================================
 #if one_column is null in Table of DB, then we get error trying to get object ! for fix this issue we can use laravel helper method .
 
