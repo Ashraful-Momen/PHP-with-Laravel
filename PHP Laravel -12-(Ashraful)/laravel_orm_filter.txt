@@ -1,3 +1,59 @@
+
+===================================================================ORM filter method============================================================================================================================
+#if one_column is null in Table of DB, then we get error trying to get object ! for fix this issue we can use laravel helper method .
+
+suppose we want to fetch country from user->name, if this column is null then we can use  ... optional{{($user->name)}}.
+
+  @foreach ($users as $user)
+                        <p class="fs-5">{{ optional($user->name)}}</p>  <------------using hte helper function---------------->
+                        @foreach ($user->addresses as $address)
+                            <p>{{$address->country}}</p>
+                        @endforeach
+                    @endforeach
+------------------------------another way to set the user name as default:return $this->belongsTo(User::class)->withDefault(['name'=>'Guest_User',]);  ------------------------------------
+
+Model :: Address =>
+======================
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Address extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id', 'country',
+    ];
+
+    public function user(){
+        return $this->belongsTo(User::class)->withDefault([
+            'name'=>'Guest_User',
+        ]);
+    }
+
+
+
+}
+====================================ORM filter method: has()->==============================================
+
+fetch those  user , who has country
+
+$user = User::has('addresses')->get();
+
+#for optimize sql query => $user = User::has('addresses')->with('addresses')->get();
+
+#fetch those user has 2 or more post => $user = User::has('addresses','>=', 2)->get(); | here addresses() is the method of User model .
+
+# suppose user has country with 'ABC' in country_title ex:'canadaABC' . for find the user with the title of ABC => $user = User::WhereHas('country',function($query){ $query->where('country' 'like' '%ABC%') })->get();
+
+# if any user haven't any country name , for find those user => $user = User::doesntHave('address')->get();
+=============================================================================================================
+=========================================================================================================================================================================================
 #how to use pluck() : if we get collection means multiple data , then we use loop in blade to show the data. but we can solve it easly with plucks().
 --------------------------
 //parent commission for life and health : -----------------------------------------
