@@ -1,3 +1,26 @@
+#how to use pluck() : if we get collection means multiple data , then we use loop in blade to show the data. but we can solve it easly with plucks().
+--------------------------
+//parent commission for life and health : -----------------------------------------
+    //show the commission page : -----------------------------------------------------------
+    function parent_commission()
+    {
+
+
+
+        $parent = Dealer::where('user_id', Auth::id())->first();
+        $childDealers = Dealer::where('parent_id', $parent->id)->latest()->get();
+
+        // Extract 'user_id' values from the $childDealers collection
+        $childDealerIds = $childDealers->pluck('user_id')->toArray();
+
+
+
+        // Fetch orders based on the extracted user_ids
+        $orders = LifeAndHealthChildOrder::whereIn('customer_id', $childDealerIds)->get();
+
+        return view('backend.parent_dealer.commission_log.life_and_health_commission', compact('orders'));
+    }
+=====================================================================================================================================================================================
 #if policyData Table  the all column 'form_status' value ==1 . then return $allFOrmStatusOne (which help me to show a button).
 
 $allFormStatusOne = $policyData->every(fn($item) => $item->form_status == 1);
