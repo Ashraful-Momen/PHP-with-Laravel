@@ -1,0 +1,343 @@
+<?php
+
+namespace App\Http\Controllers\Admin\LifeAndHealth;
+
+use App\OrderParent;
+use App\Model\LifeAndHealth;
+use Illuminate\Http\Request;
+use App\LifeAndHealthChildOrder;
+use Illuminate\Http\UploadedFile;
+use Google\Cloud\Storage\Lifecycle;
+use App\Http\Controllers\Controller;
+use App\LifeAndHealthPolicySold;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Session;
+
+
+
+class LifeAndHealthController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        // return "Hello";
+        // return 'path check';
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_add');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_add');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+
+        dd($request);
+
+        $request->validate([
+            'Pname' => 'required',
+            'image' => 'required|mimes:png,jpg',
+        ]);
+
+        $life = new LifeAndHealth;
+
+        $imageName = '';
+
+        if ($image = $request->file('image')) {
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move('images/packages', $imageName);
+        }
+
+        $life::create([
+            'category_id'=>$request->category_id,
+            'Pname' => $request->Pname,
+            'image' => $imageName,
+            'benefit' => $request->benefit,
+            'feature' => $request->feature,
+            'claim_process' => $request->claim_process,
+            'duration' => $request->duration,
+            'price' => $request->price,
+            'discount' => $request->discount,
+            'yearly_fee' => $request->yearly_fee,
+            'half_yearly_fee' => $request->half_yearly_fee,
+            'quarterly_fee' => $request->quarterly_fee,
+            'monthly_fee' => $request->monthly_fee,
+            'life_coverage_amount' => $request->life_coverage_amount,
+            'hospital_coverage_amount' => $request->hospital_coverage_amount,
+            'hospital_card_fee' => $request->hospital_card_fee,
+            'teli_medicine_fee' => $request->teli_medicine_fee,
+        ]);
+
+
+
+
+        Session::has('msg', 'Insurance Package Added');
+
+        return redirect()->to(route('admin.life_and_health_show'))->with('msg', 'Package Successfully Added!');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show()
+    {
+        $life_health =  LifeAndHealth::all();
+        // $life_health = LifeAndHealth::where('active_status', '1')->get();
+        // $life_health =  LifeAndHealth::where('active_status','like','1')->get();
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_show', compact('life_health'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $life_health = LifeAndHealth::findOrFail($id);
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_edit', compact('life_health'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'Pname' => 'required',
+        ]);
+
+        $life_health = LifeAndHealth::findOrFail($id);
+
+        $oldImage = 'images/packages/' . $life_health->image;
+        $imageName = $life_health->image;
+
+        if ($image = $request->file('image')) {
+            if (file_exists($oldImage)) {
+                File::delete($oldImage);
+            }
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move('images/packages', $imageName);
+        }
+
+
+        $life_health->update([
+            'category_id'=>$request->category_id,
+            'Pname' => $request->Pname,
+            'image' => $imageName,
+            'benefit' => $request->benefit,
+            'feature' => $request->feature,
+            'claim_process' => $request->claim_process,
+            'duration' => $request->duration,
+            'price' => $request->price,
+            'discount' => $request->discount,
+            'yearly_fee' => $request->yearly_fee,
+            'half_yearly_fee' => $request->half_yearly_fee,
+            'quarterly_fee' => $request->quarterly_fee,
+            'monthly_fee' => $request->monthly_fee,
+            'life_coverage_amount' => $request->life_coverage_amount,
+            'hospital_coverage_amount' => $request->hospital_coverage_amount,
+            'hospital_card_fee' => $request->hospital_card_fee,
+            'teli_medicine_fee' => $request->teli_medicine_fee,
+        ]);
+
+        return redirect()->to(route('admin.life_and_health_show'))->with('msg', 'Package Successfully Updated!');
+    }
+
+
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+        // dd($id);
+
+        LifeAndHealth::findOrFail($id)->delete();
+
+        return redirect()->back()->with('msg', 'Package Successfully Deleted!');
+    }
+
+    //package status for Admin.
+    public function toggleStatus(Request $request, $id)
+    {
+        // Assuming you have a model named LifeAndHealthInsurance
+        $lhInsurance = LifeAndHealth::find($id);
+
+        if ($lhInsurance) {
+            // Toggle the active_status
+            $lhInsurance->active_status = ($lhInsurance->active_status == "1") ? "0" : "1";
+            $lhInsurance->save();
+        }
+
+        return redirect()->back(); // Redirect back to the previous page
+    }
+
+
+
+    //Order List  : _____________________________________________________________________________
+
+    public function order_detials()
+    {
+
+
+        $order = OrderParent::latest()->get();
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_orders', compact('order'));
+    }
+    public function view_details_order($id)
+    {
+
+
+
+        $all_order = OrderParent::find($id);
+        $order_status = $all_order->order_status;
+        $ref_id = $all_order->order_ref_id;
+        $order =  LifeAndHealthChildOrder::where('order_parent_id', $ref_id)->get();
+
+
+
+        $totalInsurance =  $all_order->quantity;
+        $totalPrice = $all_order->bill;
+
+
+        // $user = Auth::user();
+        $orderPay = OrderParent::where('user_id', $all_order->user_id)->latest()->first();
+
+        // dd($orderPay);
+        $bill = $orderPay->bill;
+
+        $pgw_response = $orderPay->pgw_json;
+
+
+
+        // Extract the query string from the URL
+        $queryString = parse_url($pgw_response, PHP_URL_QUERY);
+
+        // Parse the query string into an associative array
+        parse_str($queryString, $queryArray);
+
+        // Get the value of payment_ref_id
+        $paymentRefId = $queryArray['payment_ref_id'] ?? null;
+
+
+
+
+
+
+
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_order_details', compact('all_order','id', 'order_status', 'order', 'totalInsurance', 'totalPrice', 'paymentRefId', 'orderPay'));
+    }
+
+    //update order status : --------------------------------------------------------------------
+    public function updateOrderStatus(Request $request, $id)
+    {
+        // dd($request,$id);
+        // Validate the request if necessary
+        $request->validate([
+            'status' => 'required|in:pending,processing,completed,canceled',
+        ]);
+
+        $newStatus = $request->input('status');
+
+        // Update the Order table with the new status based on $id
+        $order = OrderParent::find($id);
+        if ($order) {
+            $order->order_status = $newStatus;
+            $order->save();
+
+            // Redirect back or handle the response as needed
+            return redirect()->back()->with('success', 'Order status updated successfully');
+        }
+
+        // Handle the case where the order is not found
+        return redirect()->back()->with('error', 'Order not found');
+    }
+
+
+
+    //update the policy ID and pdf :-------------------------------------------------------------
+
+    public function updatePolicy(Request $request, $id)
+    {
+
+        // dd($request);
+
+        $request->validate([
+            'policyNumber' => 'required|string',
+            'policyCertificate' => 'nullable|file|mimes:pdf,jpg,png',
+        ]);
+
+        $policyNumber = $request->input('policyNumber');
+        $order = LifeAndHealthChildOrder::find($id);
+
+        if ($order) {
+            $order->policy_id = $policyNumber;
+
+            // Handle file upload if a new file is provided
+            if ($request->hasFile('policyCertificate')) {
+                $file = $request->file('policyCertificate');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('life_and_health_policy_certificates'), $fileName);
+                $order->policy_documents = $fileName;
+                $order->policy_status='Updated';
+                $order->policy_start_date=now();
+
+
+                $order->policy_end_date = now()->addYears($order->duration);
+            }
+
+            $order->save();
+
+            // Retrieve the updated order with relationships if needed
+            $updatedOrder = LifeAndHealthChildOrder::find($id);
+
+
+            return redirect()->back()->with('success', 'Policy information updated successfully');
+        }
+
+        // Handle the case where the order is not found
+        return redirect()->back()->with('error', 'Order not found');
+    }
+
+
+
+
+}
