@@ -1,0 +1,68 @@
+views: 
+----------
+ <form action="{{ route('admin.updateOrderStatus', $id) }}"
+                                                                method="POST">
+                                                                @csrf
+
+                                                                <select class="form-control bg-warning" name="status"
+                                                                    onchange="this.form.submit()">
+                                                                    <option value="0" selected disabled>Change
+                                                                        Order Status</option>
+                                                                    <option value="pending">Pending</option>
+                                                                    <option value="processing">Processing</option>
+                                                                    <option value="completed">Completed</option>
+                                                                    <option value="canceled">Canceled</option>
+                                                                </select>
+                                                            </form>
+-----------------------------------------------------------------------------------------------------------------------------------------------
+ Route::get('/life_and_health_view_details_order/{id}', [\App\Http\Controllers\Admin\LifeAndHealth\LifeAndHealthController::class, 'view_details_order'])->name('view_details_order');
+-----------------------------------------------------------------------------------------------------------------------------------------------
+controllder : 
+---------------
+  public function view_details_order($id)
+    {
+
+
+
+        $all_order = OrderParent::find($id);
+        $order_status = $all_order->order_status;
+        $ref_id = $all_order->order_ref_id;
+        $order =  LifeAndHealthChildOrder::where('order_parent_id', $ref_id)->get();
+
+
+
+        $totalInsurance =  $all_order->quantity;
+        $totalPrice = $all_order->bill;
+
+
+        // $user = Auth::user();
+        $orderPay = OrderParent::where('user_id', $all_order->user_id)->latest()->first();
+
+        // dd($orderPay);
+        $bill = $orderPay->bill;
+
+        $pgw_response = $orderPay->pgw_json;
+
+
+
+        // Extract the query string from the URL
+        $queryString = parse_url($pgw_response, PHP_URL_QUERY);
+
+        // Parse the query string into an associative array
+        parse_str($queryString, $queryArray);
+
+        // Get the value of payment_ref_id
+        $paymentRefId = $queryArray['payment_ref_id'] ?? null;
+
+
+
+
+
+
+
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_order_details', compact('all_order', 'id', 'order_status', 'order', 'totalInsurance', 'totalPrice', 'paymentRefId', 'orderPay'));
+    }
+
+
+---------------------
