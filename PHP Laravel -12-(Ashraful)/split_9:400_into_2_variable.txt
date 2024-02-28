@@ -1,0 +1,9 @@
+
+
+
+$teli_medicine_charge = $request->teli_medicine_charge; // Assuming $request->teli_medicine_charge contains "9:400"
+
+// Separate the string into two parts using the colon (:) as the delimiter
+list($teli_medi_call, $teli_medi_fee) = explode(':', $teli_medicine_charge);
+
+// Now $teli_medi_call will contain "9" and $teli_medi_fee will contain "400"
