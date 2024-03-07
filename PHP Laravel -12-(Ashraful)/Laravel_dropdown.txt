@@ -1,0 +1,14 @@
+  {{-- -----------------------------------------Ashraful ---------------------------------------------------------- --}}
+                    <div class="dropdown bg-dark">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                            <div class="mb-1 {{ Request::is('childDealer/device-insurance*') ? 'activeMe' : '' }}" id="hoverMe">
+                                Device Management
+                            </div>
+                        </a>
+                        <div class="dropdown-menu bg-dark">
+                            <a href="/childDealer/device-insurance/select/customer" class="dropdown-item">Device Insurance Sale New</a>
+                            <a href="{{ route('childDealer.device-insurance.index') }}" class="dropdown-item">Device Insurance Sale List</a>
+                            <a href="{{ route('childDealer.deviceInsSaleHistory') }}" class="dropdown-item">Device Insurance Commission Log</a>
+                        </div>
+                    </div>
+  {{-- -----------------------------------------Ashraful ---------------------------------------------------------- --}}
