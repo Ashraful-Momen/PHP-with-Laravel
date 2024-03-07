@@ -1,0 +1,89 @@
+
+ //----------------------------------------------------Claim Service : Claim status Change ---------------------------------------------------------------------------------------------------
+    // routes/web.php
+    Route::post('/life-health-claim/{id}/change-status', [LifeAndHealthController::class,'life_and_health_claim_changeStatus'])->name('admin.life_health_claim_change_status');
+ //-------------------------------change the claim status ------------------------------------------------------
+
+    function life_and_health_claim_changeStatus(Request $request, $id){
+
+        $claim = LifeAndHealthClaim::findOrFail($id);
+
+        // Validate request data if needed
+        $request->validate([
+            'status' => 'required|in:processing,approved,rejected',
+        ]);
+
+        // Update claim status
+        $claim->c_status = $request->status;
+        $claim->c_status_reason = $request->input('status_reason');
+
+
+        $claim->save();
+
+        return redirect()->back()->with('success', 'Claim status updated successfully.');
+    }
+
+
+
+
+
+{{-- ---------------------------- Change The Claim Status Now  --------------------------------------- --}}
+                                    {{-- Add this button where you want to trigger the modal --}}
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#changeStatusModal">
+                                        Change Status
+                                    </button>
+
+                                    {{-- Modal for changing claim status --}}
+                                    <div class="modal fade" id="changeStatusModal" tabindex="-1" role="dialog"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Change Claim Status</h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                
+                                                <form action="{{ route('admin.admin.life_health_claim_change_status', $life_health->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('POST')
+                                                    <div class="modal-body">
+                                                        <div class="form-group">
+                                                            <label for="status">Select Status:</label>
+                                                            <select name="status" id="status" class="form-control">
+                                                                <option value="processing">Processing</option>
+                                                                <option value="approved">Approved</option>
+                                                                <option value="rejected">Rejected</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="status_reason">Status Reason:</label>
+                                                            <textarea name="status_reason" id="status_reason" class="form-control" rows="3"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{-- ---------------------------- Change The Claim Status Now  --------------------------------------- --}}
+                                    {{-- Change The Claim Status Now  --}}
+                                    <input type="text"
+                                        placeholder="Current Claim Status: {{ $life_health->c_status == 'approved' ? 'Approved' : ($life_health->c_status == 'processing' ? 'Processing' : 'Rejected') }}"
+                                        class="form-control text-center bg-warning" disabled>
+                                        <br>
+                                        <div>
+                                            <label for="">Reason for the Change Claim Status By Admin:</label>
+                                            <textarea class="form-control" rows="3" disabled>{{ $life_health->c_status_reason }}</textarea>
+                                        </div>
+
+
+                                    <hr>
+                                    <br>
