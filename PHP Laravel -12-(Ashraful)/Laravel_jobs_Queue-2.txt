@@ -1,0 +1,186 @@
+#store 1000 records to the data base from the csv files . 
+-----------------------------------------------------------
+
+
+route: 
+--------
+<?php
+
+use App\Http\Controllers\PersonDBController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    // return "This is the Laravel Jobs and Queue Project";
+    return view('welcome');
+});
+
+Route::post('/mycsv',[PersonDBController::class,'jobs_queue'])->name('mycsv');
+
+Route::get('/store-data',[PersonDBController::class,'store'])->name('store');
+
+------------------------------------------------------------------------------------------------------------------
+controller: 
+-------------
+<?php
+
+namespace App\Http\Controllers;
+
+use App\PersonDB;
+use Illuminate\Http\Request;
+
+class PersonDBController extends Controller
+{
+
+    function jobs_queue(Request $request)
+    {
+
+        // $data =  array_map('str_getcsv', file($request->mycsv)); // this function make the csv file content in associative array....
+
+        // dd($request->all());
+        $data = file($request->mycsv);
+
+        // dd($data);
+
+        $header = $data[0];
+
+        unset($data[0]);
+
+        //array chunk : big array split inot small array .
+
+        $chunks = array_chunk($data,100); // (full_array, size_of_array_100_per_csv); 1000 records keep into 10 csv file , per csv file store 100 array .
+
+
+
+        // dd(count($chunks)); // mycsf = 1000 , after chunk we get total 10 csv file , 10*100 = 1000.
+
+
+
+
+        foreach($chunks as $key => $chunk){
+            $name = "/tmp{$key}.csv";  //temp1.csv , ...
+
+            $path = resource_path('temp');
+
+            // return $path.$name; //  -> /home/ashraful/Laravel7/Larave_jobs_queue/laravel_jobs_queue/resources/temp/tmp0.csv
+
+            file_put_contents($path. $name, $chunk);  //convert 1000 records into 10 csv file. with the file_put_contents().
+
+        }
+
+
+
+
+        // foreach ($data as $key=>$value) {
+
+        //     $person = array_combine($header, $value);   //header_name = value
+        //     PersonDB::create($person); // insert the data to the database ;
+
+
+        // }
+
+        return "DB insert the data is done";
+    }
+
+
+    // store all the csv files data into the data base .--------------------------------------------
+
+    public function store(){
+
+        $path = resource_path('temp'); // select the resource / temp , folder.
+
+        $files = glob("$path/*.csv"); // select all the csv file form the directory.
+
+        $header = [];
+
+        foreach($files as $key => $file){
+
+            $data = array_map('str_getcsv',file($file)); // get array form the csv1,csv2,.... file.
+
+            if($key === 0 ){
+
+                $header = $data[0]; // select the coloumn => first_name , last_name , email .
+
+                unset($data[0]); //remove the header.
+
+            }
+
+            //now store the data to DB : --------------------------------
+
+            foreach($data as $person){
+
+                $personData = array_combine($header,$person);
+
+                PersonDB::create($personData);
+            }
+
+
+
+        }
+
+        return "Store Successfully";
+
+    }
+}
+; 
+--------------------------------------------------------------------------------------------------
+view: 
+---------
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Title</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+
+        <!-- Bootstrap CSS v5.2.1 -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        />
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h1>Jobs Handling</h1>
+                    <form action="{{route('mycsv')}}" method="post" enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" name="mycsv" placeholder="submit the csv file ">
+                        <input type="submit" class="btn btn-success">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Bootstrap JavaScript Libraries -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"
+        ></script>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>
+
