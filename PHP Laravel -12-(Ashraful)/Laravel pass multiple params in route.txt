@@ -1,0 +1,31 @@
+
+
+#route: 
+-----------
+Route::get('/life_and_health_claim_list_single_employee/{employee_id}/{policy_id}', [LifeAndHealthChild::class, 'life_and_health_claim_list_single_employee'])->name('life_and_health_claim_list_single_employee');
+
+
+
+pass route: params: 
+---------------------
+
+<a href="{{ route('life_and_health_claim_list_single_employee', ['employee_id' => $life_health->employee_id, 'policy_id' => $life_health->employee_policy_id]) }}" class="btn btn-danger btn-block">Request for Claim</a>
+
+#function get those params : 
+---------------------------
+
+public function life_and_health_claim_list_single_employee($employee_id, $policy_id)
+{
+    // Fetch records where the employee_policy_id matches the provided $policy_id
+    $life_health = LifeAndHealthClaim::where('employee_policy_id', $policy_id)->get();
+
+    // Output the fetched records for debugging
+    dd($life_health);
+
+    // Pass the fetched records to the view
+    return view('backend.child_dealer.life_and_health.life_and_health_claim_list', compact('life_health'));
+}
+
+
+
+
