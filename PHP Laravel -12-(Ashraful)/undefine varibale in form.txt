@@ -1,0 +1,4 @@
+# when pass variable in form which is post method .... after submit the form data varibale will be null or value not set in the varibale
+that's why getting undefine varible error . so solve this use nullcolliasion operation . {{$var_name ?? ''}}
+
+{{$var_name ?? ''}} = means if $var_name has value the set this value either set the value as null.
