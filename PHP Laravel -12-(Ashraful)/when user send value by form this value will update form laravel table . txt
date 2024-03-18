@@ -1,0 +1,134 @@
+#in laravel exiting table have lot's of coverage value . if hr_of company want to claim then according to the coverage value those value will be updated. 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    public static function life_and_health_claim_form_submit(Request $request)
+    {
+
+        //here need to receive the '$policy'
+
+        // dd($policy_id);
+        // Get all data from the request
+        $requestData = $request->all();
+
+        // $requestData['o_policy'] = $policy_id;
+        // $requestData['c_status'] = "Pending";
+
+        // dd($requestData);
+
+        // --------------------------------------------------------------------------------
+         // dd($requestData);
+        //         array:16 [▼
+        //   "_token" => "igP9NjVi8RcnQg5hLroDuqraxTOqL0K1liOWgXFu"
+        //   "o_name" => null
+        //   "o_DOB" => null
+        //   "o_id_number" => null
+        //   "o_policy" => "sVDteuy"
+        //   "o_phone" => null
+        //   "o_email" => null
+        //   "n_name" => null
+        //   "n_phone" => null
+        //   "n_email" => null
+        //   "n_id_number" => null
+        //   "n_address" => null
+        //   "relation_with_nominee" => null
+        //   "c_type" => "Natural Death"
+        //   "c_amount" => "5888"
+        //   "c_reason" => null
+        // ]
+        // --------------------------------------------------------------------------------
+
+        #********************* update the substruct amount to the life and health coverage.
+
+
+
+
+        // $lf_coverage = LifeAndHealth::where('employee_policy_id',$request->o_policy)->get();
+
+        // $lf_coverage = $lf_coverage[0];
+
+        // ---------------------------------------------------------------------------------
+
+        $lf_coverage = LifeAndHealth::where('employee_policy_id', $requestData['o_policy'])->first();
+
+        // dd($lf_coverage);
+
+        // "natural_death_amount" => 123.0
+        // "accidental_death_amount" => null
+        // "ppd_ptd_amount" => null
+        // "critical_illness_amount" => null
+        // "ipd_coverage_amount" => null
+        // "opd_coverage_amount" => 3123.0
+        // "dental_coverage_amount" => null
+        // "eye_coverage_amount" => null
+        // "maternity_claim_amount" => null
+        // "ambulance_claim_amount" => null
+
+        if ($lf_coverage) {
+            // Update the coverage amount based on the claim type
+            switch ($requestData['c_type']) {
+                case 'Natural Death':
+                    $lf_coverage->natural_death_amount -= $requestData['c_amount'];
+                    break;
+                case 'Accidental Death':
+                    $lf_coverage->accidental_death_amount -= $requestData['c_amount'];
+                    break;
+                case 'PPD-PPT':
+                    $lf_coverage->ppd_ptd_amount -= $requestData['c_amount'];
+                    break;
+                case 'Critical Illness':
+                    $lf_coverage->critical_illness_amount -= $requestData['c_amount'];
+                    break;
+                case 'IPD':
+                    $lf_coverage->ipd_coverage_amount -= $requestData['c_amount'];
+                    break;
+                case 'OPD':
+                    $lf_coverage->opd_coverage_amount -= $requestData['c_amount'];
+                    break;
+                case 'Dental':
+                    $lf_coverage->dental_coverage_amount -= $requestData['c_amount'];
+                    break;
+                case 'Eye':
+                    $lf_coverage->eye_coverage_amount -= $requestData['c_amount'];
+                    break;
+                case 'Maternity':
+                    $lf_coverage->maternity_claim_amount -= $requestData['c_amount'];
+                    break;
+                case 'Ambulance':
+                    $lf_coverage->ambulance_claim_amount -= $requestData['c_amount'];
+                    break;
+                default:
+                    // Handle unsupported claim types
+                    break;
+            }
+
+            // Save the updated coverage amounts to the database
+            $lf_coverage->save();
+
+            // dd("after update the value", $lf_coverage);
+
+        }
+
+
+        // --------------------------------------------------------------------------------
+
+
+        // Define the file upload fields
+        $fileFields = ['o_id_file', 'n_id_file', 'c_file_1', 'c_file_2', 'c_file_3', 'c_file_4', 'c_file_5', 'c_file_6', 'c_file_7', 'c_file_8', 'c_file_9'];
+
+        // Process the file uploads and store them in the storage directory
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $requestData[$field] = $request->file($field)->store('public/life_and_health/claim/uploads');
+            }
+        }
+
+        // dd($requestData);
+
+
+        LifeAndHealthClaim::create($requestData);   // create can't save if any varibale pass to the blade form other location ... use insert
+
+
+        // Optionally, you can redirect the user to a success page or return a JSON response
+        return view('backend.child_dealer.life_and_health.life_and_health_temporary_claim_form')->with('msg', 'Claim Successfully Submitted!');
+    }
