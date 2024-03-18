@@ -1,0 +1,113 @@
+   <div data-mdb-input-init class="form-outline">
+
+                            {{-- <p>Select the Claim Type . *** if Particular type of Claim Coverage is zero then Can't select for the claim</p> --}}
+                            <select name="c_type" id="claimType" class="form-select form-control"
+                                aria-label="Default select example">
+                                <option value="0" selected disabled>Select Identification:</option>
+
+                                <option value="Natural Death"
+                                    {{ $lf_coverage->natural_death_amount == 0 ? 'disabled' : '' }}>
+                                    Natural Death
+                                </option>
+                                <option value="Accidental
+                                "
+                                    {{ $lf_coverage->accidental_death_amount == 0 ? 'disabled' : '' }}>Accidental
+                                    Death
+                                </option>
+                                <option value="Critical Illness"
+                                    {{ $lf_coverage->critical_illness_amount == 0 ? 'disabled' : '' }}>Critical
+                                    Illness
+                                </option>
+                                <option value="IPD" {{ $lf_coverage->ipd_coverage_amount == 0 ? 'disabled' : '' }}>
+                                    IPD
+                                </option>
+                                <option value="OPD" {{ $lf_coverage->opd_coverage_amount == 0 ? 'disabled' : '' }}>
+                                    OPD
+                                </option>
+                                <option value="PPD-PPT" {{ $lf_coverage->ppd_ptd_amount == 0 ? 'disabled' : '' }}>
+                                    PPD-PPT
+                                </option>
+                                <option value="Dental" {{ $lf_coverage->dental_coverage_amount == 0 ? 'disabled' : '' }}>
+                                    Dental
+                                </option>
+                                <option value="Eye" {{ $lf_coverage->eye_coverage_amount == 0 ? 'disabled' : '' }}>
+                                    Eye
+                                </option>
+                                <option value="Ambulance"
+                                    {{ $lf_coverage->ambulance_claim_amount == 0 ? 'disabled' : '' }}>Ambulance
+                                </option>
+                            </select>
+                            <label class="form-label" for="claimType">Select Claim Type For Claim</label>
+                        </div>
+
+                        @php
+                            $total_coverage_amount = $lf_total_claim; // Assuming this variable holds the total coverage amount
+                        @endphp
+
+                        <div class="ms-2 border border-dark rounded p-3">
+
+                            {{-- @php
+                            dd($policy_id);
+                        @endphp --}}
+
+                            <input type="number" placeholder="Enter amount to subtract" name="substruct_amount"
+                                class="form-control m-2" required>
+
+                            {{-- <a id="claimLink"
+                                href="{{ route('childDealer.life_and_health_claim_form', ['policy_id' => $policy_id, 'category' => 'category', 'substruc_amount' => 0]) }}"
+                                style="display: none;"> --}}
+
+                            <a id="claimLink"
+                                href="{{ route('childDealer.life_and_health_claim_form', ['policy_id' => $policy_id, 'option' => 'category', 'substract_amount' => 0]) }}"
+                                style="display: none;">
+
+
+                                <button id="claimButton" class="btn btn-outline btn-primary form-control" disabled>Request
+                                    for the Claim</button>
+                            </a>
+
+                            <label id="waringText" class="text-danger">If any of options coverage amount is zero
+                                then can't select for the calim </label>
+
+                        </div>
+
+
+
+                        <script>
+                            const claimTypeSelect = document.getElementById('claimType');
+                            const claimButton = document.getElementById('claimButton');
+                            const claimLink = document.getElementById('claimLink');
+                            const waringText = document.getElementById('waringText');
+
+                            const totalCoverageAmount = {{ $total_coverage_amount }};
+
+                        
+                            claimTypeSelect.addEventListener('change', function() {
+                                if (this.value === '0') {
+                                    claimLink.style.display = 'none';
+                                } else {
+                                    const selectedOptionValue = this.value;
+                                    const substractAmountInput = document.querySelector('input[name="substruct_amount"]');
+                                    const substractAmount = substractAmountInput.value;
+
+                                    const claimLinkUrl =
+                                        "{{ route('childDealer.life_and_health_claim_form', ['policy_id' => $policy_id, 'option' => 'category', 'substract_amount' => 0]) }}";
+                                    const updatedLinkUrl = claimLinkUrl.replace('option', selectedOptionValue).replace(
+                                        'substract_amount', substractAmount);
+
+                                    // claimLink.href = updatedLinkUrl;
+
+                                    claimLink.href =
+                                        "{{ route('childDealer.life_and_health_claim_form', ['policy_id' => $policy_id, 'option' => ':option', 'substract_amount' => ':substract_amount']) }}"
+                                        .replace(':option', encodeURIComponent(selectedOptionValue))
+                                        .replace(':substract_amount', encodeURIComponent(substractAmount));
+
+
+                                    claimLink.style.display = 'block';
+                                    waringText.style.display = 'none';
+                                    claimButton.disabled = false;
+                                    console.log("Selected value: ", selectedOptionValue);
+                                    console.log("Substract amount: ", substractAmount);
+                                }
+                            });
+                        </script>
