@@ -1,0 +1,68 @@
+ public function store(Request $request)
+    {
+
+
+        dd($request);
+
+
+
+        // File Upload
+        $imageName = '';
+        if ($image = $request->file('image')) {
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move('images/packages', $imageName);
+        }
+
+        // Data Insertion
+        $life = new LifeAndHealth;
+        $life->category_id = $request->category_id;
+        $life->Pname = $request->Pname;
+        $life->image = $imageName;
+
+
+
+
+        // Constructing the teli_medicine_fee value
+        $teliMedicineFee = [];
+
+        // Loop through teli_medi_fee_1 to teli_medi_fee_9
+        for ($i = 1; $i <= 9; $i++) {
+            if ($request->has("teli_medi_fee_$i")) {
+                $teliMedicineFee["teli_medi_fee_$i"] = $request->input("teli_medi_fee_$i");
+            }
+        }
+
+        // Add the unlimited value if present
+        if ($request->has('unlimited')) {
+            $teliMedicineFee['unlimited'] = $request->input('teli_medi_fee_unlimited');
+        }
+
+        // Serialize the teliMedicineFee array into JSON format
+        $jsonTeliMedicineFee = json_encode($teliMedicineFee);
+
+        // Assign the serialized JSON data to the teli_medicine_fee column
+        $life->teli_medicine_fee = $jsonTeliMedicineFee;
+        //if teli_medicine_free:
+        $life->teli_medicine_fee = $request->teli_medi_fee;
+
+
+
+
+
+        // Dynamically add other fields based on request variables
+        foreach ($request->all() as $key => $value) {
+            // Exclude checkbox fields and other unwanted fields
+            if ($key !== '_token' && $key !== 'Pname' && $key !== 'image' && !Str::endsWith($key, 'Checkbox') && $key !== 'teli_medi_fee' && !Str::startsWith($key, 'teli_medi_fee_') && $key !== 'unlimited' && $key !== 'teli_medi_fee_unlimited') {
+                $life->{$key} = $value;
+            }
+        }
+
+
+        $life->save();
+
+        // dd($request);
+
+        // Redirect with success message
+        return redirect()->route('admin.life_and_health_show')->with('msg', 'Package Successfully Added!');
+    }
+
