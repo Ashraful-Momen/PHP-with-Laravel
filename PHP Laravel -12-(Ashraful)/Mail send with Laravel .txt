@@ -1,9 +1,20 @@
 
+Username: 	ashraful@instasure.xyz
+Password: 	Use the email account’s password.
+Incoming Server: 	mail.instasure.xyz
 
+    IMAP Port: 143 POP3 Port: 110
+
+Outgoing Server: 	mail.instasure.xyz
+
+    SMTP Port: 587
+
+IMAP, POP3, and SMTP require authentication.
+===========================================================================================
 
 smtp confiquration
 =====================
-.env=>
+.env=> for sending mail select the outgoing server and port.
 ----------
 ## SMTP Mail Configuration ##
 MAIL_MAILER=smtp
