@@ -1,0 +1,77 @@
+
+
+
+smtp confiquration
+=====================
+.env=>
+----------
+## SMTP Mail Configuration ##
+MAIL_MAILER=smtp
+MAIL_HOST=business90.web-hosting.com
+MAIL_PORT=587
+MAIL_USERNAME=ashraful@instasure.xyz
+MAIL_PASSWORD=786Ashraful
+MAIL_ENCRYPTION=TLS
+# MAIL_ENCRYPTION=STARTTLS
+
+MAIL_FROM_ADDRESS="${MAIL_USERNAME}"
+MAIL_FROM_NAME="${APP_NAME}"
+
+
+
+=============================================================================================
+# create mail:
+----------------
+>>> php artisan make:mail ClaimManagementTeam
+
+
+
+#goto the Mail folder :ClaimManagementTeam.php =>
+==============================================================================================
+
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+
+class ClaimManagementTeam extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+     {
+        return $this->view('mail.claim_management'); //set theview name for the Mail template
+    }
+}
+=======================================================
+
+#mail template
+================
+this mail check for the claimManagement !!!!
+
+
+#route:
+================
+Route::get('/claim_management_mail_setup', function(){
+        Mail::to('ashraful@instasure.xyz')->send(new ClaimManagementTeam());
+    })->name('claim_management_mail_setup');
+
