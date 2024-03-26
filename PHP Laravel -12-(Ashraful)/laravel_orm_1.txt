@@ -406,7 +406,15 @@ $addresses = $user->address()->lazy()->get();
     $userIdsAndCountries = $user->pluck('id', 'addresses.country'); //(user_id,model_function.model_table_column_name)pluck method return collection which has relatation with foreign key.
 
     dd($userIdsAndCountries);
+========================================================== How to use the join method ====================================================
+ $user = \App\Models\User::all();
 
+    $userDetails = \App\Models\User::join('addresses', 'users.id', '=', 'addresses.user_id')
+        ->pluck('users.name as user_name', 'users.id as user_id', 'addresses.country');
+
+    $userDetails->each(function ($item) {
+        echo 'userName=>' . $item[0] . ' userId=>' . $item[1] . ' ' . $item[2] . '</br>';
+    });
     $userIdsAndCountries->each(function ($userName, $userId, $country) {
         echo 'userName=>' . $userName . 'userId=>' . $userId . ' ' . $country . '</br>';
     });
