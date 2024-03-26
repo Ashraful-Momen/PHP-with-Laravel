@@ -399,3 +399,14 @@ Route::get('/check', function(){
 ======================================================Django alternative differ()-> laravel lazy()==============================
 $user = User::find(1);
 $addresses = $user->address()->lazy()->get();
+=========================================================How to use the plug method ====================================================
+
+ $user = \App\Models\User::all();
+
+    $userIdsAndCountries = $user->pluck('id', 'addresses.country'); //(user_id,model_function.model_table_column_name)pluck method return collection which has relatation with foreign key.
+
+    dd($userIdsAndCountries);
+
+    $userIdsAndCountries->each(function ($userName, $userId, $country) {
+        echo 'userName=>' . $userName . 'userId=>' . $userId . ' ' . $country . '</br>';
+    });
