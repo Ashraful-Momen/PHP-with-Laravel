@@ -1,8 +1,9 @@
 first install jetstream livewire and 
 
 1. user table then add 'rol' column and migrate it .
-2. app -> http -> RouteServiceProvider ->  and rename the route ... as You want
+2. app -> http -> RouteServiceProvider ->  and rename the route ... as You want => public conts Home = "/ridirect_route_name"
 3. web.route-> create the route with the controller 
+	Route::get('/redirect_route_name',[BackendController::class,'index'])->name('user_role').
 4. goto controller and inside the function write just : 
 			
 class BackendController extends Controller
