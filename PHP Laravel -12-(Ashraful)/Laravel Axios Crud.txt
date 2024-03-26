@@ -1,0 +1,172 @@
+Routes (web.php)
+
+Route::get('/items', 'ItemController@index');
+Route::post('/items', 'ItemController@store');
+Route::put('/items/{id}', 'ItemController@update');
+Route::delete('/items/{id}', 'ItemController@destroy');
+
+Controller (ItemController.php)
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Item;
+
+class ItemController extends Controller
+{
+ public function index()
+ {
+ $items = Item::all();
+ return response()->json($items);
+ }
+
+ public function store(Request $request)
+ {
+ $request->validate([
+ 'name' => 'required|string|max:255'
+ ]);
+
+ $item = new Item();
+ $item->name = $request->name;
+ $item->save();
+
+ return response()->json($item);
+ }
+
+ public function update(Request $request, $id)
+ {
+ $request->validate([
+ 'name' => 'required|string|max:255'
+ ]);
+
+ $item = Item::findOrFail($id);
+ $item->name = $request->name;
+ $item->save();
+
+ return response()->json($item);
+ }
+
+ public function destroy($id)
+ {
+ $item = Item::findOrFail($id);
+ $item->delete();
+
+ return response()->json(['message' => 'Item deleted successfully']);
+ }
+}
+
+Blade Template (items.blade.php)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Items</title>
+</head>
+<body>
+ <h1>Items</h1>
+ 
+ <form id="addItemForm">
+ <input type="text" id="itemName" placeholder="Enter item name">
+ <button type="submit">Add Item</button>
+ </form>
+
+ <ul id="itemsList">
+ <!-- Items will be dynamically loaded here -->
+ </ul>
+
+ <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+ <script>
+ // Fetch items on page load
+ window.onload = function() {
+ fetchItems();
+ };
+
+ // Function to fetch items
+ function fetchItems() {
+ axios.get('/items')
+ .then(function(response) {
+ displayItems(response.data);
+ })
+ .catch(function(error) {
+ console.error('Error fetching items:', error);
+ });
+ }
+
+ // Function to display items
+ function displayItems(items) {
+ var itemsList = document.getElementById('itemsList');
+ itemsList.innerHTML = '';
+
+ items.forEach(function(item) {
+ var li = document.createElement('li');
+ li.textContent = item.name;
+
+ var editButton = document.createElement('button');
+ editButton.textContent = 'Edit';
+ editButton.onclick = function() {
+ var newName = prompt('Enter new name:', item.name);
+ if (newName !== null) {
+ updateItem(item.id, newName);
+ }
+ };
+
+ var deleteButton = document.createElement('button');
+ deleteButton.textContent = 'Delete';
+ deleteButton.onclick = function() {
+ deleteItem(item.id);
+ };
+
+ li.appendChild(editButton);
+ li.appendChild(deleteButton);
+ itemsList.appendChild(li); }); }
+
+ // Function to add an item
+ document.getElementById('addItemForm').addEventListener('submit', function(event) {
+ event.preventDefault(); // Prevent default form submission behavior
+ var itemName = document.getElementById('itemName').value.trim();
+
+ if (itemName === '') {
+ alert('Please enter a valid item name');
+ return;
+ }
+
+ axios.post('/items', { name: itemName })
+ .then(function(response) {
+ fetchItems(); // Refresh items after adding
+ document.getElementById('itemName').value = ''; // Clear input field
+ })
+ .catch(function(error) {
+ console.error('Error adding item:', error);
+ });
+ });
+
+ // Function to update an item
+ function updateItem(itemId, newName) {
+ axios.put('/items/' + itemId, { name: newName })
+ .then(function(response) {
+ fetchItems(); // Refresh items after updating
+ })
+ .catch(function(error) {
+ console.error('Error updating item:', error);
+ });
+ }
+
+ // Function to delete an item
+ function deleteItem(itemId) {
+ axios.delete('/items/' + itemId)
+ .then(function(response) {
+ fetchItems(); // Refresh items after deleting
+ })
+ .catch(function(error) {
+ console.error('Error deleting item:', error);
+ });
+ }
+ </script>
+</body>
+</html>
+
