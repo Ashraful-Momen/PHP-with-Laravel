@@ -274,7 +274,7 @@ class User extends Authenticatable
     ];
 
     public function address(){
-        return $this->HasOne('\App\Models\Address',);  // $this->HasOne('modelName::class', 'foreignKey', 'localKey');
+        return $this->HasOne('\App\Models\Address',);  // $this->HasOne('modelName::class(Address)', 'Address_table_foreignKey', 'userTable_localKey');
     }
 }
 
