@@ -1,0 +1,129 @@
+blade: 
+--------------
+   <div class="col">
+                                    <!-- Telimedi service  -->
+                                    <label for="teliMedicineCardAmount">Teli-Medicine Card Amount:</label>
+                                    <select name="teli_medi_fee" id="teliMedicineCardAmount"
+                                        onchange="showOptionsTeli()">
+                                        <option value="free">Free </option>
+                                        <option value="paid">Paid</option>
+                                    </select>
+                                    <div id="optionsContainer"></div>
+
+                                    <script>
+                                        function showOptionsTeli() {
+                                            var amountType = document.getElementById("teliMedicineCardAmount").value;
+                                            var optionsContainer = document.getElementById("optionsContainer");
+                                            optionsContainer.innerHTML = "";
+
+                                            if (amountType === "paid") {
+                                                for (var i = 1; i <= 9; i++) {
+                                                    var label = document.createElement("label");
+                                                    label.htmlFor = "teli_medi_fee_" + i;
+                                                    // label.appendChild(document.createTextNode("Teli_medicine_amount_" + i));
+                                                    // label.appendChild(document.createTextNode(i +" "));
+
+                                                    var selectOption = document.createElement("select");
+                                                    selectOption.name = "column_number_" + i;
+                                                    selectOption.innerHTML = "<option value='" + i + "'>" + i + "</option>";
+
+                                                    var inputField = document.createElement("input");
+                                                    inputField.type = "number";
+                                                    inputField.name = "teli_medi_fee_" + i;
+                                                    inputField.placeholder = "Amount for " + i;
+
+                                                    optionsContainer.appendChild(label);
+                                                    // optionsContainer.appendChild(selectOption);
+                                                    optionsContainer.appendChild(inputField);
+                                                    optionsContainer.appendChild(document.createElement("br"));
+                                                }
+
+                                                // Add unlimited option
+                                                var labelUnlimited = document.createElement("label");
+                                                labelUnlimited.htmlFor = "unlimited";
+                                                labelUnlimited.appendChild(document.createTextNode("Unlimited"));
+
+                                                var inputFieldUnlimited = document.createElement("input");
+                                                inputFieldUnlimited.type = "checkbox";
+                                                inputFieldUnlimited.name = "unlimited";
+                                                inputFieldUnlimited.value = "unlimited";
+                                                inputFieldUnlimited.id = "unlimited";
+
+                                                optionsContainer.appendChild(labelUnlimited);
+                                                optionsContainer.appendChild(inputFieldUnlimited);
+
+                                                // Add input field for Teli_medicine_price
+                                                var labelTeliMedicinePrice = document.createElement("label");
+                                                labelTeliMedicinePrice.htmlFor = "teli_medi_fee_unlimited";
+                                                // labelTeliMedicinePrice.appendChild(document.createTextNode("Teli Medicine Price:"));
+
+                                                var inputFieldTeliMedicinePrice = document.createElement("input");
+                                                inputFieldTeliMedicinePrice.type = "number";
+                                                inputFieldTeliMedicinePrice.name = "teli_medi_fee_unlimited"; // variable for unlimited
+                                                inputFieldTeliMedicinePrice.placeholder = "Enter Teli Medicine Price";
+
+                                                optionsContainer.appendChild(labelTeliMedicinePrice);
+                                                optionsContainer.appendChild(inputFieldTeliMedicinePrice);
+                                            }
+                                        }
+                                    </script>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+controller: 
+---------------
+  public function store(Request $request)
+{
+    // File Upload
+    $imageName = '';
+    if ($image = $request->file('image')) {
+        $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+        $image->move('images/packages', $imageName);
+    }
+
+    // Data Insertion
+    $life = new LifeAndHealth;
+    $life->category_id = $request->category_id;
+    $life->Pname = $request->Pname;
+    $life->image = $imageName;
+
+    // Constructing the teli_medicine_fee value
+    $teliMedicineFee = [];
+
+    // Loop through teli_medi_fee_1 to teli_medi_fee_9
+    for ($i = 1; $i <= 9; $i++) {
+        if ($request->has("teli_medi_fee_$i")) {
+            $teliMedicineFee["teli_medi_fee_$i"] = $request->input("teli_medi_fee_$i");
+        }
+    }
+
+    // Add the unlimited value if present
+    if ($request->has('unlimited')) {
+        $teliMedicineFee['unlimited'] = $request->input('teli_medi_fee_unlimited');
+    }
+
+    // Assign teli_medi_fee_unlimited value
+    $teliMedicineFee['teli_medi_fee_unlimited'] = $request->input('teli_medi_fee_unlimited');
+
+    // Serialize the teliMedicineFee array into JSON format
+    $jsonTeliMedicineFee = json_encode($teliMedicineFee);
+
+    // Assign the serialized JSON data to the teli_medicine_fee column
+    $life->teli_medi_fee = $jsonTeliMedicineFee;
+
+    //if teli_medicine_free:
+    $life->teli_medi_fee = $request->teli_medi_fee;
+
+    // Dynamically add other fields based on request variables
+    foreach ($request->except('_token', 'Pname', 'image', 'teli_medi_fee', 'unlimited', 'teli_medi_fee_unlimited') as $key => $value) {
+        // Exclude checkbox fields and other unwanted fields
+        if (!Str::endsWith($key, 'Checkbox')) {
+            $life->{$key} = $value;
+        }
+    }
+
+    $life->save();
+
+    // Redirect with success message
+    return redirect()->route('admin.life_and_health_show')->with('msg', 'Package Successfully Added!');
+}
+
