@@ -156,4 +156,159 @@ controller:
         return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_edit', compact('life_health', 'teliMedicineFeeValues', 'teliMedicineFree'));
     }
 
+=================================update the blade =================================================
+ <div class="col">
+                                    <!--  telimedicine  Amount -->
+
+
+                                    @if (isset($teliMedicineFeeValues) && !empty($teliMedicineFeeValues[0] && $teliMedicineFree == 'nothing'))
+                                        @php
+                                            $data = json_decode($teliMedicineFeeValues[0], true);
+                                        @endphp
+
+                                        @foreach ($data as $fieldName => $fieldValue)
+                                            <input type="number" name="{{ $fieldName }}"
+                                                value="{{ $fieldValue }}">
+                                            {{ $fieldName }}: {{ $fieldValue }}<br />
+                                        @endforeach
+                                        <label for="teliMedicineCardAmount">Teli-Medicine Card Amount</label>
+                                    @else
+                                        <input type="number" placeholder="No value find for teli medicine card"
+                                            class="form-control" disabled>
+                                        {{-- <br /> --}}
+                                    @endif
+
+                                    @if ($teliMedicineFree == 'free')
+                                        <label for="teliMedicineCardAmount">Teli-Medicine Card Amount:</label>
+                                        <select name="teli_medi_fee" id="teliMedicineCardAmount"
+                                            onchange="showOptionsTeli()">
+                                            <option value="free">Free Amount</option>
+                                            <option value="paid">Paid</option>
+                                        </select>
+                                        <div id="optionsContainer"></div>
+
+                                        <script>
+                                            function showOptionsTeli() {
+                                                var amountType = document.getElementById("teliMedicineCardAmount").value;
+                                                var optionsContainer = document.getElementById("optionsContainer");
+                                                optionsContainer.innerHTML = "";
+
+                                                if (amountType === "paid") {
+                                                    for (var i = 1; i <= 9; i++) {
+                                                        var label = document.createElement("label");
+                                                        label.htmlFor = "teli_medi_fee_" + i;
+                                                        // label.appendChild(document.createTextNode("Teli_medicine_amount_" + i));
+                                                        // label.appendChild(document.createTextNode(i +" "));
+
+                                                        var selectOption = document.createElement("select");
+                                                        selectOption.name = "column_number_" + i;
+                                                        selectOption.innerHTML = "<option value='" + i + "'>" + i + "</option>";
+
+                                                        var inputField = document.createElement("input");
+                                                        inputField.type = "number";
+                                                        inputField.name = "teli_medi_fee_" + i;
+                                                        inputField.placeholder = "Amount for " + i;
+
+                                                        optionsContainer.appendChild(label);
+                                                        // optionsContainer.appendChild(selectOption);
+                                                        optionsContainer.appendChild(inputField);
+                                                        optionsContainer.appendChild(document.createElement("br"));
+                                                    }
+
+                                                    // Add unlimited option
+                                                    var labelUnlimited = document.createElement("label");
+                                                    labelUnlimited.htmlFor = "unlimited";
+                                                    labelUnlimited.appendChild(document.createTextNode("Unlimited"));
+
+                                                    var inputFieldUnlimited = document.createElement("input");
+                                                    inputFieldUnlimited.type = "checkbox";
+                                                    inputFieldUnlimited.name = "unlimited";
+                                                    inputFieldUnlimited.value = "unlimited";
+                                                    inputFieldUnlimited.id = "unlimited";
+
+                                                    optionsContainer.appendChild(labelUnlimited);
+                                                    optionsContainer.appendChild(inputFieldUnlimited);
+
+                                                    // Add input field for Teli_medicine_price
+                                                    var labelTeliMedicinePrice = document.createElement("label");
+                                                    labelTeliMedicinePrice.htmlFor = "teli_medi_fee_unlimited";
+                                                    // labelTeliMedicinePrice.appendChild(document.createTextNode("Teli Medicine Price:"));
+
+                                                    var inputFieldTeliMedicinePrice = document.createElement("input");
+                                                    inputFieldTeliMedicinePrice.type = "number";
+                                                    inputFieldTeliMedicinePrice.name = "teli_medi_fee_unlimited"; // variable for unlimited
+                                                    inputFieldTeliMedicinePrice.placeholder = "Enter Teli Medicine Price";
+
+                                                    optionsContainer.appendChild(labelTeliMedicinePrice);
+                                                    optionsContainer.appendChild(inputFieldTeliMedicinePrice);
+                                                }
+                                            }
+                                        </script>
+                                    @endif
+                                    {{-- -------------------------------------------------------- --}}
+                                    {{-- @php
+                                        dd($teliMedicineFeeValues);
+                                    @endphp --}}
+
+
+
+                                    {{-- @if (isset($teliMedicineFeeValues))
+
+
+
+                                        @foreach ($teliMedicineFeeValues as $key => $jsonString)
+                                            @php
+                                                $data = json_decode($jsonString, true);
+                                            @endphp
+
+                                            @foreach ($data as $fieldName => $fieldValue)
+                                                <input type="number" name="{{ $fieldName }}"
+                                                    value="{{ $fieldValue }}">
+                                                {{ $fieldName }}: {{ $fieldValue }}<br />
+                                            @endforeach
+                                        @endforeach
+
+                                    @endif --}}
+
+
+
+
+                                    {{-- @php
+                                           dd($teliMedicineFeeValues);
+
+                                    @endphp --}}
+
+
+
+                                    {{-- @foreach ($teliMedicineFeeValues as $key => $value)
+                                        <input type="number" name="$teli_medicine_fee_{{ $key + 1 }}"
+                                            value="{{ $value }}">
+                                         echo $key+1." ".$value."<br/>";
+                                    @endforeach --}}
+
+                                    {{-- @php
+
+                                        dd($teliMedicineFeeValues);
+
+                                    @endphp --}}
+
+
+
+
+
+
+
+
+
+                                    <!-- Telimedi service -->
+
+
+                                    <!--  telimedicine  Amount -->
+                                    {{-- <input type="number" name="teli_medicine_fee"
+                                        value="{{ $life_health->teli_medicine_fee }}" nothing class="form-control"
+                                        placeholder="Teli-Medicine Card Amount">
+                                    <label class="form-label" for="form1Example2">Teli-Medicine Card Amount</label> --}}
+                                </div>
+
+
 
