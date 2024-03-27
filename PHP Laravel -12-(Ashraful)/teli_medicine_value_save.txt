@@ -127,3 +127,33 @@ controller:
     return redirect()->route('admin.life_and_health_show')->with('msg', 'Package Successfully Added!');
 }
 
+#update function for the controller : 
+======================================
+   public function edit($id)
+    {
+
+
+        $life_health = LifeAndHealth::findOrFail($id);
+
+        // dd($life_health->teli_medi_fee);
+
+        // Extract teli_medicine_fee values for display
+        $teliMedicineFeeValues = explode(', ', $life_health->teli_medi_fee);
+
+        // dd($teliMedicineFeeValues);
+
+
+
+        if ($life_health->teli_medi_fee == "free") {
+            $teliMedicineFree = 'free';
+        } else {
+            $teliMedicineFree = 'nothing';
+        }
+
+        // dd($life_health->teli_medicine_fee);
+
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_edit', compact('life_health', 'teliMedicineFeeValues', 'teliMedicineFree'));
+    }
+
+
