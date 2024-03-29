@@ -1,5 +1,8 @@
+
 get > created_at and updated_at  from the pivot table in many to many relationship => ->withTimestamps(); //add this function 
 
+>>> php artisan migrate:rollback . // uncomment pivot table -> $table->timeStamp() 
+#Now migrate again >>>> php artisan migrate . 
 ===========================================================================================================================
 Post:model =>
 -----------------
@@ -125,3 +128,18 @@ class Post extends Model
 }
 
 ===========================================================================================================================
+web route: 
+------------
+
+$post = Post::with(['user','tags'])->first();
+
+//attach post 1 , status = approved on pivot table . 
+$post->tags()->attach([
+1 =>[
+'status'=>'approved',
+]
+]);
+
+#show the status form pivot table. 
+$post = Post::with('tags')->first()->pivot->status;
+dd($post);
