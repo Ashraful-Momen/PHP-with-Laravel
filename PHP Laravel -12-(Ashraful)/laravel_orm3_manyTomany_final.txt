@@ -1,0 +1,244 @@
+#post table : make model with migration table
+---------------
+
+>>> php artisan make:model Post -m
+----------------------------------------------------
+#post table =>
+----------------
+ public function up()
+    {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->bigInteger('user_id')->nullable(); //fk
+            $table->string('title')->nullable();
+            $table->timestamps();
+        });
+    }
+-------------------------------------------------------
+#post model =>
+---------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $guarded = [];
+
+    protected $fillable = [
+        'title',
+        'user_id',
+    ];
+
+    public function users(){
+        return $this->belongsTo(User::class,'user_id','id'); // (user::model, post_table_forigenkey_user_id,user_table_local_key_id)
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class,'post_tag','post_id','tag_id');
+    }
+}
+
+-------------------------------------------------------
+#tag Table :
+---------------
+   public function up()
+    {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->timestamps();
+        });
+    }
+-------------------------------------------------------
+#tag Model :
+==============
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Tag extends Model
+{
+    use HasFactory;
+
+    protected $guarded = [];
+
+    protected $fillable = [
+        'name',
+    ];
+
+    public function posts(){
+        return $this->belongsToMany(Tag::class,'post_tag','tag_id','post_id');
+    }
+}
+
+-------------------------------------------------------
+User Model :
+------------
+<?php
+
+namespace App\Models;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function posts(){
+        return $this->hasMany(Post::class,'user_id','id'); //(post_model_table,post_table_fk_user_id,user_table_lockpk_id)
+    }
+}
+
+-------------------------------------------------------
+#creating post_tag pivot  table:
+----------------------------------
+>>> php artisan make:migration create_post_tag_table --create=post_tag
+-------------------------------------------------------
+#post_tag pivot table :
+-----------------------
+ public function up()
+    {
+        Schema::create('post_tag', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->bigInteger('post_id')->nullable();
+            $table->bigInteger('tag_id')->nullable();
+            // $table->timestamps();
+        });
+    }
+
+-------------------------------------------------------
+#up all the table to the DB: >>> php artisan migrate
+-------------------------------------------------------
+#route:
+------------
+<?php
+
+use App\Models\Tag;
+use App\Models\Post;
+use App\Models\User;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+
+    $user = new User();
+
+    $user->factory()->count(3)->create();
+
+    return ;
+    // return view('welcome');
+});
+
+
+Route::get('/post',function(){
+    Post::create([
+        'title'=>'post1',
+        'user_id'=>1,
+    ]);
+     Post::create([
+        'title'=>'post2',
+        'user_id'=>2,
+    ]);
+     Post::create([
+        'title'=>'post3',
+        'user_id'=>3,
+    ]);
+
+    return 'post created successfully';
+
+
+});
+
+Route::get('/tag',function(){
+
+    Tag::create([
+        'name'=>'tag1',
+
+    ]);
+    Tag::create([
+        'name'=>'tag2',
+
+    ]);
+    Tag::create([
+        'name'=>'tag3',
+
+    ]);
+
+
+    return 'tag created successfully';
+
+
+});
+
+
+//attach+dettach method for many to many relation ship
+
+Route::get('/attach',function(){
+    // $post = Post::first();
+    // $post = Post::with('tags')->first();
+    // $post = Post::with(['tags','users'])->first();
+
+    // // $post->tags()->attach([1,2,3]);
+    // dd($post);
+
+    $user = User::with('posts')->first();
+    dd($user);
+    return 'attach successfully';
+});
+
+-------------------------------------------------------
+-------------------------------------------------------
+
