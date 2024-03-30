@@ -1,0 +1,28 @@
+
+#group middleware for admin and user:
+--------------------------------------
+Route::group(['middleware' => ['auth', 'user']], function () {
+   Route::get('/dashboard', 'Frontend\HomeController@dashboard')->name('user.dashboard');
+
+}
+
+
+#single route middleware: 
+-------------------------
+  Route::get('/dashboard', 'Frontend\HomeController@dashboard')->name('user.dashboard')->middleware('user');
+
+
+#in Blade User permission with Guard: 
+---------------------------------------
+@auth('admin')
+    <li>Dashboard</li>
+    <li>Log out</li>
+@endauth
+
+
+@guest('admin')
+    @guest('web')
+        <li>Contact</li>
+        <li>About us</li>
+    @endguest
+@endguest
