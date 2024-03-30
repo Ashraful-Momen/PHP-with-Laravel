@@ -1,0 +1,295 @@
+#Route: 
+------------------------------------------------------------------------
+
+<?php
+
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+
+Route::post('/post_form',[App\Http\Controllers\post_form::class, 'post_form'])->name('post_form'); // form post ....
+
+
+
+-----------------------------------------------------------------------------------------
+#post Controller: 
+-------------------
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\post;
+use App\Events\PostCreated;
+use Illuminate\Http\Request;
+
+
+class post_form extends Controller
+{
+    public function post_form(Request $request) {
+
+
+        $post = new post();
+
+        $post->email = $request->email;
+        $post->message = $request->message;
+
+        $post->save();
+
+        $data = ['email'=>$post->email, 'message'=>$post->message];
+
+        event(new PostCreated($data));
+
+        return redirect()->back()->with('message', 'Your message has been sent successfully.');
+    }
+}
+
+
+-----------------------------------------------------------------------------------------
+Post::Blade.php => 
+--------------------
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                @if (Session::has('message'))
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ Session::get('message') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+
+                <form action="{{ route('post_form') }}" method="Post" enctype="multipart/form-data"
+                    class="mt-5 border p-5">
+                    @csrf
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input name="email" type="email" class="form-control" id="exampleInputEmail1"
+                            aria-describedby="emailHelp" placeholder="Enter email">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
+                            else.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Message</label>
+                        <textarea type="text" class="form-control" name="message" id="" cols="30" rows="4"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
+
+-----------------------------------------------------------------------------------------
+#Event: 
+-----------
+<?php
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class PostCreated
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $post;
+
+    public function __construct($post)
+    {
+        //
+        $this->post = $post;
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return \Illuminate\Broadcasting\Channel|array
+     */
+    public function broadcastOn()
+    {
+        return new PrivateChannel('channel-name');
+    }
+}
+
+
+-----------------------------------------------------------------------------------------
+Listener: 
+-----------
+<?php
+
+namespace App\Listeners;
+
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserMail;
+use App\Events\PostCreated;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+class NotifyUser
+{
+    /**
+     * Create the event listener.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     *
+     * @param  \App\Events\PostCreated  $event
+     * @return void
+     */
+    public function handle(PostCreated $event)
+    {
+
+        // dd($event->post['email'], $event->post['message']);
+
+        Mail::to($event->post['email'])->send(new UserMail($event->post['message']));
+    }
+}
+
+-----------------------------------------------------------------------------------------
+EventListenerServiceProvider: 
+------------------------------
+<?php
+
+namespace App\Providers;
+
+use App\Events\PostCreated;
+use App\Listeners\NotifyUser;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+
+class EventServiceProvider extends ServiceProvider
+{
+
+    protected $listen = [
+        Registered::class => [
+            SendEmailVerificationNotification::class,
+        ],
+        \App\Events\PostCreated::class => [
+            \App\Listeners\NotifyUser::class,
+        ],
+    ];
+
+
+    public function boot()
+    {
+        //
+        // parent::boot();
+    }
+}
+
+-----------------------------------------------------------------------------------------
+UserMail::
+-------------
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+
+class UserMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public $post; // this data comes form the listener
+    public function __construct($post)
+    {
+        //
+        $this->post = $post;
+    }
+
+
+    public function build()
+    {
+        // dd($this->post);
+        return $this->view('user_mail', ['post' => $this->post]);
+    }
+}
+
+-----------------------------------------------------------------------------------------
+#user_mail.blade.php=> 
+-------------------
+{{-- <p><b>Post Title: </b>{{ $post['email'] }}</p> --}}
+
+<p><b>Post Body: </b>{{ $post }}</p>
+
+
+{{-- @php
+    dd($post);
+@endphp --}}
+
+
+-----------------------------------------------------------------------------------------
+.env=> 
+------------
+## SMTP Mail Configuration ##
+MAIL_MAILER=smtp
+MAIL_HOST=business90.web-hosting.com
+MAIL_PORT=587
+MAIL_USERNAME=ashraful@instasure.xyz
+MAIL_PASSWORD=786Ashraful
+MAIL_ENCRYPTION=TLS
+# MAIL_ENCRYPTION=STARTTLS
+
+MAIL_FROM_ADDRESS="${MAIL_USERNAME}"
+MAIL_FROM_NAME="${APP_NAME}"
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
