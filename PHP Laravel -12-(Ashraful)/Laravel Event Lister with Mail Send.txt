@@ -1,3 +1,19 @@
+# if we want to send multple user mail , then create multiple listener + mail =>  for send mail multiple user. 
+# class UserMail extends Mailable implements ShouldQueue. [now mail send with the help of queue]. 
+
+======================================================================
+>>> php artisan key:generate
+>>> php artisan optimize:clear
+>>> php artisan make:controller controller_name
+>>> php artisan make:migration create_post_table --create=post_form
+>>> php artisan make:model post 
+>>> php artisan make:event PostCreated 
+>>> php artisan make:listener NotifyUser --event=PostCreated
+>>> php artisan queue:table
+>>> php artisan migrate
+======================================================================
+
+
 #Route: 
 ------------------------------------------------------------------------
 
