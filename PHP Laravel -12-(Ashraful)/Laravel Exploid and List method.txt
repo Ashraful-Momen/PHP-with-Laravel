@@ -1,0 +1,19 @@
+
+        $teli_medicine_charge = $request->teli_medicine_charge; // Assuming $request->teli_medicine_charge contains "9:400"
+
+        $json_decoded = json_decode($request->teli_medicine_charge);
+
+        // dd($json_decoded);
+
+        if ($json_decoded !== null) {
+            // If the input is valid JSON, set $teli_medicine_fee to 0
+            $teli_medicine_fee = 0;
+        }
+
+        elseif ($request->teli_medicine_charge == 'free') {
+            $teli_medicine_fee = 0;
+        }
+
+        elseif($json_decoded === null) {
+            list($teli_medi_call, $teli_medicine_fee) = explode(':', $teli_medicine_charge);
+        }
