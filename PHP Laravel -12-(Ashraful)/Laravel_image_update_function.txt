@@ -1,0 +1,22 @@
+#for storing the image=> 
+==========================
+$carInsurance->image = $request->image->store('images');
+
+        $carInsurance->save();
+
+#for update the imgae => 
+==========================
+ if ($request->hasFile('image')) {
+            // Delete the existing image file if it exists
+            Storage::delete($carInsurance->image);
+
+            // Store the new image
+            $carInsurance->image = $request->image->store('images');
+        }
+
+
+
+
+
+
+        $carInsurance->save();
