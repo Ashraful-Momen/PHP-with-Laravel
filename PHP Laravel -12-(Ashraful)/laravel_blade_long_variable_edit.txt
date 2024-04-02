@@ -6,3 +6,8 @@ for edit the num+string var: in blade :
                                     <label class="form-label" for="form1Example2">Basic Premium</label>
                                 </div>
 ==============================================
+
+in controller : 
+==================
+ $carInsurance->{'3000cc_over_extra_2'} = $request->{'3000cc_over_extra_2'};
+ 
