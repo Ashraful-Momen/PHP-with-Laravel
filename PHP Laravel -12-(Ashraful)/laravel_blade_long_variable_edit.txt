@@ -1,0 +1,8 @@
+for edit the num+string var: in blade : 
+===========================================
+ <div class="col">
+                                    <input type="number" name="3000cc_over_fee" value="{{ $car->{'3000cc_over_fee'} }}"
+                                        class="form-control" placeholder="Basic Premium (Ex: 2990 Tk)" nothing>
+                                    <label class="form-label" for="form1Example2">Basic Premium</label>
+                                </div>
+==============================================
