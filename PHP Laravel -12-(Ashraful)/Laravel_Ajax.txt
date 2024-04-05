@@ -1,0 +1,588 @@
+Route:
+----------
+<?php
+
+use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Route;
+
+
+
+
+
+Route::get('/', [ProductController::class, 'product'])->name('product');
+
+Route::post('/product_store', [ProductController::class, 'store'])->name('product.store');
+Route::post('/product_update', [ProductController::class, 'update'])->name('product.update');
+Route::post('/product_delete', [ProductController::class, 'delete'])->name('product.delete');
+Route::get('/pagination/paginate-data', [ProductController::class, 'pagination'])->name('product.pagination');
+Route::get('/search', [ProductController::class, 'search'])->name('product.search');
+
+-----------------------------------------------------------------------------------------------------------------
+controller=>
+-------------
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+
+class ProductController extends Controller
+{
+    //
+
+    //show the product blade
+    public function product()
+    {
+        $products = Post::latest()->paginate(5);
+        return view("product", ['products' => $products]);
+    }
+
+    public function store(Request $request)
+    {
+
+        //test those validation and data save with ajax with return response()->json(); either getting lots of error.
+
+        $request->validate(
+            [
+                "name" => "required ", // If we use unique then it will not work for ajax .
+                "price" => "required",
+            ],
+            [
+                "name.required" => "Name is required",
+                "name.unique" => "Product already exits", // this condition is not working
+                "price.required" => "Price is required",
+            ]
+
+        );
+
+        // dd($request);
+
+
+        $product = new Post();
+        $product->name = $request->name;
+        $product->price = $request->price;
+        $product->save();
+
+
+        return response()->Json([
+            "status" => "success",
+        ]);
+    }
+
+    // public function update(Request $request)
+    // {
+
+
+    //     dd($request->all());
+
+
+    //     //test those validation and data save with ajax with return response()->json(); either getting lots of error.
+
+    //     // $request->validate(
+    //     //     [
+    //     //         "up_name" => "required |unique:product,name,".$request->up_id, // If we use unique then it will not work for ajax .
+    //     //         "up_price" => "required",
+    //     //     ],
+    //     //     [
+    //     //         "name.required" => "Name is required",
+    //     //         "name.unique" => "Product already exits",// this condition is not working
+    //     //         "price.required" => "Price is required",
+    //     //         ]
+
+    //     //     );
+
+
+
+
+
+
+    //     $product = Post::where('id',$request->up_id)->get();
+    //     $product::update([
+    //         'name' => $request->up_name,
+    //         'price' =>$request->up_price,
+    //     ]);
+
+
+    //     return response()->Json([
+    //         "status"=> "success",
+    //     ]);
+
+
+    // }
+
+
+
+    public function update(Request $request)
+    {
+
+
+
+        // Validate request data
+        $request->validate([
+            "up_name" => "required",
+            "up_price" => "required",
+        ], [
+            "up_name.required" => "Name is required",
+            "up_name.unique" => "Product already exists",
+            "up_price.required" => "Price is required",
+        ]);
+
+        // Update product
+        $product = Post::find($request->up_id);
+        $product->name = $request->up_name;
+        $product->price = $request->up_price;
+        $product->save();
+
+        return response()->json([
+            "status" => "success",
+        ]);
+    }
+
+    public function delete(Request $request){
+
+        $product = Post::find($request->id)->delete();
+
+        return response()->json([
+            "status" => "success",
+        ]);
+    }
+
+    public function pagination(){
+        $products = Post::latest()->paginate(5);
+        return view("product_pagination", ['products' => $products])->render(); //now this view will render to the ajax functon product(page);
+    }
+
+
+    public function search(Request $request){
+        $products = Post::where('name','like', '%'.$request->search.'%')
+        ->orWhere('price','like', '%'.$request->search.'%')
+        ->orderBy('id','desc')->paginate(5);
+
+        if($products->count() >= 1){
+            return view("product_pagination", ['products' => $products])->render();
+        }
+        else{
+            return response()->json([
+                'status'=>'nothing_found',
+            ]);
+        }
+    }
+
+}
+
+-----------------------------------------------------------------------------------------------------------------
+main page => product.blade.php
+--------------------------------
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    {{-- ajax cdn link --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+</head>
+
+<body class="bg-background">
+    <div class="container ">
+        <div class="row ">
+            <div class="col   pageReload" style="height: 100vh">
+                <h4 class="text-center mt-5 text-white ">Ajax Laravel CRUD
+                    <hr>
+                </h4>
+                <button class="btn btn-warning mt-5 mb-1" data-bs-toggle="modal" data-bs-target="#addProductModal">Add
+                    Product</button>
+                <input type="text" class="form-control mb-3 mt-3" id="search" name="search" placeholder="Search here">
+                <div class="table-data">
+                    <table class="table border  text-center">
+                        <thead>
+                            <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- @php
+                                dd($products);
+                            @endphp --}}
+
+                            @foreach ($products as $key => $product)
+                                <tr>
+                                    <th scope="row">{{ $key + 1 }}</th>
+                                    <td>{{ $product->name }}</td>
+                                    <td>{{ $product->price }}</td>
+                                    <td>
+                                        <a href="" data-bs-target="#updateProductModal" data-bs-toggle="modal"
+                                            data-id="{{ $product->id }}" data-name="{{ $product->name }}"
+                                            data-price="{{ $product->price }}"
+                                            class="edit_btn"
+                                            id="edit_btn">
+                                            <button class="btn btn-primary">Edit</button>
+                                        </a>
+                                        <a href=""  data-id="{{ $product->id }}" class="delete_btn" >
+
+                                            <button class="btn btn-danger">Delete</button>
+
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+
+                        </tbody>
+                    </table>
+                     {{ $products->links() }}
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
+    </script>
+
+    {{-- line for add product with modal  --}}
+    @include('product_add_modal')
+
+    {{-- line for update product with modal  --}}
+    @include('product_update_modal')
+
+    {{-- link the ajax file  --}}
+    @include('product_ajax_file')
+</body>
+
+</html>
+
+-----------------------------------------------------------------------------------------------------------------
+product_ajax_file.blade.php=>
+------------------------------
+{{-- laravel jquery file for ajax --}}
+{{-- <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script> --}}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+{{-- laravel ajax script setup --}}
+<script>
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // alert("this is the check for the alert");
+
+        //add product ajax function: ______________________________
+        // when the add product button is clicked, then trigger the function
+        $(document).on('click', '.add_product_btn', function(e) {
+            e.preventDefault();
+            let name = $('#name').val();
+            let price = $('#price').val();
+
+            console.log(name, price); // without  this line can't dd() from controller
+
+            $.ajax({
+                url: "{{ route('product.store') }}",
+                method: "POST",
+                data: {
+                    name: name,
+                    price: price,
+                },
+                success: function(
+                    res
+                ) { // if controller return response()->Json(). then this success function will work.
+
+                    if (res.status ==
+                        "success"
+                    ) { //this res.status comes form controller json response array.
+
+                        $('#addProductModal').modal(
+                            'hide'); //close the modal, after submiting.
+                        $('#addProductForm')[0]
+                            .reset(); //reset the form(input field), after submiting.
+                        $('.pageReload').load(location.href +
+                            ' .pageReload'
+                        ); // reload the table after submiting. auto refreshing the table.
+
+                    }
+
+                },
+                error: function(
+                    err
+                ) { //if controller return response()->Json(). then this error function will work. and show the validation error .
+                    let error = err
+                        .responseJSON; // controller return response()->Json(). get the error from the laravel store function validation.
+
+                    // console.log(error.errors);
+                    // display the error in a div product blade.
+                    $.each(error.errors,
+                        function(key, value) {
+                            $('.errorMsgContainer').append('<p class="text-danger">' +
+                                value + '</p>' + '</br>');
+                        }
+                    )
+                },
+
+
+
+            })
+        })
+
+        //update product value in update modal: modal _________________________
+        $(document).on('click', '#edit_btn', function(e) {
+
+
+            //edit button data-id, data-name, data-price =>  this is the product blade.
+            let id = $(this).data('id'); //those value get from edit button =>id,name,price.
+            let name = $(this).data('name');
+            let price = $(this).data('price');
+
+            // console.log(id,name,price);
+
+
+            //update modal data-id, data-name, data-price =>  this is the update blade.
+            $('#up_id').val(id); //hidden field .val(let id)
+            $('#up_name').val(name); //.val(let name)
+            $('#up_price').val(price); //.val(let price)
+
+        })
+
+        //update ajax function : ____________________________________
+        $(document).on('click', '.update_product_btn', function(e) {
+            e.preventDefault();
+            let id = $('#up_id').val();
+            let name = $('#up_name').val();
+            let price = $('#up_price').val();
+
+            console.log(id, name, price);
+
+            $.ajax({
+                url: "{{ route('product.update') }}",
+                method: "POST",
+                data: {
+                    up_id: id,
+                    up_name: name,
+                    up_price: price,
+                    // Corrected the variable names and values
+                },
+                success: function(res) {
+                    if (res.status == "success") {
+                        $('#updateProductModal').modal('hide');
+                        $('#updateProductForm')[0].reset();
+                        $('.table').load(location.href + ' .table');
+                    }
+                },
+                error: function(err) {
+                    let error = err.responseJSON;
+                    $('.errorMsgContainer').empty(); // Clear previous error messages
+                    $.each(error.errors, function(key, value) {
+                        $('.errorMsgContainer').append('<p class="text-danger">' +
+                            value + '</p>');
+                    });
+                },
+            });
+        });
+
+        //delete product : ________________________________________
+
+        $(document).on('click', '.delete_btn', function(e) {
+            e.preventDefault();
+            let product_id = $(this).data('id');
+            console.log(product_id);
+            if (confirm("Are you sure to delete?")) {
+                $.ajax({
+                    url: "{{ route('product.delete') }}",
+                    method: "POST",
+                    data: {
+                        id: product_id,
+                    },
+                    success: function(res) {
+                        if (res.status == "success") {
+
+                            $('.table').load(location.href + ' .table');
+                        }
+                    },
+
+                });
+            }
+        })
+
+        //pagination : __________________________________________
+        $(document).on('click', '.pagination a', function(e) {
+            e.preventDefault();
+            let page = $(this).attr('href').split('page=')[
+            1]; //in pagination class we just collect page number , example: page=2
+            // console.log(page);
+            product(page);
+        })
+
+        function product(page) {
+            $.ajax({
+                url: "/pagination/paginate-data?page=" + page,
+                success: function(res) {
+                    $('.table-data').html(
+                    res); //load the table when controller pagination function return response and render the table view.
+                }
+            })
+        }
+
+        //search: _________________________________________
+
+        $(document).on('keyup', '#search', function(e) {
+            e.preventDefault();
+            let search = $(this).val();
+            console.log(search);
+            $.ajax({
+                url: "{{ route('product.search') }}",
+                method: "get",
+                data: {
+                    search: search
+                },
+                success: function(res) {
+                    $('.table-data').html(res); //load the table when controller pagination function return response and render the table view.
+                    if (res.status == "nothing_found") {
+                        $('.table-data').html('<span class="text-danger">' +
+                            'Nothing Found' + '</span>');
+                    }
+                }
+            });
+        });
+
+
+    })
+</script>
+
+-----------------------------------------------------------------------------------------------------------------
+addProduct modal =>
+----------------------
+<!-- Button trigger modal -->
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="errorMsgContainer">
+                {{-- show the error msg  --}}
+            </div>
+          <form action="{{route('product.store')}}" method="post" id="addProductForm">
+            @csrf
+            <label for="name">Add Product Name</label>
+            <input type="text" class="form-control mb-3" id="name" name="name" id="name">
+            <label for="name">Add Product Price</label>
+            <input type="number" class="form-control" id="price" name="price" id="price">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary add_product_btn">Add Product</button>
+        </div>
+    </form>
+      </div>
+    </div>
+  </div>
+
+-----------------------------------------------------------------------------------------------------------------
+update modal =>
+------------------
+<!-- Button trigger modal -->
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="updateProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Update Product </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="errorMsgContainer">
+                {{-- show the error msg  --}}
+            </div>
+          <form action="" method="post" id="updateProductForm">
+            @csrf
+            <input hidden  id="up_id">
+            <label for="name">Add Product Name</label>
+            <input type="text" class="form-control mb-3" id="up_name" name="up_name" id="name">
+            <label for="name">Add Product Price</label>
+            <input type="number" class="form-control" id="up_price" name="up_price" id="price">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary update_product_btn">Update Product</button>
+        </div>
+    </form>
+      </div>
+    </div>
+  </div>
+
+-----------------------------------------------------------------------------------------------------------------
+laravel Pagination.blade.php=>
+----------------------------------
+<div class="table-data">
+
+
+   <table class="table border  text-center">
+       <thead>
+           <tr>
+               <th scope="col">Id</th>
+               <th scope="col">Name</th>
+               <th scope="col">Price</th>
+               <th scope="col">Action</th>
+           </tr>
+       </thead>
+       <tbody>
+           {{-- @php
+               dd($products);
+           @endphp --}}
+
+           @foreach ($products as $key => $product)
+               <tr>
+                   <th scope="row">{{ $key + 1 }}</th>
+                   <td>{{ $product->name }}</td>
+                   <td>{{ $product->price }}</td>
+                   <td>
+                       <a href="" data-bs-target="#updateProductModal" data-bs-toggle="modal"
+                           data-id="{{ $product->id }}" data-name="{{ $product->name }}"
+                           data-price="{{ $product->price }}"
+                           class="edit_btn"
+                           id="edit_btn">
+                           <button class="btn btn-primary">Edit</button>
+                       </a>
+                       <a href=""  data-id="{{ $product->id }}" class="delete_btn" >
+
+                           <button class="btn btn-danger">Delete</button>
+
+                       </a>
+                   </td>
+               </tr>
+           @endforeach
+
+       </tbody>
+   </table>
+    {{ $products->links() }}
+</div>
+
+-----------------------------------------------------------------------------------------------------------------
+Allah Hafez!
+-----------------------------------------------------------------------------------------------------------------
