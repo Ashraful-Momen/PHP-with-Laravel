@@ -1,0 +1,83 @@
+pagination:
+---------------
+AppServiceProvider=>
+--------------------
+ public function boot()
+    {
+        Paginator::useBootstrap();
+    }
+==============================================================
+route=>
+-------
+Route::get('/pagination/paginate-data', [ProductController::class, 'pagination'])->name('product.pagination');
+==============================================================
+controller=>
+------------
+ public function pagination(){
+        $products = Post::latest()->paginate(5);
+        return view("product_pagination", ['products' => $products])->render(); //now this view will render to the ajax functon product(page);
+    }
+==============================================================
+product_pagination.blade.php=>
+-------------------------------
+<table class="table border  text-center">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Price</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{-- @php
+            dd($products);
+        @endphp --}}
+
+        @foreach ($products as $key => $product)
+            <tr>
+                <th scope="row">{{ $key + 1 }}</th>
+                <td>{{ $product->name }}</td>
+                <td>{{ $product->price }}</td>
+                <td>
+                    <a href="" data-bs-target="#updateProductModal" data-bs-toggle="modal"
+                        data-id="{{ $product->id }}" data-name="{{ $product->name }}"
+                        data-price="{{ $product->price }}"
+                        class="edit_btn"
+                        id="edit_btn">
+                        <button class="btn btn-primary">Edit</button>
+                    </a>
+                    <a href=""  data-id="{{ $product->id }}" class="delete_btn" >
+
+                        <button class="btn btn-danger">Delete</button>
+
+                    </a>
+                </td>
+            </tr>
+        @endforeach
+
+    </tbody>
+</table>
+ {{ $products->links() }}
+
+==============================================================
+ajax function :
+=================
+
+        //pagination : __________________________________________
+        $(document).on('click', '.pagination a', function(e) {
+            e.preventDefault();
+            let page = $(this).attr('href').split('page=')[1]; //in pagination class we just collect page number , example: page=2
+            // console.log(page);
+            product(page);
+        })
+
+        function product(page){
+            $.ajax({
+            url:"/pagination/paginate-data?page="+page,
+            success:function(res){
+                $('.table-data').html(res); //load the table when controller pagination function return response and render the table view.
+            }
+        })
+        }
+==============================================================
