@@ -18,7 +18,7 @@ install client side for pusher=>
 npm install pusher-js && laravel-echo
 
 ----------------------
-after configure all goto > config > app.php and commnetout=> 
+after configure all goto > config > app.php and commnetout=>
 
 commentout this line=> App\Providers\BroadcastServiceProvider::class,
 
@@ -112,14 +112,15 @@ welcome.blade.php =>
                                         {{-- <div class="card-body" data-mdb-perfect-scrollbar="true"
                                             style="position: relative; height: 400px"> --}}
 
-                                        <div class="card-body" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px; overflow-y: auto;">
+                                        <div class="card-body" data-mdb-perfect-scrollbar="true"
+                                            style="position: relative; height: 400px; overflow-y: auto;">
 
 
-                                            <div class="d-flex justify-content-between"  id="show_username">
-                                                <p class="small mb-1 text-muted">23 Jan 2:00 pm</p>
+                                            <div class="d-flex justify-content-between" id="show_username">
+                                                <p class="small mb-1 text-muted" id="show_time"></p>
                                                 {{-- <p class="small mb-1">Timona Siera</p> --}}
                                             </div>
-                                            <div class="d-flex flex-row justify-content-start" >
+                                            <div class="d-flex flex-row justify-content-start">
                                                 <div id="show_img">
 
                                                 </div>
@@ -144,7 +145,7 @@ welcome.blade.php =>
                                                 <input type="text" class="form-control" placeholder="Type Username"
                                                     name="username" id="username" value="{{ old('username') }}" />
                                                 <input type="text" class="form-control" placeholder="Type Message"
-                                                    name="sms" id="sms"  />
+                                                    name="sms" id="sms" />
 
                                             </div>
                                             <button class="btn btn-warning" type="button" id="send-message"
@@ -192,30 +193,63 @@ welcome.blade.php =>
     @include('js')
 
     <script>
-
         // Enable pusher logging - don't include this in production
         Pusher.logToConsole = true;
 
         var pusher = new Pusher('1b962f36c70062cc4d34', {
-          cluster: 'ap2'
+            cluster: 'ap2'
         });
 
         var channel = pusher.subscribe('chat');
         channel.bind('message', function(data) {
 
-            $('#show_messages').append('<strong>'+data.username+'</strong> :'+'<p class="small p-2 ms-3 mb-3 rounded-3 direct-chat-message" style="background-color: #f5f6f7;">'+data.message+'</p>'+'<br>');
+            // ------------------code for the time-----------------------------
+            // var now = new Date(); // Current date and time
+            // var currentDate = now.toLocaleDateString(); // Get current date in local format
+            // var currentTime = now.toLocaleTimeString(); // Get current time in local format
+            // -----------------------------------
+            var now = new Date(); // Current date and time
+
+            // Get the month name
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var monthName = months[now.getMonth()];
+
+            // Get the date components
+            var date = now.getDate();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var ampm = hours >= 12 ? 'pm' : 'am';
+
+            // Convert hours to 12-hour format
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 should be treated as 12
+
+            // Add leading zeros to minutes if needed
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+
+            // Construct the formatted date and time string
+            var formattedDateTime = date + ' ' + monthName + ' ' + hours + ':' + minutes + ' ' + ampm;
+
+
+            // -----------------------------------------------
+
+            $('#show_messages').append('<strong>' + data.username + '</strong> :' + '<p class=" p-2 ms-3 mb-3 rounded-3 direct-chat-message" style="background-color: #f5f6f7;">' +
+                data.message + '</p>' + '<br> <small>' + formattedDateTime   + '</small>' + '<br>');
             // $('#show_username').html(data.username);
+            $('#sms').val('');
+            $('$')
 
 
 
-        //   console.log(data.username,data.message);
+            //   console.log(data.username,data.message);
         });
-      </script>
+    </script>
 
 </body>
 
 
 </html>
+
 
 
 ---------------------------------------------------------------------------
@@ -254,7 +288,7 @@ js.blade.php=>
                             },
                             success:function(res){
                                 if(res.success==true){
-                                    alert(res.username, res.message);
+                                    // alert(res.username, res.message);
                                 }
                             }
                         })
