@@ -1,0 +1,318 @@
+install pusher server=>
+------------------------
+>>> composer requier pusher/pusher-php-server
+------------------------
+>>> goto pusher.js => create app and paste credential
+----------------------
+.env =>
+----------------------
+BROADCAST_DRIVER=pusher
+
+PUSHER_APP_ID=1783985
+PUSHER_APP_KEY=1b962f36c70062cc4d34
+PUSHER_APP_SECRET=5f3fe6969b909535dd06
+PUSHER_APP_CLUSTER=ap2
+----------------------
+install client side for pusher=>
+----------------------
+npm install pusher-js && laravel-echo
+
+----------------------
+after configure all goto > config > app.php and commnetout=> 
+
+commentout this line=> App\Providers\BroadcastServiceProvider::class,
+
+===============================================================
+
+route =>
+----------
+<?php
+
+use App\Events\Message;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+
+
+
+
+Route::post('send-message',function(Request $request){
+
+    $message = $request->input('message');
+    $username = $request->input('username');
+    event(new Message($username,$message));
+
+
+
+    return ['success'=>true];
+
+})->name('send_message');
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+---------------------------------------------------------------------------
+welcome.blade.php =>
+----------------------
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    {{-- laravel ajax  --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
+
+
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+
+
+
+
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <section style="background-color: #eee;">
+                    <div class="container py-5">
+
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-md-8 col-lg-6 col-xl-4">
+
+                                <div class="card">
+                                    <form action="" method="post" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="card-header d-flex justify-content-between align-items-center p-3"
+                                            style="border-top: 4px solid #ffa900;">
+                                            <h5 class="mb-0">Chat messages</h5>
+                                            <div class="d-flex flex-row align-items-center">
+                                                <span class="badge bg-warning me-3">20</span>
+                                                <i class="fas fa-minus me-3 text-muted fa-xs"></i>
+                                                <i class="fas fa-comments me-3 text-muted fa-xs"></i>
+                                                <i class="fas fa-times text-muted fa-xs"></i>
+                                            </div>
+                                        </div>
+                                        {{-- <div class="card-body" data-mdb-perfect-scrollbar="true"
+                                            style="position: relative; height: 400px"> --}}
+
+                                        <div class="card-body" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px; overflow-y: auto;">
+
+
+                                            <div class="d-flex justify-content-between"  id="show_username">
+                                                <p class="small mb-1 text-muted">23 Jan 2:00 pm</p>
+                                                {{-- <p class="small mb-1">Timona Siera</p> --}}
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-start" >
+                                                <div id="show_img">
+
+                                                </div>
+                                                {{-- <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp"
+                                                    alt="avatar 1" style="width: 45px; height: 100%;"> --}}
+                                                <div id="show_messages">
+                                                    {{-- <p class="small p-2 ms-3 mb-3 rounded-3 direct-chat-message "
+                                                        style="background-color: #f5f6f7;">.....</p> --}}
+                                                </div>
+                                            </div>
+
+
+
+
+
+
+                                        </div>
+                                        <div
+                                            class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+                                            <div class="input-group mb-0">
+
+                                                <input type="text" class="form-control" placeholder="Type Username"
+                                                    name="username" id="username" value="{{ old('username') }}" />
+                                                <input type="text" class="form-control" placeholder="Type Message"
+                                                    name="sms" id="sms"  />
+
+                                            </div>
+                                            <button class="btn btn-warning" type="button" id="send-message"
+                                                style="padding-top: .55rem;">
+                                                Button
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
+    </script>
+
+    {{-- ajax minified cdn  --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    {{-- laravel ajax  --}}
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pusher/7.0.3/pusher.min.js"></script>
+    {{-- <script src="{{ asset('js/app.js') }}"></script> --}}
+
+    {{-- <script src="{{ asset('js/app.js') }}" defer="defer"> </script> --}}
+    {{-- <script src="{{ mix('js/app.js') }}"></script> --}}
+    @include('js')
+
+    <script>
+
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('1b962f36c70062cc4d34', {
+          cluster: 'ap2'
+        });
+
+        var channel = pusher.subscribe('chat');
+        channel.bind('message', function(data) {
+
+            $('#show_messages').append('<strong>'+data.username+'</strong> :'+'<p class="small p-2 ms-3 mb-3 rounded-3 direct-chat-message" style="background-color: #f5f6f7;">'+data.message+'</p>'+'<br>');
+            // $('#show_username').html(data.username);
+
+
+
+        //   console.log(data.username,data.message);
+        });
+      </script>
+
+</body>
+
+
+</html>
+
+
+---------------------------------------------------------------------------
+js.blade.php=>
+--------------
+<script>
+    $(document).ready(function() {
+
+
+
+                $(document).ready(function() {
+                    $(document).on('click', "#send-message", function(e) {
+                        e.preventDefault();
+
+                        let username = $("#username").val();
+                        let message = $("#sms").val();
+
+                        // Check the retrieved values
+                        // console.log(username, message);
+
+                        // Alert the retrieved values
+                        // alert("Username: " + username + "\nMessage: " + message);
+
+                        if(username == '' || message == '') {
+                            alert("Please enter username and message");
+                            return false;
+                        }
+
+                        //ajax code :
+                        $.ajax({
+                            method:"post",
+                            url:'{{ route('send_message') }}',
+                            data:{
+                                username:username,
+                                message:message
+                            },
+                            success:function(res){
+                                if(res.success==true){
+                                    alert(res.username, res.message);
+                                }
+                            }
+                        })
+                    });
+                });
+
+            });
+
+
+
+</script>
+
+
+
+---------------------------------------------------------------------------
+event=> Message:
+-----------------
+<?php
+
+namespace App\Events;
+
+use Illuminate\Support\Facades\Log;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+
+class Message implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $username;
+    public $message;
+    public function __construct($username,$message)
+    {
+        //
+        $this->username = $username;
+        $this->message = $message;
+
+    }
+
+
+    public function broadcastOn()
+    {
+        return new Channel('chat'); //channel name
+    }
+    public function broadcastAs()
+    {
+        Log::info("broadcastAs called");
+        return 'message';  //event name
+    }
+}
+
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
