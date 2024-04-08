@@ -1,0 +1,19 @@
+ public function details($id)
+    {
+        $life_health =  LifeAndHealth::findOrFail($id);
+
+        $teli_medicine_fees = \App\Model\LifeAndHealth::where('id', $life_health->id)
+            ->pluck('teli_medi_fee');
+
+
+
+        $teli_medicine_array_value = json_decode($teli_medicine_fees, true); // Decode as associative array
+
+        
+
+
+        return view('backend.child_dealer.life_and_health.life_and_health_details', compact('life_health', 'teli_medicine_array_value'));
+    }
+
+  ====================================================================================
+  
