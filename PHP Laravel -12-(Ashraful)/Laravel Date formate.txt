@@ -1,0 +1,2 @@
+#add 2 year from today date
+$order_child->expire_date = now()->addYears(2)->format('Y-m-d');
