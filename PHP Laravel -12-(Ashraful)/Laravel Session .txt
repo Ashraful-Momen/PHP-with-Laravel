@@ -1,0 +1,57 @@
+session in laravel: 
+======================
+store value in session: 
+-----------------------
+Session::put(key,value or array) => store value in session. 
+
+#store value as array with push method: push or add value in session array. 
+---------------------------------------
+Session::push(key_name,['shuvo']);
+
+
+fetch value in blade: 
+---------------
+{{Session::get(key)}}
+
+========================================================
+
+#check the value exist in session : 
+-----------------------------------
+$value = Session::has('key')
+
+if($value){
+echo "session $value key is exist";
+}
+
+#return everything in session : 
+---------------------------------
+Session::all()
+
+dd(Session::all());
+
+========================================================== 
+#remove key from session : 
+----------------------------
+Session::forget('key_name');
+
+#remove everything from the session : 
+---------------------------------------
+Session::flush();
+
+===========================================================
+#regenerate the token in session : 
+----------------------------------
+Session::regenerate();
+
+===========================================================
+>>> php artisan session:table
+
+#.env => SESSION_DRIVER = database
+
+#we can store data from session to DB with custom SessionModel . 
+
+
+
+
+
+
