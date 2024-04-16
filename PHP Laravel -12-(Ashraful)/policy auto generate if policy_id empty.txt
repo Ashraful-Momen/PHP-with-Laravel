@@ -1,0 +1,39 @@
+#auto generate the policy id if policy_id is emptry: (Life and Health-> order_payment function())
+------------------------------------------------------
+
+ if ($OrderParent) {
+                $ref_id = $OrderParent->order_ref_id;
+
+                $childOrder = LifeAndHealthChildOrder::where('order_parent_id', $ref_id)->get();
+
+                // dd($childOrder);
+
+                // -------------------------------------------------------
+                $length = 10;
+                $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $randomString = substr(str_shuffle($characters), 0, $length);
+                // -------------------------------------------------------
+
+                //auto generate the policy_id for the life_and_health_order_child table ...................................
+                foreach ($childOrder as $existingOrder) {
+                    $updateData = [
+                        'payment_frequency' => $current_frequency,
+                        'advance_payment' => $advanced_amount,
+                        'due_payment' => $due_amount,
+                        'total_payment' => $total_paid,
+                        // Add more columns and their respective new values if needed
+                    ];
+
+                    // Check if policy_id is empty before updating it
+                    if (empty($existingOrder->policy_id)) {
+                        $updateData['policy_id'] = $randomString;
+                        $updateData['policy_start_date'] = now()->format('Y-m-d');
+                        $updateData['policy_end_date'] = now()->addYears(1)->format('Y-m-d');
+                    }
+
+                    // Now update the database
+                    DB::table('life_and_health_child_orders')
+                        ->where('id', $existingOrder->id)
+                        ->update($updateData);
+                }
+}
