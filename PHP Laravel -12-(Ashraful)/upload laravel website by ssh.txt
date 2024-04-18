@@ -63,6 +63,8 @@ These steps should guide you through the process of uploading your Laravel websi
 #with the ssh we can easyly upload or download : 
 -------------------------------------------------
 
+before download zip the file : /var/www/html/microsite/ => >>> zip -r microsite.zip .
+
 for download : sudo scp root@36.255.70.101:/var/www/html/microsite/17-3-24-instaweb.zip /home/shuvo/Downloads 
 
 for upload : sudo scp -r /home/shuvo/Laravel7/* root@36.255.70.101:/var/www/html/microsite/17-3-24-instaweb.zip 
