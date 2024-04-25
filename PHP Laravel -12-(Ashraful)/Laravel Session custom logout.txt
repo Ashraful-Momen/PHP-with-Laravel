@@ -1,0 +1,79 @@
+Route: 
+------------
+Route::post('/custom-logout', 'Frontend\AuthController@custom_logout')->name('custom-logout');
+
+controller: 
+------------
+ public function custom_logout(Request $request)
+    {
+        // dd("Logout");
+        if(Session::has('nagadMicrosite')){
+            // dd("Logout");
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect('/instasure-nagad');
+        }
+
+    }
+
+
+view: 
+----------
+@auth
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="{{ route('logout') }}"
+                                onclick="event.preventDefault();
+                        @if (Session::has('nagadMicrosite'))
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="{{ route('custom-logout') }}"
+                                    onclick="event.preventDefault();
+                                document.getElementById('logout-form').submit();">
+
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
+                                    <form id="logout-form" action="{{ route('custom-logout') }}" method="POST"
+                                        style="display: none;">
+                                        @csrf
+                                    </form>
+
+                                <div class="mb-1">
+                                    Sign Out
+                                </div>
+                                    <div class="mb-1">
+                                        Sign Out
+                                    </div>
+
+                                </a>
+                            </li>
+                        @else
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
+        document.getElementById('logout-form').submit();">
+
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                        style="display: none;">
+                                        @csrf
+                                    </form>
+
+                                    <div class="mb-1">
+                                        Sign Out
+                                    </div>
+
+                                </a>
+                            </li>
+                        @endif
+
+                            </a>
+                        </li>
+                        {{-- <li>
+                            <hr class="dropdown-divider">
+                        </li> --}}
+
+                        @endauth
