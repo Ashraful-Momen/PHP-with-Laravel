@@ -10,6 +10,10 @@
 
 #first() => use get method for single row of table , User::where('col_name','match_col')->first(); // if match then just get 1 row ...
 
+// $life_health = LifeAndHealth::all();
+// $life_health = LifeAndHealth::whereNotNull('child_dealer_id')->get();
+   $life_health = LifeAndHealth::whereNull('child_dealer_id')->get();
+
 
 
 
