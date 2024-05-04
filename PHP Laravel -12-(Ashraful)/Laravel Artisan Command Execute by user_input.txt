@@ -1,0 +1,18 @@
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+
+class RouteController extends Controller
+{
+    public function create(Request $request)
+    {
+        // Extract user input
+        $controllerName = $request->input('controller_name');
+        
+        // Execute the artisan command to create the controller
+        Artisan::call('make:controller', ['name' => $controllerName]);
+
+        return redirect()->back()->with('success', 'Controller created successfully.');
+    }
+}
