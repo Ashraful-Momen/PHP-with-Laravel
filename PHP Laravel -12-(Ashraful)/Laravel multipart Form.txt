@@ -10,34 +10,34 @@
 <!-- Step 1 - Personal Info -->
 <div class="step active shadow-lg p-4" id="step1">
     <!-- Step 1 content -->
-    <button class="btn btn-primary next-step">Next</button>
+    <button type="button" class="btn btn-primary next-step">Next</button>
 </div>
 
 <!-- Step 2 - Additional Personal Info -->
 <div class="step shadow-lg p-4" id="step2">
     <!-- Step 2 content -->
-    <button class="btn btn-secondary prev-step">Previous</button>
-    <button class="btn btn-primary next-step">Next</button>
+    <button type="button" class="btn btn-secondary prev-step">Previous</button>
+    <button type="button" class="btn btn-primary next-step">Next</button>
 </div>
 
 <!-- Step 3 - Nominee Info -->
 <div class="step shadow-lg p-4" id="step3">
     <!-- Step 3 content -->
-    <button class="btn btn-secondary prev-step">Previous</button>
-    <button class="btn btn-primary next-step">Next</button>
+    <button type="button" class="btn btn-secondary prev-step">Previous</button>
+    <button type="button" class="btn btn-primary next-step">Next</button>
 </div>
 
 <!-- Step 4 - Claim Details -->
 <div class="step shadow-lg p-4" id="step4">
     <!-- Step 4 content -->
-    <button class="btn btn-secondary prev-step">Previous</button>
-    <button class="btn btn-primary next-step">Next</button>
+    <button type="button" class="btn btn-secondary prev-step">Previous</button>
+    <button type="button" class="btn btn-primary next-step">Next</button>
 </div>
 
 <!-- Step 5 - Document Upload -->
 <div class="step shadow-lg p-4" id="step5">
     <!-- Step 5 content -->
-    <button class="btn btn-secondary prev-step">Previous</button>
+    <button type="button" class="btn btn-secondary prev-step">Previous</button>
     <button type="submit" class="btn btn-success">Submit</button>
 </div>
 
