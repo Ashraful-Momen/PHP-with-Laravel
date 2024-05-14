@@ -181,3 +181,10 @@ $allFormStatusOne = $policyData->every(fn($item) => $item->form_status == 1);
 
 
         dd($check_children);
+==================================================================================================
+#get the column value and update: 
+------------------------------------
+ $coverage_amount = LifeAndHealthCoverage::where('policy_id', $request->policy_id)->value($request->coverage_name );
+        //if opd : then update 3 columns coverage table :
+
+$coverage_amount_update = LifeAndHealthCoverage::where('policy_id', $request->policy_id)->update([ $request->coverage_name =>$coverage_amount+$request->coverage_amount]);
