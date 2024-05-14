@@ -1,0 +1,51 @@
+                                      <div class="row">
+                                                
+                                                <div class="col-md-4">
+                                                    <label class="form-label" for="consultation_accommodation">Consultation Accommodation</label>
+                                                    <div data-mdb-input-init class="form-outline">
+                                                        <input type="number" name="opd_consultation_claim_amount" id="consultation_accommodation"
+                                                            class="form-control sum-input" placeholder="Ex: 15000">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label" for="lab_test_fee">Lab Test Fee</label>
+                                                    <div data-mdb-input-init class="form-outline">
+                                                        <input type="number" name="opd_test_claim_amount" id="lab_test_fee"
+                                                            class="form-control sum-input" placeholder="Ex: 15000">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label" for="medicine_investigation">Medicine Investigation</label>
+                                                    <div data-mdb-input-init class="form-outline">
+                                                        <input type="number" name="opd_medicines_claim_amount" id="medicine_investigation"
+                                                            class="form-control sum-input" placeholder="Ex: 15000">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label" for="total_coverage">Total OPD Coverage</label>
+                                                    <div data-mdb-input-init class="form-outline">
+                                                        <input type="number" name="coverage_amount" id="total_coverage" class="form-control" placeholder="Coverage Amount" max="{{ $request['coverage_amount']-$request['coverage_used']}}">
+                                                    </div>
+                                                </div>
+
+
+
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', (event) => {
+                                                    function calculateTotal() {
+                                                        let total = 0;
+                                                        document.querySelectorAll('.sum-input').forEach(input => {
+                                                            total += parseFloat(input.value) || 0;
+                                                        });
+                                                        document.getElementById('total_coverage').value = total;
+                                                    }
+
+                                                    document.querySelectorAll('.sum-input').forEach(input => {
+                                                        input.addEventListener('input', calculateTotal);
+                                                    });
+                                                });
+                                                </script>
+
+
+
+                                            </div>
