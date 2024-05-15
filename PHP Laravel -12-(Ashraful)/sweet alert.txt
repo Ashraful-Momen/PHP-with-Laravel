@@ -1,0 +1,17 @@
+         <!-- sweet alert CDN-->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+            <!-- sweet alert  -->
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <!-- <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li> -->
+                <script>
+                  Swal.fire("Your Mail Sent Successfully!");
+               </script>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            
+            <!-- end sweet alert  -->
