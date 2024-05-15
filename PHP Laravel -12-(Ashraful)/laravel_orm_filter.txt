@@ -188,3 +188,7 @@ $allFormStatusOne = $policyData->every(fn($item) => $item->form_status == 1);
         //if opd : then update 3 columns coverage table :
 
 $coverage_amount_update = LifeAndHealthCoverage::where('policy_id', $request->policy_id)->update([ $request->coverage_name =>$coverage_amount+$request->coverage_amount]);
+==================================================================================================
+ //get multiple column value : 
+-------------------------------
+$policy_ids = MotorOrderChild::where('customer_id', $user->id)->pluck('policy_id');
