@@ -1,2 +1,10 @@
 #add 2 year from today date
 $order_child->expire_date = now()->addYears(2)->format('Y-m-d');
+
+============================================================
+                                        <td>
+                                            {{ date_format_custom($lh->created_at, ' d M, Y') }}
+                                            <span class="badge badge-info">
+                                                {{ date_format_custom($lh->created_at, 'H:i A') }}
+                                            </span>
+                                        </td>
