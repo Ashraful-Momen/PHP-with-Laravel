@@ -1,0 +1,70 @@
+#Laravel Caching : 
+-------------------
+#Config/cache.php => env(cache_driver,memcache): 
+                  => set the cache driver: use memcache/redis for fasted caching speed , not use file , or others . better use the redis default port : 6379. 
+                  => if use redis , then use pre-redis pkg , install by composer. >>>  composer requir pre-redis
+                  
+                  
+
+# Caching : store data as key=> value like Session . 
+-----------
+                => get value from cache key :   $value = Cache::get('key');
+                
+                => Cache::get('key',functin() { #if not get data by Cache::$key : then use the function for query to fetch datas }); 
+                
+                => check the data is exit or not in cache : Cache::has('key) . example: if(Cache::has('key')){execute this block}. 
+                
+                => Cache remember (for storing data with time). ex: Cache::remember('key',$minutes, function(){#if key doesn't any value then execute this functin for query })
+                
+                => Cache remember forever : stor data until I delete => Cache::rememberForever('users',function(){retunr DB::table('users')->get()});
+                
+                => Retrieve & Delete : $value = Cache::pull('key'); 
+                
+                => Cache::put() - use keep the data into the cache as like append 
+                
+                => Cache::add() - add the data if not exit , not store the same data for multiple times . 
+                
+                => Cache::forever() - store the data for all the time . 
+                
+                => Cache::forget() - delete the specific key form the cache. 
+                
+                => Cache::flush () - delete the whole cache data . 
+                
+                => Helper method : $value = cache('key') | cache('key',function(){fetch data if key haven't any value }).  | $value = cache('key'=> 'value',$time); 
+                
+               ----------------------------------------------------------------------------------------------------------------
+               
+# if create new post or delete or update then use the model event function Laravel / elequent / events , In model add => 
+               
+                    => protected $dispatchsEvents = [
+                        'created' => UserSaved::class,
+                        'updated' => userSaved::class, 
+                        'deleted' => UserDeleted::class, 
+                    ]; 
+                    
+# create Event  for : after event crud to know someone is notification . after/before event todo some of task as listener is defined as broadcasting. 
+                    => php artisan make:event PostCreated
+                    => php artisan make:event PostUpdated
+                    => php artisan make:event PostDeleted
+                    
+# create  Listener for : after event crud to know someone is notification . after/before event todo some of task as listener is defined as broadcasting. 
+                    => php artisan make:listener PostCachListener
+                  
+                  in listener => 
+                                public functino handle($event)
+                                {
+                                cache()->forget('post');
+                                $post = Post::with('user','category')->orderBy('created_at','desc')->take(20)->get();
+                                cache('post',$post);
+                                }
+                    
+                    
+                    
+                    
+               
+               
+               
+               
+                
+                
+    
