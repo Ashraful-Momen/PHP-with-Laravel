@@ -30,16 +30,16 @@
                 
                 => Cache::flush () - delete the whole cache data . 
                 
-                => Helper method : $value = cache('key') | cache('key',function(){fetch data if key haven't any value }).  | $value = cache('key'=> 'value',$time); 
+                => Helper method :if value exit then get from the key either execute the closer function =>  $value = cache('key') | cache('key',function(){fetch data if key haven't any value }).  | $value = cache('key'=> 'value',$time); 
                 
                ----------------------------------------------------------------------------------------------------------------
                
 # if create new post or delete or update then use the model event function Laravel / elequent / events , In model add => 
                
                     => protected $dispatchsEvents = [
-                        'created' => UserSaved::class,
-                        'updated' => userSaved::class, 
-                        'deleted' => UserDeleted::class, 
+                        'created' => PostCreated::class,
+                        'updated' => PostUpdate::class, 
+                        'deleted' => PostDeleted::class, 
                     ]; 
                     
 # create Event  for : after event crud to know someone is notification . after/before event todo some of task as listener is defined as broadcasting. 
@@ -53,10 +53,27 @@
                   in listener => 
                                 public functino handle($event)
                                 {
-                                cache()->forget('post');
+                                cache()->forget('article');
                                 $post = Post::with('user','category')->orderBy('created_at','desc')->take(20)->get();
-                                cache('post',$post);
+                                cache()->forever('article',$post);
+                                //check in the Logs: 
+                                info(cache()->get('article'));
                                 }
+
+#for calling the event : app > Provider > EventServiceProvider > //when event created then call the listener . 
+---------------------------
+                    => 
+                        protected $listen = [
+                                    PostCreated::class => [
+                                        PostCachListener::class,
+                                    ],
+                                    PostUpdated::class => [
+                                        PostCachListener::class,
+                                    ],
+                                    PostDeleted::class => [
+                                        PostCachListener::class,
+                                    ],
+                        ] 
                     
                     
                     
