@@ -1,0 +1,34 @@
+<?php
+
+public function createCardNumber()
+{
+    $partner = 123;
+    $local = 1;
+    $virtual = 0;
+    $category = 4;
+    $random = $this->generateRandomNumber();
+
+    $cardNumber = $partner . $local . $virtual . $category . $random;
+
+    return $this->formatCardNumber($cardNumber);
+}
+
+private function generateRandomNumber()
+{
+    return random_int(100000, 999999);
+}
+
+private function formatCardNumber($cardNumber)
+{
+    // Ensure the card number is a string
+    $cardNumber = (string) $cardNumber;
+
+    // Split the card number into chunks of 4 characters separated by a space
+    return chunk_split($cardNumber, 4, ' ');
+}
+
+// Example usage
+$cardNumber = 7895463214786932;
+$formattedCardNumber = $this->formatCardNumber($cardNumber);
+echo $formattedCardNumber; // Output: 7895 4632 1478 6932
+?>
