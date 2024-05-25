@@ -1,0 +1,114 @@
+#Laravel SMS to the user: 
+--------------------------
+#install the SMS pkg: >>> composer require laravel/nexmo-notification-channel nexmo/laravel
+
+#add the sms pkg to the config/services: 
+-----------------------------------------------
+
+'nexmo' => [
+    'sms_form' => 'phone_number',
+], 
+
+
+#create Notification: 
+----------------------
+import => use Illuminate\Notifications\Messages\NexmoMessage; 
+
+>>> php artisan make:notification WelcomeSMSNotification
+
+
+public function via ($notifiable){
+
+return ['nexmo']
+}
+
+
+public function toNexmo($notifiable){
+
+return (new NexmoMessage)->content("Hello , Thank you fjor subscription')
+}
+
+#App\User: 
+--------------
+public function routeNotificationForNexmo($notification){
+return $this->phone_number;
+}
+
+#.env: 
+-----------
+NEXMO_KEY =0ed75542
+NEXMO_SECRET =Q9mbU5p5YfszgKy0
+
+#ROUTE: 
+-----------
+route::get('/hdc_sms',function(){
+$user = User::first();
+$user = notify(new WelcomeSMSNotification)
+});
+
+==============================================================================official sms ===========================================================
+.env: 
+-----------
+SMS_API_URL=http://smsapi.dsl.com.bd/smsapi/?api_key=C200113762652a5391f3f1.74072766&type=unicode&senderid=8809601001861
+SMS_API_KEY=C200113762652a5391f3f1.74072766
+SMS_API_SENDER_ID=8809601001861
+
+#UserInfo::smsApi=> helper function : 
+-------------------------------------
+    public static function  smsAPI($receiver_number, $sms_text)
+    {
+
+        $url = env('SMS_API_URL');
+        $data = [
+            "api_key" =>  env('SMS_API_KEY'),
+            "senderid" => env('SMS_API_SENDER_ID'),
+            "type" => "text/unicode",
+            "contacts" => $receiver_number,
+            "msg" => str_replace('+', ' ', ($sms_text))
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        // ----------------------------------------
+        // Follow redirects
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        // Limit the number of redirects (optional)
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 3); // Adjust the number as needed
+        // ----------------------------------------
+
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+
+        dd($response, $err, $data, $url);
+        curl_close($ch);
+        if ($err) {
+            return $err;
+        } else {
+            return "sms sent";
+        }
+    }
+    
+===========================================================
+#Route=> 
+=========
+ Route::get('/hdc-notification-sms', function(){
+            $user = Auth::user();
+
+            $user = User::findOrFail($user->id);
+
+
+            // dd($user);
+
+            UserInfo::smsApi('8801859385787',"Test SMS");
+
+
+
+            return "SMS sent Successfully!";
+
+    });
+===========================================================
