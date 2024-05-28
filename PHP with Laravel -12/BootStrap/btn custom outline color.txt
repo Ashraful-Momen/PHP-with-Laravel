@@ -1,0 +1,24 @@
+HTML
+
+html
+
+<button type="button" class="btn btn-outline-primary custom-outline-color"
+        data-bs-toggle="modal" data-bs-target="#telmediModal">
+    Choose Teli Medicine Service
+</button>
+
+CSS
+
+css
+
+<style>
+    .btn-outline-primary.custom-outline-color {
+        color: #002e5b; /* Text color */
+        border-color: #002e5b; /* Border color */
+    }
+    
+    .btn-outline-primary.custom-outline-color:hover {
+        background-color: #002e5b; /* Background color on hover */
+        color: #ffffff; /* Text color on hover */
+    }
+</style>
