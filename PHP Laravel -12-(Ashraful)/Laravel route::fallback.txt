@@ -1,14 +1,17 @@
-Route::fallback(function (){
-    return "<!-- resources/views/errors/404.blade.php -->
+use Illuminate\Support\Facades\Route;
+
+Route::fallback(function () {
+    return "
     <!DOCTYPE html>
     <html>
     <head>
         <title>Page Not Found</title>
     </head>
     <body>
-        <div  align='center'>
-        <h1>404 - Page Not Found</h1>
-        <p>The page you are looking for could not be found.</p>
+        <div align='center'>
+            <h1>404 - Page Not Found 😢</h1>
+            <h6>Out of the box 🙂</h6>
+            <p>The page you are looking for could not be found.</p>
         </div>
     </body>
     </html>
