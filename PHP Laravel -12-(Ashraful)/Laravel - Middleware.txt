@@ -1,0 +1,88 @@
+#Laravel Middleware: 
+---------------------
+
+[route -> middleware::class->function() -> route->controller function ]
+>>>php artisan make:middleware MiddlewareName
+
+
+#before going to the route : middleware work as controller function app/http/middleware:MiddlewareName. 
+
+#Global middleware : app/Http/Kernel.php [in private middleware => add the MiddlewareName::class ]
+
+=====================================================
+>>> php artisan make:middleware webGuard
+
+#Route Middleware: *** app/Http/Kernel.php [in protected route middleware => add the MiddlewareName::class ]
+=====================================================
+**** don't forget to use >>> $php artisan optimize:clear
+
+=============================================Main Part ==========================================
+middleware: 
+-----------
+class webGuard
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     */
+    public function handle(Request $request, Closure $next)
+    {
+
+        dd(Session::all());
+
+        if(Session::has('user_id')){
+            echo "hello";
+            return $next($request);
+        }
+        else{
+            dd('your not authorized');
+            
+        }
+    }
+}
+==========================================================================
+app/Http/kernal=> 
+----------------
+    protected $routeMiddleware = [
+        'auth' => \App\Http\Middleware\Authenticate::class,
+        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
+        'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'webGuard' => \App\Http\Middleware\webGuard::class,
+    ];
+-----------------------------------------------------------
+route: 
+------
+
+Route::get('/', function () {
+    dd("hello");
+    return view('welcome');
+});
+
+
+Route::get('/login_user',function(){
+
+    dd("Login");
+    Session::put('user_id',1);
+    echo "LoggedIn ";
+    return redirect('/');
+});
+
+Route::get('/logout_user',function(){
+    Session::forget('user_id');
+    echo "Logout ";
+    return redirect('/');
+});
+
+Route::get('/check_user',function(){
+    return "Your are authorized";
+})->middleware('webGuard');
+
