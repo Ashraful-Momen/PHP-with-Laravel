@@ -85,4 +85,43 @@ Route::get('/logout_user',function(){
 Route::get('/check_user',function(){
     return "Your are authorized";
 })->middleware('webGuard');
+================================================Group middle ware==============================
+middleware: 
+============
+>>> php artisan make:middleware authcheck
+>>> php artisan make:middleware webguard
 
+#define middleware function as well as previous code . 
+------------------------------------
+kernal.php=> 
+--------------
+ protected $middlewareGroups = [
+        'web' => [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            // \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        'api' => [
+            #add multiple middleware::class ,
+            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            'throttle:api',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+        'group_name_of_middlewares' => [
+        #add multiple middleware::class ,
+            webGuard::class,
+            authGuard::class,
+        ]
+    ];
+-----------------------
+Route:=> 
+------------------------
+Route::middleware(['webGuard', 'authGuard'])->get('/dashboard', function () {
+    
+    return view('dashboard');
+});
