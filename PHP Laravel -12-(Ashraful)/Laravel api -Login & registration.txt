@@ -5,7 +5,15 @@ Create Controller
 Create Routes
 Create collection folder in postman and add api request----------------------------------------------------------
 
-Create Controller : php artisan make:controller RegisterController
+==============================================================================
+app>http>kernal.
+        'api' => [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,  | uncomments this line
+            'throttle:api',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+Create Controller : php artisan make:controller Api\AuthController
 --------------------------------------------------------------------
 app\Http\Controllers\RegisterController.php
 <?php
