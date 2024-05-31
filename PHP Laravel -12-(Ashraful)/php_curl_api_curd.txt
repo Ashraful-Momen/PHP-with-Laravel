@@ -1,0 +1,140 @@
+<?php
+
+#run the server with php : php -S localhost:8000 
+#goto to the directory and run curl_get.php
+#for run the curl_get.php  must be install curl: sudo apt-get install php-curl
+
+
+#Get data from API
+// --------------------
+
+// $ch = curl_init();
+// $url = 'https://jsonplaceholder.typicode.com/posts';
+
+// -----------------------------------
+$fh = fopen('file.txt', 'w');
+// -----------------------------------
+// curl_setopt($ch, CURLOPT_URL, $url);
+// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+// curl_setopt($ch, CURLOPT_FILE, $fh); //save response to the file 
+
+// echo "hello world";
+// $response = curl_exec($ch);
+
+
+// if($e  = curl_error($ch)){
+//     echo $e;
+// }
+// else{
+//     $decode = json_decode($response,true);
+//     echo "<pre>";
+//     print_r($decode);
+//     // var_dump($decode);
+//     echo "</pre>";
+// }
+// fclose($fh);
+// curl_close($ch);
+
+#Post data from API
+// -------------------------------------------------------------------------
+
+// $ch = curl_init();
+// $url = 'https://jsonplaceholder.typicode.com/posts';
+
+// $data_array = array(
+//     'userId' => 1,
+//     'title' => 'test title',
+//     'body' => 'test body',
+    
+// );
+
+// $data = http_build_query($data_array); 
+
+// curl_setopt($ch, CURLOPT_URL, $url);
+// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+// curl_setopt($ch, CURLOPT_POST, true);
+// curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+// $response = curl_exec($ch);
+
+
+// if($e  = curl_error($ch)){
+//     echo $e;
+// }
+// else{
+//     $decode = json_decode($response,true);
+
+//     foreach ($decode as $key => $value) {
+//         echo $key . " : " . $value . "<br>";
+//     }
+    
+// }
+
+// curl_close($ch);
+
+
+
+#Put data from API
+// -------------------------------------------------------------------------
+
+// $ch = curl_init();
+// $url = 'https://jsonplaceholder.typicode.com/posts/1';
+
+// $data_array = array(
+//     'userId' => 1,
+//     'title' => 'test title 1',
+//     'body' => 'test body 1',
+    
+// );
+
+// $data = http_build_query($data_array); 
+// // $data = json_encode($data_array); 
+
+// curl_setopt($ch, CURLOPT_URL, $url);
+// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+// curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+// curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+// $response = curl_exec($ch);
+
+
+// if($e  = curl_error($ch)){
+//     echo $e;
+// }
+// else{
+//     $decode = json_decode($response,true);
+
+//     foreach ($decode as $key => $value) {
+//         echo $key . " : " . $value . "<br>";
+//     }
+   
+// }
+
+//Delete data from API: 
+//-------------------------------------------------------------------------
+// $ch = curl_init();
+// $url = 'https://jsonplaceholder.typicode.com/posts/1';
+
+// curl_setopt($ch, CURLOPT_URL, $url);
+// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+// curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+
+// $response = curl_exec($ch);
+
+// if ($e = curl_error($ch)) {
+//     echo "cURL Error: " . $e;
+// } else {
+//     $decode = json_decode($response, true);
+
+//     echo "Response:Delete Successfully " . $response;
+//     if (json_last_error() === JSON_ERROR_NONE) {
+//         foreach ($decode as $key => $value) {
+//             echo $key . " : " . $value . "<br>";
+//         }
+//     } else {
+//         echo "JSON Decode Error: " . json_last_error_msg();
+//     }
+// }
+
+// curl_close($ch);
+?>
