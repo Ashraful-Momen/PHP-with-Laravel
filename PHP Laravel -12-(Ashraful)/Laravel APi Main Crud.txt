@@ -1,0 +1,76 @@
+# app > http > middleware > kernal.php . 
+---------------------------------------------
+>>> uncomment the api =[
+scantum::class, 
+]
+
+--------------------------------------------
+api> route: 
+-------------
+Route::get('/post',[CrudController::class,'show']);
+Route::post('/post_store',[CrudController::class,'store']);
+
+
+#controller : 
+--------------------
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Models\Post;
+use App\Models\User;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+
+class CrudController extends Controller
+{
+    //
+
+    public function show(){
+        $post = Post::all();
+        $response = [
+            'post'=> $post,
+            'msg' => 'Fetcing post successfully'
+        ];
+        return response()->json($response,200);
+    }
+
+    public function store(Request $request){
+        $validator = Validator::make($request->all(),[
+            'title' => 'required',
+            'user_id' => 'required',
+        ]);
+
+        if($validator->fails()) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => $validator->errors()->first()
+
+            ]);
+
+        }
+
+        $post = Post::create([
+
+            'title'     => $request->title,
+            'user_id'    => $request->user_id,
+
+        ]);
+
+
+
+        return response()->json([
+
+            'success' => true,
+
+            'post' => $post,
+
+            'message' => 'Post register successfully.'
+        ],201);
+    }
+}
