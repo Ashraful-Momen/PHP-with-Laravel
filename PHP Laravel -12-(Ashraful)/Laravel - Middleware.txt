@@ -121,7 +121,9 @@ kernal.php=>
 -----------------------
 Route:=> 
 ------------------------
-Route::middleware(['webGuard', 'authGuard'])->get('/dashboard', function () {
+Route::group(['as' => 'childDealer.', 'prefix' => 'childDealer', 'namespace' => 'ChildDealer', 'middleware' => ['auth', 'childDealer']], function () {
+
+    Route::get('/dashboard', 'Frontend\HomeController@dashboard')->name('user.dashboard');
     
     return view('dashboard');
 });
