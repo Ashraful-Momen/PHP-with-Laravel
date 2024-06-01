@@ -1,0 +1,22 @@
+<!-- resources/views/ptd.blade.php -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTD Definition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .definition {
+            white-space: pre-wrap; /* This preserves the formatting */
+        }
+    </style>
+</head>
+<body>
+    <p class="definition">{{ $ptdDefinition }}</p>
+</body>
+</html>
