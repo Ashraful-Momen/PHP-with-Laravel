@@ -127,3 +127,14 @@ Route::group(['as' => 'childDealer.', 'prefix' => 'childDealer', 'namespace' => 
     
     return view('dashboard');
 });
+----------------------------------------
+Route::group([
+    'as' => 'childDealer.', // This route will be named 'childDealer.dashboard'
+    'prefix' => 'childDealer',  // This route will be accessed at '/childDealer/dashboard'
+    'namespace' => 'ChildDealer', // This assumes the controller class is in the App\Http\Controllers\ChildDealer namespace
+    'middleware' => ['auth', 'childDealer'] 
+], function () {
+    Route::get('dashboard', 'ChildDealerController@dashboard')->name('dashboard');
+    Route::get('profile', 'ChildDealerController@profile')->name('profile');
+});
+
