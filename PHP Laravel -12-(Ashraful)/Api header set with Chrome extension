@@ -1,0 +1,37 @@
+To set an API header in the Chrome browser using a Chrome extension, you can use an extension like "ModHeader" or "Requestly." Here’s how you can do it with both:
+
+Using ModHeader
+Install ModHeader:
+
+Go to the Chrome Web Store.
+Search for "ModHeader".
+Click "Add to Chrome" and confirm the installation.
+Set the Header:
+
+Click on the ModHeader extension icon in the Chrome toolbar.
+Click "Add" to create a new profile if needed.
+In the "Request Headers" section, add a new header.
+Enter the header name and value. For example, for an API key, you might use Authorization as the name and Bearer <your_api_key> as the value.
+The header will now be added to all outgoing requests made by the browser.
+Using Requestly
+Install Requestly:
+
+Go to the Chrome Web Store.
+Search for "Requestly".
+Click "Add to Chrome" and confirm the installation.
+Set the Header:
+
+Click on the Requestly extension icon in the Chrome toolbar.
+Click on "New Rule" and select "Modify Headers".
+Choose "Request Headers" and click "Add".
+Enter the header name and value. For example, for an API key, you might use Authorization as the name and Bearer <your_api_key> as the value.
+Specify the URL pattern where the header should be applied, or leave it generic for all URLs.
+Save the rule. The header will now be added to all outgoing requests that match the specified pattern.
+These extensions provide an easy way to modify request headers without needing to write any custom code or scripts.
+
+
+
+
+
+
+
