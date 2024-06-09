@@ -1,3 +1,15 @@
+*********if user loggedin then set the token in header : 
+
+#thunder client : 
+-----------------
+header=> 
+        Content-type : application/json
+        Authorization: Bearer Past_the_token_id
+
+body => for the post method send data in json formate. 
+
+
+
 # app > http > middleware > kernal.php . 
 ---------------------------------------------
 >>> uncomment the api =[
@@ -74,3 +86,71 @@ class CrudController extends Controller
         ],201);
     }
 }
+
+# Data pass function to function with static function : 
+-----------------------------------------------------------
+the api route is =>  Route::post('/instasure-api-payment', [HDCCustomerController::class, 'payment'])->name('api_payment');
+-----------------------------------------------------------
+  public function payment(Request $request)
+    {
+        // Extract request data
+        $category_id = encrypt($request->input('category_id', 12));
+        $order_id = encrypt($request->input('order_id'));
+        $order_amount = encrypt($request->input('order_amount'));
+        $pgw_name = "aamarPay";
+        $api = "true";
+
+        // Prepare response data
+        $response = [
+            'success' => true,
+            'msg' => 'Fetching HDC card successfully',
+            'category_id' => $category_id,
+            'order_id' => $order_id,
+            'order_amount' => $order_amount,
+            'pgw_name' => $pgw_name,
+            'api' => $api
+        ];
+
+        // Call the payNow method with response data
+        // $payNowResponse = $this->payNow(new Request($response));
+
+        $payNowResponse = PaymentController::payNow(new Request($response));
+
+        // Return the payNow method's response
+        return $payNowResponse;
+    }
+
+    public static function payNow(Request $request)
+    {
+        // Log or debug
+        // Log::info("payNow function called");
+
+        var_dump($request->all());
+
+        // Ensure the required data is present and decrypted
+        try {
+            $category_id = decrypt($request->input('category_id'));
+            $order_id = decrypt($request->input('order_id'));
+            $order_amount = decrypt($request->input('order_amount'));
+        } catch (\Exception $e) {
+            Log::error('Decryption error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'msg' => 'Invalid data'], 400);
+        }
+
+        // Generate a random string
+        $length = 10;
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomString = substr(str_shuffle($characters), 0, $length);
+
+        // Create and save the payment redirect data
+        $paymentRedirect = new PaymentRedirect();
+        $paymentRedirect->category_id = $category_id;
+        $paymentRedirect->order_id = $order_id;
+        $paymentRedirect->order_amount = $order_amount;
+        $paymentRedirect->pgw_name = $request->input('pgw_name');
+        $paymentRedirect->order_random_id = $randomString;
+        $paymentRedirect->save();
+
+        // Return response
+        return response()->json(['success' => true, 'msg' => 'Payment processed successfully', 'payment_redirect_id' => $paymentRedirect], 200);
+    }
