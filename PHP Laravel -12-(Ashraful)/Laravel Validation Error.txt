@@ -1,0 +1,50 @@
+ // Validate the request
+        $validator = Validator::make($request->all(), [
+            'cart_id' => 'nullable',
+            'form_status' => 'required|integer',
+            'cc_limit' => 'required|string',
+            'seating_capacity' => 'required|integer',
+            'bike_price' => 'required|numeric',
+            'insurance_purchased' => 'required|string',
+            'insurance_years' => 'required|integer',
+            'accidental_damage_theft_coverage' => 'nullable|string',
+            'additional_coverage' => 'nullable',
+            'tracking_device_installed' => 'required|string',
+            'techo_device_installed' => 'required|string',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:15',
+            'motor_cc' => 'required|integer',
+            'eng_no' => 'required|string|max:255',
+            'chassis_no' => 'required|string|max:255',
+            'driving_license' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'identification_doc' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
+        ]);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'msg' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422); // 422 Unprocessable Entity
+        }
+
+        // Handle the uploaded file
+        if ($request->file('identification_doc')) {
+            $file = $request->file('identification_doc');
+            $path = $file->store('identification_doc', 'public'); // Store the image in the 'public/identification_doc' directory
+        }
+
+        // Prepare response data
+        $response = [
+            'success' => true,
+            'msg' => 'Data received from user',
+            'request' => $request->except('identification_doc'), // Exclude the file from response
+        ];
+
+        // Add the file path to the response data
+        if (isset($path)) {
+            $response['request']['identification_doc'] = $path;
+        }
