@@ -2,8 +2,10 @@
 
 #thunder client : 
 -----------------
+url => domain_name/api/route_name
+
 header=> 
-        Content-type : application/json
+        Content-type : application/json // for upload image , Content-Type:  multipart/form-data //no need content type for uploading image . method must be : post method . 
         Authorization: Bearer Past_the_token_id
 
 body => for the post method send data in json formate. 
@@ -86,6 +88,43 @@ class CrudController extends Controller
         ],201);
     }
 }
+
+
+
+-----------------------------------------------------------
+#for uploading image: 
+-----------------------------------------------------------
+ public function upload(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        // Handle the uploaded file
+        if ($request->file('image')) {
+            $file = $request->file('image');
+            $path = $file->store('images', 'public');
+
+            // Return a response
+            return response()->json([
+                'success' => true,
+                'message' => 'Image uploaded successfully!',
+                'path' => $path
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Image upload failed!'
+        ], 500);
+    }
+
+
+
+
+
+
 
 # Data pass function to function with static function : 
 -----------------------------------------------------------
