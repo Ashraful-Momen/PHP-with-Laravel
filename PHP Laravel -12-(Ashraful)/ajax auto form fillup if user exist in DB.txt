@@ -1,0 +1,90 @@
+Step 1: Update Your Blade Template
+
+Add an event listener to trigger the AJAX call when the phone number field loses focus (blur event):
+
+blade
+
+<div class="row">
+    <div class="col mb-3">
+        <label for="owner_phone">Phone</label>
+        <input type="text" id="owner_phone" name="owner_phone" class="mt-3 form-control" placeholder="Enter Customer Number" required>
+    </div>
+    <div class="col mb-3">
+        <label for="owner_name">Name</label>
+        <input type="text" id="owner_name" name="owner_name" class="mt-3 form-control" placeholder="Enter Customer Name" required>
+    </div>
+</div>
+<div class="row">
+    <div class="col mb-3">
+        <textarea class="form-control" id="owner_address" rows="4" name="owner_address"></textarea>
+        <label class="form-label" for="owner_address">Address</label>
+    </div>
+</div>
+
+<b>If user does not exist, then UserName: Phone Number & Password: 123456</b>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#owner_phone').blur(function () {
+            var ownerPhone = $(this).val();
+
+            if (ownerPhone) {
+                $.ajax({
+                    url: '{{ route("admin.staff_hdc_packages.check-user") }}',
+                    type: 'GET',
+                    data: { phone: ownerPhone },
+                    success: function (data) {
+                        if (data.exists) {
+                            $('#owner_name').val(data.name);
+                            $('#owner_address').val(data.address);
+                        } else {
+                            $('#owner_name').val('');
+                            $('#owner_address').val('');
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+Step 2: Add a Route for the AJAX Call
+
+Add a route in web.php for the AJAX call to check if the user exists:
+
+php
+
+Route::get('/check-user', [StaffHDCController::class, 'checkUser'])->name('admin.staff_hdc_packages.check-user');
+
+Step 3: Implement the Controller Method
+
+In your StaffHDCController, add the checkUser method:
+
+php
+
+public function checkUser(Request $request)
+{
+    $phone = $request->get('phone');
+    $user = User::where('phone', $phone)->first();
+
+    if ($user) {
+        return response()->json([
+            'exists' => true,
+            'name' => $user->name,
+            'address' => $user->address, // Assuming 'address' is a field in your User model
+        ]);
+    } else {
+        return response()->json(['exists' => false]);
+    }
+}
+
+Step 4: Ensure Database Schema
+
+Ensure your User model has name and address fields. If not, you may need to adjust the code accordingly.
+Step 5: Update Form Submission Handling
+
+Ensure that if the user is found, the form fields are correctly populated, and if not, the new user is created as per your existing logic.
+Final Integration
+
+Your Blade template should now handle checking for existing users via AJAX, and your controller should return the necessary user details if the user exists. This setup will enhance the user experience by dynamically checking and populating user information without requiring a page refresh.
