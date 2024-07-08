@@ -8,3 +8,7 @@ $order_child->expire_date = now()->addYears(2)->format('Y-m-d');
                                                 {{ date_format_custom($lh->created_at, 'H:i A') }}
                                             </span>
                                         </td>
+=========================================================
+#if getting formate() member function error => 
+
+ {{ (new DateTime($hdc_card->send_date))->format('d-F-Y h:i A') }}
