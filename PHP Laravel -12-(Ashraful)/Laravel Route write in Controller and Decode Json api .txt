@@ -1,0 +1,61 @@
+ // API: HDC order & generate HDC card
+                        if (empty($existingOrder->free_hdc_id && !empty($existingOrder->insruance_owner))) {
+
+
+                            // dd("api section", $existingOrder);
+
+                            $hdc_pkg_id = $existingOrder->hospital_card_id;
+
+
+
+                            $requestData['package_id'] = $hdc_pkg_id;
+
+                            // Create HDC order for owner only with API and handle JSON response
+                            $hdc_api_order_response = app()->call(
+                                [HDCCustomerController::class, 'hdc_place_order'],
+                                ['request' => new \Illuminate\Http\Request($requestData)]
+                            );
+
+                            // dd("api section", $hdc_api_order_response);
+
+                            // Decode the JSON response
+                            $hdc_api_order_response_array = $hdc_api_order_response->getData(true);
+
+                            // dd($hdc_api_order_response_array); //this line is ok
+
+                            // Accessing the 'id' under 'Order Parent '
+                            $hdc_order_id = $hdc_api_order_response_array['HDC Order']['id'] ?? null;
+
+                            // dd($hdc_order_id); // Check the value of $order_parent_id
+
+
+
+
+
+                            if ($hdc_order_id != null) {
+                                // Create an instance of HDCCustomerController
+                                $hdcController = app()->make(HDCCustomerController::class);
+
+                                // Call the non-static method 'card_generate' on the instance
+                                // $hdc_api_generated_card = $hdcController->card_generate(['id' => $order_parent_id]);
+                                $hdc_api_generated_card = $hdcController->card_generate(new \Illuminate\Http\Request(['id' => $hdc_order_id]));
+
+                                // Check the generated card response
+                                // dd($hdc_api_generated_card);
+
+                                // Decode the JSON response
+                                $hdc_api_generated_card_array = $hdc_api_generated_card->getData(true);
+
+                                // dd($hdc_api_generated_card_array['data']['id']);
+
+                                #now update the single order 'free_hdc_id' with the generated card id:
+                                $existingOrder->free_hdc_card_id = $hdc_api_generated_card_array['data']['id'];
+                                $existingOrder->save();
+
+                               
+
+
+
+                                // Handle the JSON response and return the web page or perform further actions
+                            }
+                        }
