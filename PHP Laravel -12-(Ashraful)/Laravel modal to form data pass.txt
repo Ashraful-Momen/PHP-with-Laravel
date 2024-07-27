@@ -1,0 +1,89 @@
+<tbody>
+                                @foreach ($life_health as $key => $lh)
+                                    <tr>
+                                        <th scope="row">{{ $key + 1 }}</th>
+                                        {{-- <td>
+                                            <img style="height:100px; width:100px" class=" rounded-circle"
+                                                src="{{ asset('images/packages/' . $lh->image) }}" alt="Image not Found">
+                                        </td> --}}
+
+                                        <td>{{ $lh->Pname }}</td>
+
+                                        <td class="text-center">
+                                            {{-- @if ($lh->insrurance_company_name) --}}
+                                            {{ $lh->insurance_company_name ?? 'N/A' }}
+                                            {{-- @endif --}}
+                                        </td>
+
+                                        <td>
+                                            {{ $lh->insurance_company_price ?? '0' }} TK
+                                            {{-- @if ($lh->duration)
+                                            {{ $lh->duration }} year</td>
+                                            @endif --}}
+
+                                            {{-- <td>{{ $lh->created_at->diffForHumans() }}</td> --}}
+                                        <td>{{ $lh->created_at->format('d-F-Y') }}</td>
+
+                                        <td>
+                                            <form action="{{ route('admin.life-and-health.toggle-status', $lh->id) }}" method="post">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="btn btn-{{ $lh->active_status == '1' ? 'success' : 'warning' }} btn-sm">
+                                                    {{ $lh->active_status == '1' ? 'Active' : 'Inactive' }}
+                                                </button>
+                                            </form>
+                                        </td>
+
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-primary m-1 btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#modal-{{ $lh->id }}">
+                                                Update
+                                            </button>
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modal-{{ $lh->id }}" data-bs-backdrop="static"
+                                                data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalLabel-{{ $lh->id }}"
+                                                aria-hidden="true">
+                                                <form action="{{ route('admin.life_and_health_edit_staff', $lh->id) }}" method="post">
+                                                    @csrf
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h1 class="modal-title fs-5" id="modalLabel-{{ $lh->id }}">Update Life & Health</h1>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="form-row mb-4">
+                                                                    <div class="col">
+                                                                        <label for="insuranceCompanyName-{{ $lh->id }}">Insurance Company Name:</label><br>
+                                                                        <input type="text" id="insuranceCompanyName-{{ $lh->id }}"
+                                                                            name="insurance_company_name" class="form-control"
+                                                                            value="{{ old('insurance_company_name', $lh->insurance_company_name) }}"
+                                                                            placeholder="Insurance Company Name" required><br>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <label for="insuranceCompanyPrice-{{ $lh->id }}">Insurance Company Price:</label><br>
+                                                                        <input type="text" id="insuranceCompanyPrice-{{ $lh->id }}"
+                                                                            name="insurance_company_price" class="form-control"
+                                                                            value="{{ old('insurance_company_price', $lh->insurance_company_price) }}"
+                                                                            placeholder="Insurance Company Price" required><br>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-primary">Update</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+
+                                            {{-- <a href="{{ route('admin.life_and_health_delete', $lh->id) }}">
+                                                <button class="btn btn-danger m-1 btn-sm">Delete</button>
+                                            </a> --}}
+
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
