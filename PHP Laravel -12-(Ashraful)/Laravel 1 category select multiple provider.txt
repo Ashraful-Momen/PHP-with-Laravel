@@ -1,0 +1,68 @@
+Route: 
+--------
+Route::get('/categories', [CategoryController::class, 'showCategories'])->name('categories.index');
+Route::post('/categories/{category}/policy-providers', [CategoryController::class, 'storePolicyProviders'])->name('categories.policy-providers.store');
+
+
+Controller: 
+-----------
+
+public function showCategories()
+    {
+        $categories = Category::all();
+        $policyProviders = PolicyProvider::all();
+
+        return view('backend.admin.categories.category_policy_provider', compact('categories', 'policyProviders'));
+    }
+
+    public function storePolicyProviders(Request $request, Category $category)
+    {
+        // $request->validate([
+        //     'policy_providers' => 'required|array',
+        //     'policy_providers.*' => 'exists:policy_providers,id',
+        // ]);
+
+        // dd($request);
+
+        $category->policyProviders()->sync($request->policy_providers);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Policy providers updated successfully.');
+    }
+
+#view: 
+-------
+<div class="card-body table-responsive">
+
+                        <h1>Categories and Policy Providers</h1>
+
+                        @if (Session::has('msg'))
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <strong>{{ session('msg') }}</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        <form method="POST"
+                            action="{{ route('admin.categories.policy-providers.store', ['category' => $categories->first()->id]) }}">
+                            @csrf
+
+                            <label for="category">Select Category:</label>
+                            <select id="category" name="category"
+                                onchange="this.form.action='{{ url('/admin/categories') }}/'+this.value+'/policy-providers'">
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+
+                            <label for="policy_providers">Select Policy Providers:</label>
+                            <select id="policy_providers" name="policy_providers[]" multiple>
+                                @foreach ($policyProviders as $policyProvider)
+                                    <option value="{{ $policyProvider->id }}">{{ $policyProvider->company_name }}</option>
+                                @endforeach
+                            </select>
+
+                            <button type="submit">Save</button>
+                        </form>
+
+                    </div>
