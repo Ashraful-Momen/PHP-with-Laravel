@@ -1,0 +1,195 @@
+To implement user roles such as `admin` and `user` in a Laravel application, you need to set up routes, middleware, controllers, and views. Here’s a step-by-step guide:
+
+### 1. **Setting Up Database Migrations**
+
+First, create a migration to add roles to your `users` table:
+
+```bash
+php artisan make:migration add_role_to_users_table --table=users
+```
+
+In the migration file (`database/migrations/YYYY_MM_DD_add_role_to_users_table.php`), add:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddRoleToUsersTable extends Migration
+{
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('role', ['admin', 'user'])->default('user');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('role');
+        });
+    }
+}
+```
+
+Run the migration:
+
+```bash
+php artisan migrate
+```
+
+### 2. **Creating Middleware**
+
+Create middleware to handle role-based access:
+
+```bash
+php artisan make:middleware RoleMiddleware
+```
+
+In `app/Http/Middleware/RoleMiddleware.php`, add:
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Support\Facades\Auth;
+
+class RoleMiddleware
+{
+    public function handle($request, Closure $next, $role)
+    {
+        if (Auth::check() && Auth::user()->role === $role) {
+            return $next($request);
+        }
+
+        return redirect('/'); // Redirect if the user does not have the required role
+    }
+}
+```
+
+Register the middleware in `app/Http/Kernel.php`:
+
+```php
+protected $routeMiddleware = [
+    // ...
+    'role' => \App\Http\Middleware\RoleMiddleware::class,
+];
+```
+
+### 3. **Creating Controllers**
+
+Create controllers for handling different user roles:
+
+```bash
+php artisan make:controller AdminController
+php artisan make:controller UserController
+```
+
+In `app/Http/Controllers/AdminController.php`:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class AdminController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('role:admin');
+    }
+
+    public function index()
+    {
+        return view('admin.index');
+    }
+}
+```
+
+In `app/Http/Controllers/UserController.php`:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('role:user');
+    }
+
+    public function index()
+    {
+        return view('user.index');
+    }
+}
+```
+
+### 4. **Defining Routes**
+
+In `routes/web.php`, define routes for the admin and user areas:
+
+```php
+// Admin routes
+Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index');
+
+// User routes
+Route::get('/user', [App\Http\Controllers\UserController::class, 'index'])->name('user.index');
+```
+
+### 5. **Creating Views**
+
+Create views for each role in `resources/views`.
+
+**For Admin:**
+
+Create `resources/views/admin/index.blade.php`:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, Admin</h1>
+</body>
+</html>
+```
+
+**For User:**
+
+Create `resources/views/user/index.blade.php`:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, User</h1>
+</body>
+</html>
+```
+
+### Summary
+
+1. **Migration**: Add a `role` column to the `users` table to distinguish between `admin` and `user`.
+2. **Middleware**: Create a middleware to restrict access based on the user’s role.
+3. **Controllers**: Create controllers with role-based middleware for handling different user sections.
+4. **Routes**: Define routes for admin and user areas.
+5. **Views**: Create simple views for the admin and user dashboards.
+
+This setup allows you to manage different user roles and restrict access to certain routes based on the user’s role.
