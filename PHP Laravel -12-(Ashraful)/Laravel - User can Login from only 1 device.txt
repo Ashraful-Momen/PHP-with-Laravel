@@ -1,0 +1,141 @@
+To ensure that a user can log in from only one device at a time with one IP address in Laravel, you can follow these steps:
+
+1. **Create a New Middleware to Handle Session Management**: This middleware will check if the user is trying to log in from a new device and will invalidate any existing session if so.
+
+2. **Update the Authentication Logic**: Modify the login logic to store the user's session information including the IP address.
+
+3. **Apply the Middleware**: Ensure the middleware is applied to routes that need to enforce this restriction.
+
+Here's how you can implement it:
+
+### Step 1: Create Middleware
+
+Create a new middleware using the Artisan command:
+
+```bash
+php artisan make:middleware SingleDeviceLogin
+```
+
+Open the newly created middleware in `app/Http/Middleware/SingleDeviceLogin.php` and add the following logic:
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class SingleDeviceLogin
+{
+    public function handle($request, Closure $next)
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $currentSessionId = session()->getId();
+            $currentIp = $request->ip();
+
+            // Retrieve the last session ID and IP from the database
+            $lastSessionId = $user->last_session_id;
+            $lastIp = $user->last_ip;
+
+            // If the user is logging in from a new device or IP, invalidate the old session
+            if ($lastSessionId && $currentSessionId !== $lastSessionId) {
+                // Invalidate the previous session
+                DB::table('sessions')->where('id', $lastSessionId)->delete();
+
+                // Optionally, you can log out the user from the old session
+                // Auth::logoutOtherDevices($request->password);
+
+                // Update the user's session and IP information
+                $user->last_session_id = $currentSessionId;
+                $user->last_ip = $currentIp;
+                $user->save();
+            }
+        }
+
+        return $next($request);
+    }
+}
+```
+
+### Step 2: Update the User Model
+
+Ensure your `User` model has the necessary fields to store the session ID and IP address. Add the following fields to the `users` table by creating a new migration:
+
+```bash
+php artisan make:migration add_session_fields_to_users_table --table=users
+```
+
+In the migration file (`database/migrations/YYYY_MM_DD_add_session_fields_to_users_table.php`), add:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddSessionFieldsToUsersTable extends Migration
+{
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('last_session_id')->nullable();
+            $table->string('last_ip')->nullable();
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['last_session_id', 'last_ip']);
+        });
+    }
+}
+```
+
+Run the migration:
+
+```bash
+php artisan migrate
+```
+
+### Step 3: Update Authentication Logic
+
+In your `LoginController`, update the `authenticated` method to store the session ID and IP address:
+
+```php
+protected function authenticated(Request $request, $user)
+{
+    $user->last_session_id = session()->getId();
+    $user->last_ip = $request->ip();
+    $user->save();
+}
+```
+
+### Step 4: Apply the Middleware
+
+Register the middleware in `app/Http/Kernel.php`:
+
+```php
+protected $routeMiddleware = [
+    // ...
+    'single.device.login' => \App\Http\Middleware\SingleDeviceLogin::class,
+];
+```
+
+Apply the middleware to the routes that require this restriction, for example in `routes/web.php`:
+
+```php
+Route::group(['middleware' => ['auth', 'single.device.login']], function () {
+    // Your protected routes
+});
+```
+
+### Final Notes
+
+This setup ensures that a user can only have one active session from a single device/IP at any given time. When a user logs in from a new device or IP, the previous session is invalidated, and the new session is recorded.
+
+This approach requires that you have session management configured properly in Laravel and that sessions are being stored in a database or a centralized storage system to allow for session invalidation.
