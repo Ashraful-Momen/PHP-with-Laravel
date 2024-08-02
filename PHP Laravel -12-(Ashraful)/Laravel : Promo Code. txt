@@ -1,0 +1,365 @@
+# model : polymorph many to many design . 
+-----------
+life model=> 
+----------------
+class LifeAndHealth extends Model
+{
+    //
+    protected $table = 'life_and_healths';
+
+    protected $guraded = [];
+
+    //fillable set; 
+
+    // relationship DB: -----------------------------------------------------
+    public function promo__codes__alls(){
+        return $this->MorphToMany(Promo_Codes_All::class, 'promo_codable');
+    }
+
+}
+
+Hdc model => 
+-----------------
+
+class HDCPackages extends Model
+{
+    protected $table = 'hdc_card_packages';
+
+    protected $fillable = [];
+
+
+    //relationship DB: -----------------------------------------------------
+    public function promo__codes__alls(){
+        return $this->MorphToMany(Promo_Codes_All::class, 'promo_codable');
+    }
+
+    public function cardTheme()
+    {
+        return $this->belongsTo(CardTheme::class, 'theme_id', 'id');
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Dealer::class, 'brand_id', 'id');
+    }
+
+}
+
+#promo code model => 
+------------------------
+class Promo_Codes_All extends Model
+{
+
+    protected $guarded = [];
+    protected $fillable = [
+        'promo_name',
+        'unique_code',
+        'discount_type',
+        'discount',
+        'valid_from',
+        'valid_to',
+        'apply_quantity_limit',
+        'applicable_self_others',
+    ];
+
+    //life_health pkg: ----------------------------------
+    public function life_health_pkg(){
+        return $this->morphedByMany(LifeAndHealth::class, 'promo_codable');
+    }
+    //car pkg: ----------------------------------
+    public function car_pkg(){
+        return $this->morphedByMany(CarInsuranceAdminTable::class, 'promo_codable');
+    }
+    //bike pkg: ----------------------------------
+    public function bike_pkg(){
+        return $this->morphedByMany(BikeInsuranceAdminTable::class, 'promo_codable');
+    }
+    //HDC pkg: ----------------------------------
+    public function hdc_pkg(){
+        return $this->morphedByMany(HDCPackages::class, 'promo_codable');
+    }
+
+    //cattle pkg: ----------------------------------
+    //have to create modal for the cattle :
+    // public function cattle_pkg(){
+    //     return $this->morphedByMany(HDCPackages::class, 'promo_codable');
+    // }
+
+    //travel pkg: ----------------------------------
+    public function trave_pkg(){
+        return $this->morphedByMany(TravelInsPlansChart::class, 'promo_codable');
+    }
+
+    //device pkg: ----------------------------------
+    public function device_pkg(){
+        return $this->morphedByMany(InsurancePackage::class, 'promo_codable');
+    }
+
+
+
+}
+
+Route: for promo code => 
+----------------------------
+ //Ashraful::promo code----------------------------------------------------------------------------------------------------------------------------------------------
+
+    Route::get('promo-codes_create', [PromoCodeAllController::class, 'create'])->name('promo_codes_all.create');
+    Route::post('promo-codes_store', [PromoCodeAllController::class, 'store'])->name('promo_codes_all.store');
+
+
+
+# Admin view for promo code form : 
+-----------------------------------------------
+@section('content')
+    <div class="container">
+
+        <h1>Create Promo Code</h1>
+        <hr>
+
+        <form action="{{ route('admin.promo_codes_all.store') }}" method="POST">
+            @csrf
+            <div class="form-group row">
+                <div class="col">
+                    <label for="promo_name">Promo Name</label>
+                    <input type="text" class="form-control" id="promo_name" name="promo_name" required>
+                </div>
+                {{-- <div class="col">
+                        <label for="unique_code">Unique Code</label>
+                        <input type="text" class="form-control" id="unique_code" name="unique_code" required>
+
+                    </div> --}}
+                <div class="col">
+                    <label for="unique_code">Unique Code</label>
+                    <input type="text" class="form-control" id="unique_code" name="unique_code" required>
+
+                </div>
+                <div class="col">
+                    <label for=""> Click For Unique Code </label>
+                    <button type="button" class="btn btn-primary" onclick="generateUniqueCode()">Generate Code</button>
+                </div>
+
+
+                <div class="col">
+                    {{--
+                    <input type="text" class="form-control" id="discount_type" name="discount_type" required> --}}
+                    <label for="discount_type">Discount Type</label>
+                    <select class="form-select" aria-label="Default select example" id="discount_type" name="discount_type">
+                        <option disabled>Discount Type</option>
+                        <option value="flat">Flat</option>
+                        <option value="percentage">Percentage</option>
+
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="discount">Discount</label>
+                    <input type="number" class="form-control" id="discount" name="discount" required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col">
+                    <label for="valid_from">Valid From</label>
+                    <input type="date" class="form-control" id="valid_from" name="valid_from" required>
+                </div>
+
+                <div class="col">
+                    <label for="valid_to">Valid To</label>
+                    <input type="date" class="form-control" id="valid_to" name="valid_to" required>
+                </div>
+                <div class="col">
+                    <label for="apply_quantity_limit">Apply Quantity Limit</label>
+                    <input type="number" class="form-control" id="apply_quantity_limit" name="apply_quantity_limit">
+                </div>
+            </div>
+
+            {{-- <div class="form-group">
+                    <label for="applicable_self_others">Applicable Self/Others</label>
+                    <input type="text" class="form-control" id="applicable_self_others" name="applicable_self_others">
+                </div> --}}
+
+            <div class="form-group">
+                <label class="h5" for="packages">Select Packages</label>
+                <hr>
+
+                <h4>HDC Packages</h4>
+                <div>
+                    <input type="checkbox" id="select_all_hdc" onclick="toggleSelectAll('hdc')">
+                    <label for="select_all_hdc">Select All</label>
+                </div>
+                @foreach ($hdcPackages as $package)
+                    <div>
+                        <input type="checkbox" class="hdc" name="packages[]" value="hdc:{{ $package->id }}">
+                        <label>{{ $package->title }}</label>
+                    </div>
+                @endforeach
+
+                <h4>Life and Health Packages</h4>
+                <div>
+                    <input type="checkbox" id="select_all_life" onclick="toggleSelectAll('life')">
+                    <label for="select_all_life">Select All</label>
+                </div>
+                @foreach ($lifeAndHealthPackages as $package)
+                    <div>
+                        <input type="checkbox" class="life" name="packages[]" value="life:{{ $package->id }}">
+                        <label>{{ $package->Pname }}</label>
+                    </div>
+                @endforeach
+
+                <h4>Car Packages</h4>
+                <div>
+                    <input type="checkbox" id="select_all_car" onclick="toggleSelectAll('car')">
+                    <label for="select_all_car">Select All</label>
+                </div>
+                @foreach ($carPackages as $package)
+                    <div>
+                        <input type="checkbox" class="car" name="packages[]" value="car:{{ $package->id }}">
+                        <label>{{ $package->Pname }}</label>
+                    </div>
+                @endforeach
+
+                <h4>Bike Packages</h4>
+                <div>
+                    <input type="checkbox" id="select_all_bike" onclick="toggleSelectAll('bike')">
+                    <label for="select_all_bike">Select All</label>
+                </div>
+                @foreach ($bikePackages as $package)
+                    <div>
+                        <input type="checkbox" class="bike" name="packages[]" value="bike:{{ $package->id }}">
+                        <label>{{ $package->Pname }}</label>
+                    </div>
+                @endforeach
+
+                <h4>Travel Packages</h4>
+                <div>
+                    <input type="checkbox" id="select_all_travel" onclick="toggleSelectAll('travel')">
+                    <label for="select_all_travel">Select All</label>
+                </div>
+                @foreach ($travelPackages as $package)
+                    <div>
+                        <input type="checkbox" class="travel" name="packages[]" value="travel:{{ $package->id }}">
+                        <label>{{ $package->plan_title }} - {{ $package->country_type }}</label>
+                    </div>
+                @endforeach
+
+                <h4>Device Packages</h4>
+                <div>
+                    <input type="checkbox" id="select_all_device" onclick="toggleSelectAll('device')">
+                    <label for="select_all_device">Select All</label>
+                </div>
+                @foreach ($devicePackages as $package)
+                    <div>
+                        <input type="checkbox" class="device" name="packages[]" value="device:{{ $package->id }}">
+                        <label>{{ $package->package_name }}</label>
+                    </div>
+                @endforeach
+            </div>
+            <button type="submit" class="btn btn-primary mb-4">Save Promo Code</button>
+        </form>
+
+    </div>
+
+    <script>
+        function toggleSelectAll(packageType) {
+            const checkboxes = document.querySelectorAll(`.${packageType}`);
+            const selectAllCheckbox = document.getElementById(`select_all_${packageType}`);
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+    </script>
+    <script>
+        function generateUniqueCode() {
+            // Generate a random string
+            let code = 'UC' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+            // Set the value of the input field
+            document.getElementById('unique_code').value = code;
+        }
+    </script>
+@endsection
+
+--------------------------------------------------------------------------
+#controller for promo code => 
+------------------------------
+class PromoCodeAllController extends Controller
+{
+
+    public function create()
+    {
+        // Fetch all package categories:
+        $hdcPackages = HDCPackages::all();
+        $lifeAndHealthPackages = LifeAndHealth::all();
+        $carPackages = CarInsuranceAdminTable::all();
+        $bikePackages = BikeInsuranceAdminTable::all();
+        // $travelPackages = TravelInsPlansChart::all();
+        $travelPackages =  DB::table('travel_ins_plans_categories')->get();
+
+        // foreach($travelPackages as $pkg){
+        //     echo $pkg->plan_title,":",$pkg->country_type,"<br>";
+        // }
+
+        // dd($travelPackages);
+
+
+
+        $devicePackages = InsurancePackage::all();
+
+        return view('backend.admin.promo_code_all/promot_code_all_add', compact(
+            'hdcPackages', 'lifeAndHealthPackages', 'carPackages',
+            'bikePackages', 'travelPackages', 'devicePackages'
+        ));
+    }
+
+    public function store(Request $request)
+    {
+
+        // dd($request);
+        // Validate input
+        // $request->validate([
+        //     'promo_name' => 'required|string|max:255',
+        //     'unique_code' => 'required|string|max:255|unique:promo_codes_all',
+        //     'discount_type' => 'required|string|max:255',
+        //     'discount' => 'required|numeric',
+        //     'valid_from' => 'required|date',
+        //     'valid_to' => 'required|date',
+        //     'apply_quantity_limit' => 'required|boolean',
+        //     'applicable_self_others' => 'required|boolean',
+        //     'packages' => 'required|array',
+        //     'packages.*' => 'required|string'
+        // ]);
+
+        // Create promo code
+        $promoCode = Promo_Codes_All::create($request->all());
+
+        // Attach selected packages to promo code
+        foreach ($request->packages as $package) {
+            list($type, $id) = explode(':', $package);
+            switch ($type) {
+                case 'hdc':
+                    $promoCode->hdc_pkg()->attach($id);
+                    break;
+                case 'life_health':
+                    $promoCode->life_health_pkg()->attach($id);
+                    break;
+                case 'car':
+                    $promoCode->car_pkg()->attach($id);
+                    break;
+                case 'bike':
+                    $promoCode->bike_pkg()->attach($id);
+                    break;
+                case 'travel':
+                    $promoCode->trave_pkg()->attach($id);
+                    break;
+                case 'insurance':
+                    $promoCode->device_pkg()->attach($id);
+                    break;
+            }
+        }
+
+        return redirect()->route('admin.promo_codes_all.create')->with('success', 'Promo code created successfully.');
+    }
+
+}
+
+
+
