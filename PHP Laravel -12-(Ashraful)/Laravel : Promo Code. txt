@@ -106,6 +106,52 @@ Route: for promo code =>
     Route::get('promo-codes_create', [PromoCodeAllController::class, 'create'])->name('promo_codes_all.create');
     Route::post('promo-codes_store', [PromoCodeAllController::class, 'store'])->name('promo_codes_all.store');
 
+//optional test for route: 
+-----------------------------
+Route::get('/promo_code_check', function () {
+
+
+
+    //-----------------------------
+    #create a new promo code
+
+
+
+    // $pkg = LifeAndHealth::find(50);
+
+    // // dd($pkg->promo__codes__alls);
+
+    // $pkg->promo__codes__alls()->create([
+    //     'promo_name' => 'test',
+    // ]);
+
+    // dd($pkg);
+
+    //--------------------------------------
+    #check the relation varibale from the pivot table
+
+    // $pkg = LifeAndHealth::find(50);
+    // dd($pkg->promo__codes__alls);
+
+    //--------------------------------------
+    #retrive all promo code with pivot table data ['model_function1','model_function2']
+
+        // $promo_codes = Promo_Codes_All::with([
+        //     'life_health_pkg',
+        //     'car_pkg',
+        //     'bike_pkg',
+        //     'hdc_pkg',
+        //     'trave_pkg',
+        //     'device_pkg'
+        // ])->get();
+
+        // dd($promo_codes);
+    // ----------------------------------------
+
+
+    return "successfully saved";
+});
+
 
 
 # Admin view for promo code form : 
