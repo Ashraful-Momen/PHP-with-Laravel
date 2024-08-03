@@ -1,0 +1,15 @@
+use Carbon\Carbon;
+
+Route::get('/promo_code_check', function () {
+    // Fetch only valid promo codes with related models and pivot data
+    $promo_codes = Promo_Codes_All::with([
+        'life_health_pkg',
+        'car_pkg',
+        'bike_pkg',
+        'hdc_pkg',
+        'trave_pkg',
+        'device_pkg'
+    ])->where('valid_to', '>=', Carbon::now())->get();
+
+    return view('promo_code_check', compact('promo_codes'));
+});
