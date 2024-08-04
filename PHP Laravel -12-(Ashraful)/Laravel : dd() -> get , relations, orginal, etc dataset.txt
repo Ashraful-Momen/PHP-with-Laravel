@@ -1,0 +1,15 @@
+ //here life and health pkg have model function : promo__codes__alls()
+
+        if ($package->promo__codes__alls->isNotEmpty()) {
+            $promoCode = $package->promo__codes__alls->first();
+
+            $attributes = $promoCode->getAttributes();
+            $original = $promoCode->getOriginal();
+
+            dd($original['pivot_promo_codable_type']);
+
+            dd([
+                'attributes' => $promoCode->getAttributes(),
+                'original' => $promoCode->getOriginal(),
+                'relations' => $promoCode->getRelations(),
+            ]);
