@@ -451,12 +451,19 @@ class PromoCodeAllController extends Controller
 
                     // echo "after Discount Price : ", $with_discount_pirce;
 
-                    if($promo_code_limit->used_limit < $promo_code_used_limit){
-
-                        $promo_code_limit != null  ? $promo_code_limit->update(['promo_code' => $request->promo_code_hidden,'used_limit' => $promo_code_limit->used_limit + 1, 'user_id' => Auth::user()->id]) : $promo_code_limit = Promo_Code_All_Used::create([
+                    if($promo_code_limit == null){
+                        $promo_code_limit = Promo_Code_All_Used::create([
                             'promo_code' => $request->promo_code_hidden,'used_limit' => 1, 'user_id' => Auth::user()->id
                         ]);
                     }
+
+                    elseif($promo_code_limit->used_limit < $promo_code_used_limit){
+
+                         $promo_code_limit->update(['promo_code' => $request->promo_code_hidden,'used_limit' => $promo_code_limit->used_limit + 1, 'user_id' => Auth::user()->id]);
+
+                    }
+
+
                 // dd($discountType, $discountAmount, $discountApplied);
 
         }
