@@ -407,5 +407,62 @@ class PromoCodeAllController extends Controller
 
 }
 
+//---------------------------------------------------------------------------------------------
+#Promo code limit for customer view : 
+----------------------------------------
+// ------------------------------------Promo Code ----------------------------------------------------
+        #discount  = promo code amount .
+
+
+        //here life and health pkg have model function : promo__codes__alls()
+
+        if ($package->promo__codes__alls->isNotEmpty()) {
+
+            $promo_code = $request->promo_code_hidden; // get all promo code in pkg .
+            // --------------------------------------------------
+            $backend_promoCodes = $package->promo__codes__alls;
+
+            foreach ($backend_promoCodes as $promoCode) {
+
+                // echo $promoCode->unique_code,"<br>";
+                if ($promoCode->unique_code === $request->promo_code_hidden) {
+                    // Apply the discount here
+                    $discount = $promoCode->discount; // adjust based on your discount logic
+                    $discountType = $promoCode->discount_type;
+                    $discountAmount = $promoCode->discount;
+                    $promo_code_used_limit = $promoCode->apply_quantity_limit;
+                    $discountApplied = true;
+                    break; // Exit loop if a matching promo code is found
+                }
+            }
+
+            $discount = $discount;
+
+            //if discount type == percentage : apply discount on pkg price .
+            $discount_type = $discountType ?? '';
+            $discount_type == 'percentage' ? $with_discount_pirce = $before_discount_pirce * (1 - ($discount / 100)) : $with_discount_pirce = $before_discount_pirce - $discount;
+
+            //update the promo code used limit: -------------------------------------------------------------
+                // if the promo code exist on the table the update the used limit:
+                // if the promo code not exist on the table the insert the promo code used limit:
+                    $promo_code_limit = Promo_Code_All_Used::where('promo_code', $request->promo_code_hidden)->where('user_id', Auth::user()->id)->first();
+
+                    // dd($promo_code_limit->used_limit, $promo_code_used_limit);
+
+                    // echo "after Discount Price : ", $with_discount_pirce;
+
+                    if($promo_code_limit->used_limit < $promo_code_used_limit){
+
+                        $promo_code_limit != null  ? $promo_code_limit->update(['promo_code' => $request->promo_code_hidden,'used_limit' => $promo_code_limit->used_limit + 1, 'user_id' => Auth::user()->id]) : $promo_code_limit = Promo_Code_All_Used::create([
+                            'promo_code' => $request->promo_code_hidden,'used_limit' => 1, 'user_id' => Auth::user()->id
+                        ]);
+                    }
+                // dd($discountType, $discountAmount, $discountApplied);
+
+        }
+
+
+        // -----------------------------------Promo Code-----------------------------------------------------
+
 
 
