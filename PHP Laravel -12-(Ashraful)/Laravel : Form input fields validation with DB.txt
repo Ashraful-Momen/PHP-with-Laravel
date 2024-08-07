@@ -1,5 +1,6 @@
- $user_promo_code = $request->promo_code;
-            //check promo code validation :----------------------------------------------------
+ #controller: 
+   ---------------
+   //check promo code validation :----------------------------------------------------
             $promo_code_match = Promo_Codes_All::where('unique_code', $user_promo_code)->first();
 
 
@@ -9,4 +10,11 @@
                 return Redirect::back()->with('msg',"Promo Code Not Found!");
             }
 
-            //End check promo code validation :----------------------------------------------------
+  //End check promo code validation :----------------------------------------------------
+            
+    #view : 
+    ---------
+     @if(Session::has('msg'))
+        <span class="text-danger">{{ Session::get('msg') }}</span>
+    @endif
+----------------------------------------
