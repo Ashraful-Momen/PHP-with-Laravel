@@ -470,6 +470,89 @@ class PromoCodeAllController extends Controller
 
 
         // -----------------------------------Promo Code-----------------------------------------------------
+========================================Promo code for controller: HDC, Bike, Car=======================================
+// --------------------------------------Promo Code-----------------------------------------------------------
+        $user_promo_code = $request->promo_code;
+        $user_id = Auth::user()->id;
+
+         #if pkg promo code match user promo code then apply discount :
+       // ==================================Promo Code Section=================================
+        // ------------------------------------------------------------------------------
+        #if pkg promo code match user promo code then apply discount :
+        // Assuming $bike is your package model instance
+        $user_promo_code = $request->promo_code;
+        $backend_promoCodes = $package->promo__codes__alls;
+        $total_amount = $price;
+
+
+        // dd($package,$user_promo_code);
+
+        // echo "before discount amount Price ",$total_amount = $price; // don't delete this line
+
+
+
+        $discountApplied = false;
+
+        foreach ($backend_promoCodes as $promoCode) {
+
+            // echo $promoCode->unique_code,"<br>";
+            if ($promoCode->unique_code === $user_promo_code) {
+
+                // dd("promo code match",$promoCode->unique_code, $user_promo_code,"discount",$discountAmount = $promoCode->discount);
+                // Apply the discount here
+                $discountAmount = $promoCode->discount; // adjust based on your discount logic
+                $discountType = $promoCode->discount_type;
+                $discountAmount = $promoCode->discount;
+                $promo_code_used_limit = $promoCode->apply_quantity_limit;
+                $discountApplied = true;
+
+                // Apply discount logic here, e.g.:
+                // $totalPrice = $originalPrice - $discountAmount;
+
+                break; // Exit loop if a matching promo code is found
+            }
+        }
+
+        // dd($discountApplied,$discountAmount, $discountType, $promo_code_used_limit);
+
+        echo "before discount amount",$total_amount;
+
+        if ($discountApplied == true) {
+
+            $discountType == 'percentage' ? $total_amount = $total_amount * (1 - ($discountAmount / 100)) : $total_amount = $total_amount - $discountAmount;
+
+            //update the promo code used limit: -------------------------------------------------------------
+            // if the promo code exist on the table the update the used limit:
+            // if the promo code not exist on the table the insert the promo code used limit:
+                $promo_code_limit = Promo_Code_All_Used::where('promo_code', $user_promo_code)->where('user_id', Auth::user()->id)->first();
+                // dd($promo_code_limit);
+
+                if($promo_code_limit == null){
+                    $promo_code_limit = Promo_Code_All_Used::create([
+                        'promo_code' => $user_promo_code,'used_limit' => 1, 'user_id' => Auth::user()->id
+                    ]);
+                }
+
+                elseif($promo_code_limit->used_limit < $promo_code_used_limit){
+
+                     $promo_code_limit->update(['promo_code' => $user_promo_code,'used_limit' => $promo_code_limit->used_limit + 1, 'user_id' => Auth::user()->id]);
+
+                }
+        }
+
+        // echo "after discount amount",$total_amount;
+
+        // dd();
+
+        $price = $total_amount;
+
+
+
+        // dd($discountApplied,$discountType, $discountAmount, $user_promo_code);
+
+        // dd($user_promo_code, $backend_promoCodes);
+
+        // --------------------------------------End Promo Code-------------------------------------------------------
 
 
 
