@@ -1,0 +1,70 @@
+#Promo Code Input field check : 
+---------------------------------
+
+view: 
+---------
+<!-- /.form-group  -->
+<div class="form-group mb-2">
+    <label for="promo_code" class="c-form-label">Promo Code
+        <sup class="text-danger" title="Required">*</sup></label>
+    <input type="text" id="promo_code" name="promo_code" class="form-control"
+        placeholder="Apply Promo Code">
+    <span id="promo_code_msg" class="text-danger"></span>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#promo_code').on('blur', function() {
+            var promoCode = $(this).val();
+            $.ajax({
+                url: '{{ route("check-promo-code") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    promo_code: promoCode
+                },
+                success: function(response) {
+                    if (response.status == 'error') {
+                        $('#promo_code_msg').text(response.message);
+                    } else {
+                        $('#promo_code_msg').text('');
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+route: 
+----------
+// routes/web.php
+Route::post('/check-promo-code', [YourController::class, 'checkPromoCode'])->name('check-promo-code');
+
+
+controller : 
+--------------
+// YourController.php
+
+use Illuminate\Http\Request;
+use App\Models\Promo_Codes_All;
+
+public function checkPromoCode(Request $request)
+{
+    $user_promo_code = $request->input('promo_code');
+    $promo_code_match = Promo_Codes_All::where('unique_code', $user_promo_code)->first();
+
+    if ($promo_code_match == null) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Promo Code Not Found!'
+        ]);
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Promo Code Applied Successfully!'
+    ]);
+}
+
+
