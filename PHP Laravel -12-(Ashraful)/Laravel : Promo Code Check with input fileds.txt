@@ -67,4 +67,46 @@ public function checkPromoCode(Request $request)
     ]);
 }
 
+========================================================================= Promo Code input Check for Life and Health Pkg ================================================================================
+
+ {{-- apply promo code  --}}
+                                                                        {{-- apply promo code  --}}
+                                                                        <input type="text" name="promo_code"
+                                                                            placeholder="Apply Promo Code"
+                                                                            class="btn btn-outline-primary custom-outline-color rounded-pill"
+                                                                            id="promo_code_{{ $life_health->id }}">
+                                                                        <br>
+                                                                        <span id="promo_code_msg_{{ $life_health->id }}"
+                                                                            class="text-danger"></span>
+                                                                        <br>
+
+                                                                        {{-- apply promo code  --}}
+                                                                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                                                        <script>
+                                                                            $(document).ready(function() {
+                                                                                // Target all promo code input fields by name
+                                                                                $('input[name="promo_code"]').on('blur', function() {
+                                                                                    var promoCode = $(this).val();
+                                                                                    var promoCodeId = $(this).attr('id').split('_').pop(); // Extract the ID part
+                                                                                    var promoCodeMsgId = '#promo_code_msg_' + promoCodeId;
+
+                                                                                    $.ajax({
+                                                                                        url: '{{ route('check-promo-code') }}',
+                                                                                        method: 'POST',
+                                                                                        data: {
+                                                                                            _token: '{{ csrf_token() }}',
+                                                                                            promo_code: promoCode
+                                                                                        },
+                                                                                        success: function(response) {
+                                                                                            if (response.status == 'error') {
+                                                                                                $(promoCodeMsgId).text(response.message);
+                                                                                            } else {
+                                                                                                $(promoCodeMsgId).text('');
+                                                                                            }
+                                                                                        }
+                                                                                    });
+                                                                                });
+                                                                            });
+                                                                        </script>
+
 
