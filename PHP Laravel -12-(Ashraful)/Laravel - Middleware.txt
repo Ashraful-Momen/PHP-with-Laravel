@@ -1,5 +1,6 @@
 #Laravel Middleware: 
 ---------------------
+--------->route---------->middleware-------------->controller_function_of_route
 
 [route -> middleware::class->function() -> route->controller function ]
 >>>php artisan make:middleware MiddlewareName
