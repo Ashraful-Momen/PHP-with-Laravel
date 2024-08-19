@@ -1,0 +1,70 @@
+Route: 
+----------
+// --------------------------------- Brand Manage : Microsite-----------------------------------------------------------------
+Route::get('/microsite/{session_name}', [HomeController::class, 'controlMicrosite'])->name('controlMicrosite');
+
+// -------------------------------------------------Nagad: Microsite Routes-------------------------------------------------------------------------------
+
+
+
+Route::get('/instasure/microsite/nagadMicrosite', [NagadMicrosite::class, 'nagadMicrosite'])->name('nagadMicrosite');
+
+// Custom Logout - Sajid Anam Ifti
+Route::post('/custom-logout', 'Frontend\AuthController@custom_logout')->name('custom-logout');
+
+
+// -------------------------------------------------AamarPay: Microsite Routes-------------------------------------------------------------------------------
+
+Route::get('/instasure/microsite/aamarPayMicrosite', [AamarPayMicrosite::class, 'aamarPayMicrosite'])->name('aamarPayMicrosite');
+// Route::get('/instasure-aamarPay', [AamarPayMicrosite::class, 'aamarPayMicrosite'])->name('aamarPay-microsite');
+// Route::get('/instasure/micrsite/{id}', [AamarPayMicrosite::class, 'aamarPayMicrosite'])->name('aamarPay-microsite');
+Route::post('/logout-AamarPay', 'Frontend\AuthController@custom_logout')->name('custom-logout');
+
+// -------------------------------------------------Robi: Microsite Routes-------------------------------------------------------------------------------
+
+Route::get('/instasure/microsite/RobiMicrosite', [RobiMicrosite::class, 'RobiMicrosite'])->name('RobiMicrosite');
+// Route::get('/instasure-Robi', [RobiMicrosite::class, 'RobiMicrosite'])->name('Robi-microsite');
+Route::post('/logout-Robi', 'Frontend\AuthController@custom_logout')->name('custom-logout');
+
+//--------------------------------------------------UserBan & Delete Routes--------------------------------------------------------------------------------
+
+Route::get('/userDelReq', [HomeController::class, 'userDel'])->name('userDel'); // delete any user
+Route::post('/userDelReqSubmit', [HomeController::class, 'userDelSubmit'])->name('userDelSubmit'); // delete any user
+
+// -------------------------------------------------End Nagad Microsite Routes------------------------------------------------------------------------------
+
+Controller: 
+----------------
+ // Brand Management : Microstie----------------------------------------------------------
+    function controlMicrosite($brand)
+    {
+        // Fetch the list of brand names
+        $brands = MicrositeManagePkg::where('item_type', 'brand')->pluck('session_brand_name')->toArray();
+
+        // $brand = in_array($brand, $brands);
+
+
+
+        // Check if the brand exists in the array
+        if (in_array($brand, $brands)) {
+            // dd($brand);
+            // Construct the URL path for the brand microsite
+            $targetUrl = url("/instasure/microsite/{$brand}");
+
+            return redirect($targetUrl);
+
+            // Prevent redirect loop by checking if the current URL matches the target URL
+            if (url()->current() !== $targetUrl) {
+                return redirect($targetUrl);
+            } else {
+                // If already on the correct page, you can either do nothing or display a message
+                // echo "You're already on the {$brand} microsite page.";
+                // or simply return a view if necessary
+                return view('microsites.' . $brand);
+            }
+        } else {
+            return " Microsite not found";
+            // If the brand does not exist, handle it accordingly
+            return abort(404, 'Microsite not found');
+        }
+    }
