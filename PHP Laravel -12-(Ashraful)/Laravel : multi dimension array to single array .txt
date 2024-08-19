@@ -1,0 +1,64 @@
+
+        $teli_medicine_charge = $request->teli_medicine_charge; // Assuming $request->teli_medicine_charge contains "9:400"
+
+        $json_decoded = json_decode($request->teli_medicine_charge);
+
+        // dd($json_decoded);
+
+        if ($json_decoded !== null) {
+            // If the input is valid JSON, set $teli_medicine_fee to 0
+            $teli_medicine_fee = 0;
+        }
+
+        elseif ($request->teli_medicine_charge == 'free') {
+            $teli_medicine_fee = 0;
+        }
+
+        elseif($json_decoded === null) {
+            list($teli_medi_call, $teli_medicine_fee) = explode(':', $teli_medicine_charge);
+        }
+
+==========================================more example==================================================
+<td>
+    @php
+        // Decode the JSON string to a PHP array
+        $categories = json_decode($brand->cat_id, true);
+    @endphp
+
+    @if (!empty($categories) && is_array($categories))
+        <ul>
+            @foreach ($categories as $category)
+                @php
+                    // Split the category into its components and use list() for readability
+                    list($categoryId, $categoryName) = explode(':', $category) + [null, 'Unknown'];
+                @endphp
+                <li>{{ $categoryName }}</li>
+            @endforeach
+        </ul>
+    @else
+        No categories assigned
+    @endif
+</td>
+=============================================== without list method how to exploid ==============================================
+ <td>
+                                            @php
+                                                // Decode the JSON string to a PHP array
+                                                $categories = json_decode($brand->cat_id, true);
+                                            @endphp
+
+                                            @if (!empty($categories) && is_array($categories))
+                                                <ul>
+                                                    @foreach ($categories as $category)
+                                                        @php
+                                                            // Split the category into its components
+                                                            $parts = explode(':', $category);
+                                                            $categoryId = $parts[0];
+                                                            $categoryName = $parts[1] ?? 'Unknown'; // Fallback if no name is provided
+                                                        @endphp
+                                                        <li>{{ $categoryName }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                No categories assigned
+                                            @endif
+                                        </td>
