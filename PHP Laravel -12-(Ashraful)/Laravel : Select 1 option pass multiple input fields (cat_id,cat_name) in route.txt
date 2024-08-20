@@ -1,0 +1,31 @@
+<div class="col category-field">
+                                        <div data-mdb-input-init class="form-outline">
+                                            {{-- <input type="text" id="cat_name" name="cat_name" class="form-control" /> --}}
+
+
+                                            @if ($category !== null && $category->isNotEmpty())
+                                                <select id="cat_name" name="cat_name" value="{{ old('cat_name') }}"
+                                                    class="form-select form-control-input" required onchange="updateRoute(this)">
+                                                    @foreach ($category as $c)
+                                                        <option value="{{ $c->name }}"   data-id="{{ $c->id }}">{{ $c->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <label class="form-label" for="brand_name">Category name</label>
+                                            @else
+                                                <label class="form-label text-danger" for="form3Example3">[Category not
+                                                    Found]</label>
+
+                                            @endif
+                                            <label class="form-label" for="cat_name">Category name</label>
+                                            {{-- hiddhen input value pass accroding to select optin  --}}
+                                            <input type="hidden" id="cat_route" name="cat_id" value="{{ old('cat_id') }}">
+                                            {{-- hiddhen input value pass accroding to select optin  --}}
+                                            <script>
+                                                function updateRoute(selectElement) {
+                                                    var selectedOption = selectElement.options[selectElement.selectedIndex];
+                                                    var id = selectedOption.getAttribute('data-id');
+                                                    document.getElementById('cat_id').value = id;
+                                                }
+                                            </script>
+                                        </div>
+                                    </div>
