@@ -1,0 +1,323 @@
+css :
+---------
+{{-- ---------------------------------------------------------------------------------------------- --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" href="{{ asset('backend/plugins/datatables/dataTables.bootstrap4.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
+    {{-- ---------------------------------------------------------------------------------------------- --}}
+
+
+js: 
+-------
+{{-- --------------------------------don't delete previous code -------------------------------- --}}
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+    {{-- --------------------------------don't delete previous code -------------------------------- --}}
+    {{-- --------------------------------don't delete previous code -------------------------------- --}}
+
+
+    <script>
+        $(document).ready(function() {
+            $("#example1").DataTable({
+                dom: 'Bfrtip', // Enables the buttons for export, column visibility, etc.
+                buttons: [
+                    'colvis',      // Button to show/hide columns
+                    'csv',         // Button to export table data as CSV
+                    'excel',       // Button to export table data as Excel
+                    'pdf',         // Button to export table data as PDF
+                    'print'        // Button to print the table
+                ],
+                paging: true,           // Enables pagination
+                lengthChange: true,     // Allows changing the number of rows per page
+                searching: true,        // Enables the search functionality
+                ordering: true,         // Enables column ordering
+                info: true,             // Shows information about the table (e.g., "Showing 1 to 10 of 57 entries")
+                autoWidth: false,       // Disables automatic column width calculation
+                columnDefs: [           // Define custom column visibility
+                    {
+                        targets: [],    // Specify the indexes of columns that should be hidden by default
+                        visible: false
+                    }
+                ]
+            });
+        });
+    </script>
+    {{-- --------------------------------don't delete previous code -------------------------------- --}}
+
+=======================================================view=================================================
+@extends('frontend.layouts.app')
+@section('title', 'Dashboard')
+@push('css')
+    <style>
+        .single-pricing-box .pricing-header.bg2 {
+            background-image: url(https://t4.ftcdn.net/jpg/01/19/11/55/360_F_119115529_mEnw3lGpLdlDkfLgRcVSbFRuVl6sMDty.jpg);
+        }
+
+        .ptb-100 {
+            padding-top: 25px;
+            padding-bottom: 100px;
+        }
+
+        .single-pricing-box {
+            padding-bottom: 19px;
+        }
+
+        .single-pricing-box .pricing-header {
+            background-color: #002e5b;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            padding-top: 25px;
+            padding-bottom: 25px;
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        @media only screen and (max-width: 767px) {
+            .page-title-area {
+                height: -14%;
+                padding-top: 214px;
+                padding-bottom: 32px;
+            }
+        }
+
+        .src-image {
+            display: none;
+        }
+
+        .card2 {
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+            padding: 0;
+            color: #fff;
+
+        }
+
+        .card2 .header-bg {
+            /* This stretches the canvas across the entire hero unit */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            border-bottom: 1px #FFF solid;
+            /* This positions the canvas under the text */
+            z-index: 1;
+        }
+
+        .card2 .avatar {
+            position: relative;
+            z-index: 100;
+        }
+
+        .card2 .avatar img {
+            width: 100px;
+            height: 100px;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            border: 5px solid rgba(0, 0, 30, 0.8);
+        }
+
+        #hoverMe {
+            border-bottom: 1px dashed #e5e5e5;
+            text-align: left;
+            padding: 13px 20px 11px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #002e5b;
+
+        }
+
+        #hoverMe:hover {
+            border-left: 3px solid #002e5b;
+            background-color: #ebebeb;
+            color: #002e5b;
+
+        }
+
+        .text-white a {
+            color: #fff !important;
+        }
+
+        /* -------------------------------------------cart table sytel --------------------------------------- */
+        .gradient-custom {
+            /* fallback for old browsers */
+            /* background: #6a11cb; */
+
+            /* Chrome 10-25, Safari 5.1-6 */
+            /* background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1)); */
+
+            /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            /* background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1)) */
+        }
+
+        /* @media (max-width: 767px) {
+                                                                                        .fixed-bottom {
+                                                                                            position: -webkit-sticky;
+                                                                                            position: sticky;
+                                                                                            bottom: 0;
+                                                                                        }
+                                                                                    } */
+        @media (max-width: 767px) {
+            .sticky-bottom {
+                width: 100%;
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+            }
+        }
+
+        /* ------------------------------------------ cart table sytel --------------------------------------------- */
+    </style>
+@endpush
+@section('content')
+    <!-- Start Page Title Area -->
+    <div
+        class="page-title-area page-title-bg1  {{ Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') || Session::has('RobiMicrosite') ? ' d-lg-block d-none' : '' }} wow animate__zoomIn">
+        <div class="d-table">
+            <div class="d-table-cell">
+                <div class="container">
+                    <div class="page-title-content">
+                        <h2>Orders</h2>
+                        <ul>
+                            <li><a href="{{ url('/') }}">Home</a></li>
+                            <li>Dashboard - Insurance All Orders </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {{-- {{desktop views for the orders }} --}}
+    <section class="pricing-area ptb-20 pb-70 d-none d-md-block d-lg-block">
+        <div class="container">
+            <div class="row">
+                <div
+                    class="col-lg-3 col-md-2 col-sm-2 {{ Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') || Session::has('RobiMicrosite') ? ' d-lg-block d-none' : '' }}">
+                    @include('frontend.partials.customer_dashboard_sidebar')
+                </div>
+                <div
+                    class="col-lg-9 col-md-10 col-sm-10  rounded  {{ Session::has('nagadMicrosite') ? ' mt-5 ' : '' }} wow animate__zoomIn">
+                    {{-- <table class="table bg-white m-2"> --}}
+                    <div class=" shadow-lg p-4" style="border-radius: 15px;">
+
+                        {{-- @php
+                            // dd(count($order));
+                        @endphp --}}
+
+                        @if (count($order) == 0)
+
+                            <h5 class="text-center d-block mt-5">No Orders Found</h5>
+                        @else
+                        <table id="example1" class="table table-bordered table-striped border">
+                            <div class="mb-3 row ">
+                                <div class="col">
+
+                                    <label>Start Date:</label>
+                                    <input type="date" id="startDate" class="form-control">
+                                </div>
+                                <div class="col">
+
+                                    <label>End Date:</label>
+                                    <input type="date" id="endDate" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <label>Search By Date:</label>
+                                    <button onclick="filterOrders()" class="btn btn-primary  form-control">Filter</button>
+                                </div>
+                            </div>
+
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Total Bill</th>
+                                    <th>Order Status</th>
+                                    <th>Payment Status</th>
+                                    <th>Details</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($order as $key => $o)
+                                    <tr>
+                                        <td>{{ $key + 1 }}</td>
+                                        <td>{{ $o->order_ref_id }}</td>
+                                        <td data-date="{{ $o->created_at->format('Y-m-d') }}">{{ date_format_custom($o->created_at, ' d M, Y') }}</td>
+                                        <td>{{ $o->bill }}TK</td>
+                                        <td>{{ $o->order_status }}</td>
+                                        <td>{{ $o->payment_status }}</td>
+                                        <td><a href="{{ route('view_detais_order', $o->id) }}"><button type="submit" class="default-btn">Details</button></a></td>
+                                        <td>
+                                            @if ($o->payment_status === 'Complete')
+                                                <form action="{{ route('all_payment_method') }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn-success btn-sm form-control" disabled>Paid</button>
+                                                    <input type="hidden" name="order_id" value="{{ $o->id }}">
+                                                </form>
+                                            @else
+                                                <form action="{{ route('all_payment_method') }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-sm btn-block form-control">Pay Now</button>
+                                                    <input type="hidden" name="order_id" value="{{ $o->id }}">
+                                                </form>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+
+
+
+                           
+                        @endif
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function filterOrders() {
+            // Get the start and end dates
+            var startDate = moment(document.getElementById('startDate').value, 'YYYY-MM-DD');
+            var endDate = moment(document.getElementById('endDate').value, 'YYYY-MM-DD');
+
+            // Get all rows in the table
+            var rows = document.querySelectorAll('#example1 tbody tr');
+
+            rows.forEach(function(row) {
+                // Get the date from the row
+                var rowDate = moment(row.querySelector('td[data-date]').getAttribute('data-date'), 'YYYY-MM-DD');
+
+                // Check if the rowDate is between startDate and endDate
+                if ((!startDate || rowDate.isSameOrAfter(startDate)) && (!endDate || rowDate.isSameOrBefore(endDate))) {
+                    row.style.display = ''; // Show the row
+                } else {
+                    row.style.display = 'none'; // Hide the row
+                }
+            });
+        }
+    </script>
