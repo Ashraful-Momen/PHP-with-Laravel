@@ -1,5 +1,59 @@
 css :
 ---------
+custom css for modify the postion of the data table : 
+--------------------------------------------------------
+ <style>
+        /* Custom styles to align buttons in the middle */
+        .dt-buttons {
+            display: flex;
+            justify-content: center; /* Center the buttons horizontally*/
+            margin-bottom: 0; /* Add some space below the buttons*/
+            background-color:#002e5b;
+            border-radius: 14px !important; /* Optional: Add slight rounding to button corners */
+        }
+
+        .dataTables_length {
+            float: left; /* Keep the "number of rows" dropdown on the left */
+        }
+
+        .dataTables_filter {
+            float: right; /* Align the search box to the right */
+            margin-bottom: 10px; /* Add space to match button alignment */
+        }
+
+         /* Custom button styles */
+        .dt-button, .dt-buttons .btn {
+            background-color: #002e5b !important; /* Apply the secondary color */
+            border-color: #002e5b !important; Ensure the border matches the background
+            color: white !important; /* Ensure the text color contrasts well */
+
+        }
+         /* Move the 'Search' label to the right side of the input field */
+        /* .dataTables_filter label {
+            display: flex;
+            float: right;
+            justify-content: center;
+            align-items: center;
+        } */
+        .dropdown-item {
+        font-weight: 400;
+        color: #c0c8d0;
+        text-align: inherit;
+        white-space: nowrap;
+        }
+        .dropdown-item:hover{
+        font-weight: 400;
+        color: #2cb3b3;
+        text-align: inherit;
+        white-space: nowrap;
+        }
+
+        /* Ensure the DataTable container has proper padding */
+        .dataTables_wrapper .row {
+            margin-bottom: 10px; /* Add space below rows to prevent overlap */
+        }
+    </style>
+
 {{-- ---------------------------------------------------------------------------------------------- --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
@@ -30,7 +84,8 @@ js:
     <script>
         $(document).ready(function() {
             $("#example1").DataTable({
-                dom: 'Bfrtip', // Enables the buttons for export, column visibility, etc.
+                 dom: '<"row"<"col-sm-12 col-md-4 b"l><"col-sm-12 col-md-4"f><"col-sm-12 col-md-4"B>>tip', // Custom layout
+                //dom: 'Bfrtip', // Enables the buttons for export, column visibility, etc.
                 buttons: [
                     'colvis',      // Button to show/hide columns
                     'csv',         // Button to export table data as CSV
