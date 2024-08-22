@@ -1,0 +1,20 @@
+@foreach ($order as $o)
+
+    @php
+        use Carbon\Carbon;
+
+        // Parse the dates using Carbon
+        $startDate = Carbon::parse($o->policy_start_date);
+        $endDate = Carbon::parse($o->policy_end_date);
+
+        // Calculate the difference in days
+        $dateDiff = $endDate->diffInDays($startDate);
+
+        // Calculate the expiration date
+        $expirationDate = $endDate->addDays($dateDiff);
+
+        // Output the values for debugging
+        dd($startDate, $endDate, $dateDiff, $expirationDate);
+    @endphp
+
+@endforeach
