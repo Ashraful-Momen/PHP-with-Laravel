@@ -1,20 +1,25 @@
-@foreach ($order as $o)
+                                      @foreach ($order as $o)
+                                            @php
+                                                // use Carbon\Carbon;
 
-    @php
-        use Carbon\Carbon;
+                                                // Parse the dates using Carbon
+                                                $startDate = Carbon\Carbon::parse($o->policy_start_date);
+                                                $endDate = Carbon\Carbon::parse($o->policy_end_date);
 
-        // Parse the dates using Carbon
-        $startDate = Carbon::parse($o->policy_start_date);
-        $endDate = Carbon::parse($o->policy_end_date);
+                                                // Calculate the difference in days
+                                                $dateDiff = $endDate->diffInDays($startDate);
 
-        // Calculate the difference in days
-        $dateDiff = $endDate->diffInDays($startDate);
+                                                // Calculate the expiration date
+                                                // $expirationDate = $endDate->addDays($dateDiff);
 
-        // Calculate the expiration date
-        $expirationDate = $endDate->addDays($dateDiff);
+                                                // Calculate the difference from today's date
+                                                // $expirationDate = $endDate->diffForHumans();
 
-        // Output the values for debugging
-        dd($startDate, $endDate, $dateDiff, $expirationDate);
-    @endphp
+                                                // Calculate the difference in days from today's date
+                                                $daysUntilExpiration = Carbon\Carbon::now()->diffInDays($endDate, false);
 
-@endforeach
+                                                // Output the values for debugging
+                                                // dd($startDate, $endDate, $dateDiff, $expirationDate);
+                                                echo $daysUntilExpiration;
+                                            @endphp
+                                        @endforeach
