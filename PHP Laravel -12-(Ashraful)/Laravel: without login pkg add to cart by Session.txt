@@ -1,7 +1,20 @@
-1. From 'view' pass all data to addTo_cart route (*** add to cart must be get method)
+1. From 'view' pass all data to addTo_cart route (*** add to cart must be get method): 
+----------------------------------------------------------------------------------------
+
+ <form action="{{ route('addTo_cart_for_all', $life_health->id) }}"
+  method="POST">
+ @csrf
+
 
 2. Function for handle the session: 
 ------------------------------------
+route: 
+---------
+
+Route::post('/life-insurance-form-addTo_cart/{id}', 'Frontend\HomeController@addToCartWithoutLogin')->name('addTo_cart_for_all'); //this route will be  common for all product / service
+--------------------------------------------------------------
+Controller: 
+--------------
  public function addToCartWithoutLogin(Request $request, $lifeHealthId)
     {
 
