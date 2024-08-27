@@ -1,0 +1,44 @@
+1. From 'view' pass all data to addTo_cart route (*** add to cart must be get method)
+
+2. Function for handle the session: 
+------------------------------------
+ public function addToCartWithoutLogin(Request $request, $lifeHealthId)
+    {
+
+        // ---------------------------------------------------------------------
+        $formData = $request->all(); // You can adjust this according to your form structure
+
+
+
+        // Store the form data in the session
+        Session::put('life_health', [
+            'id' => $lifeHealthId,
+            'hospital_card' => $request->hospital_card,
+            'teli_medicine_charge' => $request->teli_medicine_charge,
+            'billing_frequency' => $request->billing_frequency,
+        ]);
+
+        if (Session::has('life_health')) {
+
+            $lf_session = Session::get('life_health');
+            echo "get the session ";
+        }
+
+        // dd($formData);
+
+
+
+        // You can also flash a success message if needed
+        $request->session()->flash('success_message', 'Item added to cart successfully');
+
+        // Redirect back to the previous page or any other appropriate page
+        // return redirect('login');
+
+        $lf_session = Session::get('life_health');
+        return redirect()->route('addTo_cart', $lf_session['id'])->send(); // .
+
+      
+        // ---------------------------------------------------------------------
+        
+    }
+
