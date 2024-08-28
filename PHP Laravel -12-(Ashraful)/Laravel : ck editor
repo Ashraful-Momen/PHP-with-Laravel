@@ -1,0 +1,164 @@
+#how to add ck editor in laravel blade : 
+---------------------------------------------
+@extends('backend.layouts.master')
+@section('title', 'Tele Medicine Categories List')
+@push('css')
+    <link rel="stylesheet" href="{{ asset('backend/plugins/datatables/dataTables.bootstrap4.css') }}">
+    <style>
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <!-- CKEditor CDN -->
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+@endpush
+
+@section('content')
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Tele Medicine</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item active">Tele Medicine Package Add</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-info card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title float-left">Tele Medicine Package Add</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('admin.tele_medicines_store') }}" method="POST" enctype="multipart/form-data" class="form-control p-3">
+                            @csrf
+                            <!-- Hidden Fields -->
+                            <input type="number" name="category_id" hidden value="16" />
+                            <input type="number" name="active_status" hidden value="1" />
+                            
+                            <!-- Package Name and Image -->
+                            <div class="row">
+                                <div class="col form-outline mb-4">
+                                    <input type="text" name="Pname" class="form-control" value="{{ old('Pname') }}" placeholder="Package Name" />
+                                    <label class="form-label">Package Name</label>
+                                </div>
+                                <div class="col form-outline mb-4">
+                                    <input type="file" name="image" class="form-control" value="{{ old('image') }}" />
+                                    <label class="form-label">Package Image</label>
+                                </div>
+                            </div>
+
+                            <!-- Package Description -->
+                            <div class="form-outline mb-4">
+                                <textarea name="description" class="form-control" rows="3" placeholder="Package Description">{{ old('description') }}</textarea>
+                                <label class="form-label">Package Description</label>
+                            </div>
+
+                            <!-- Other Inputs -->
+                            <div class="row form-outline mb-4">
+                                <!-- Package Duration -->
+                                <div class="col form-outline mb-4">
+                                    <input type="number" name="duration" class="form-control" value="{{ old('duration') }}" placeholder="Package Duration (Year)" />
+                                    <label class="form-label">Package Duration (Year)</label>
+                                </div>
+                                <!-- Package Call Limit -->
+                                <div class="col form-outline mb-4">
+                                    <input type="number" name="call_limit" class="form-control" value="{{ old('call_limit') }}" placeholder="Package Call Limit" />
+                                    <label class="form-label">Package Call Limit</label>
+                                </div>
+                                <!-- Package Price -->
+                                <div class="col form-outline mb-4">
+                                    <input type="text" name="price" class="form-control" value="{{ old('price') }}" placeholder="Package Price" />
+                                    <label class="form-label">Package Price</label>
+                                </div>
+                                <!-- Package Discount -->
+                                <div class="col form-outline mb-4">
+                                    <input type="number" name="discount" class="form-control" value="{{ old('discount') }}" placeholder="Package Discount (%)" />
+                                    <label class="form-label">Package Discount (%)</label>
+                                </div>
+                                <!-- Package VAT -->
+                                <div class="col form-outline mb-4">
+                                    <input type="number" name="vat" class="form-control" value="{{ old('vat') }}" placeholder="Package VAT (%)" />
+                                    <label class="form-label">Package VAT (%)</label>
+                                </div>
+                            </div>
+
+                            <!-- Partner Code and Insurance Company Code -->
+                            <div class="row">
+                                <div class="col">
+                                    <select name="partner_code" class="form-control" required>
+                                        @foreach ($brands as $b)
+                                            <option value="{{ $b->brand_code }}">{{ $b->brand_name }}: {{ $b->brand_code }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="form-label">Partner Code (Brand)</label>
+                                </div>
+                                <div class="col">
+                                    <select name="insurance_company_code" class="form-control" required>
+                                        @foreach ($providers as $policyProvider)
+                                            <option value="{{ $policyProvider->code }}">{{ $policyProvider->company_name }} : {{ $policyProvider->code }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="form-label">Insurance Company Code</label>
+                                </div>
+                                <div class="col">
+                                    <select name="b2b_b2c_code" class="form-control" required>
+                                        <option selected>Select B2B/B2C</option>
+                                        <option value="B">Business to Business</option>
+                                        <option value="C">Business to Customer</option>
+                                    </select>
+                                    <label class="form-label">B2B / B2C Code</label>
+                                </div>
+                                <div class="col">
+                                    <select name="brand_name" class="form-control" required>
+                                        @foreach ($brands as $b)
+                                            <option value="{{ $b->session_brand_name }}">{{ $b->session_brand_name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="form-label">Brand Session Name for Package Privileges</label>
+                                </div>
+                                <div class="col">
+                                    @if ($providers !== null && $providers->isNotEmpty())
+                                        <select name="provider_name" class="form-control" required>
+                                            @foreach ($providers as $provider)
+                                                <option value="{{ $provider->id }}">{{ $provider->company_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="form-label mb-4">Select Policy Provider</label>
+                                    @else
+                                        <label class="form-label text-danger">[Policy Provider not Found]</label>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Initialize CKEditor -->
+    <script>
+        CKEDITOR.replace('description');
+    </script>
+@endsection
