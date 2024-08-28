@@ -1,0 +1,11 @@
+<div class="col">
+                                    <select name="brand_name" class="form-control form-select" required>
+                                        @foreach ($brands as $b)
+                                            <option value="{{ $b->session_brand_name }}"
+                                                {{ old('brand_name', $tele->brand_name) == $b->session_brand_name ? 'selected' : '' }}>
+                                                {{ $b->session_brand_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <label class="form-label">Brand Session Name for Package Privileges</label>
+                                </div>
