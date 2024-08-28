@@ -4,6 +4,9 @@
 @section('title', 'Tele Medicine Categories List')
 @push('css')
     <link rel="stylesheet" href="{{ asset('backend/plugins/datatables/dataTables.bootstrap4.css') }}">
+
+    {{-- <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script> --}}
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
     <style>
         .step {
             display: none;
@@ -17,10 +20,7 @@
     </style>
 @endpush
 
-@push('scripts')
-    <!-- CKEditor CDN -->
-    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
-@endpush
+
 
 @section('content')
     <section class="content-header">
@@ -38,7 +38,7 @@
             </div>
         </div>
     </section>
-    
+
     <section class="content">
         <div class="row">
             <div class="col-12">
@@ -52,7 +52,7 @@
                             <!-- Hidden Fields -->
                             <input type="number" name="category_id" hidden value="16" />
                             <input type="number" name="active_status" hidden value="1" />
-                            
+
                             <!-- Package Name and Image -->
                             <div class="row">
                                 <div class="col form-outline mb-4">
@@ -158,7 +158,10 @@
     </section>
 
     <!-- Initialize CKEditor -->
-    <script>
+    {{-- <script>
         CKEDITOR.replace('description');
+    </script> --}}
+     <script>
+        CKEDITOR.replace( 'description' );
     </script>
 @endsection
