@@ -1,0 +1,66 @@
+#controller pass array to the view : 
+-------------------------------------
+  //vat:--------------------------------------------------------------------
+        $discount_pirce_with_vat = $with_discount_pirce + ($with_discount_pirce * ($vat / 100));
+
+        //tele medicine order array  : --------------------------------------------------
+        $tele_medicine_order = [
+            'tele_medicine' => $t->getAttributes(),
+
+            'pkg_id'=>$t->id,
+
+            'brand' => $brand,
+
+            'price' => $price,
+
+            'promo_code' => $promo_code,
+
+            'discount' => $discount,
+
+            'vat' => $vat,
+
+            'with_discount_price' => $with_discount_pirce,
+
+            'discount_price_with_vat' => $discount_pirce_with_vat,
+
+        ];
+        // end order array
+
+
+        $request->session()->put('tele_medicine_order', $tele_medicine_order);
+
+
+
+
+
+
+
+
+        return view('frontend.pages.tele_medicine_before_order_details', compact('t', 'brand','discount_pirce_with_vat','tele_medicine_order'));
+
+#Views pass to controller with json encode : 
+-----------------------------------------------
+ <form action="{{ route('tele_medicine_make_order') }}" method="post">
+
+                                                @csrf
+
+                                                <input type="hidden" name="tele_medicine_order" value="{{json_encode($tele_medicine_order)}}">
+
+
+
+                                                <button type="submit" class="default-btn btn-primary btn-lg btn-block">
+                                                    Place Order <span></span>
+                                                </button>
+                                            </form>
+#route: 
+---------
+    Route::post('/tele_medicine_make_order', [TeleMedicineCustomer::class, 'tele_medicine_make_order'])->name('tele_medicine_make_order');
+#controller : 
+----------------
+ //make order : tele_medicine_before_order_details-------------------------------------------
+    function tele_medicine_make_order(Request $request){
+
+        $order = json_decode($request->tele_medicine_order, true);
+        $pkg_id = $order['tele_medicine']['id'];
+        dd($pkg_id);
+    }
