@@ -1,3 +1,24 @@
+#session Problem fix: 
+------------------------
+1. route => 'life-insurance' =>  (hospital card id,tele medicine fee + call , promo code hiden )
+
+*****those value  pass by form to route =>   @guest route -> addTo_cart_for_all (with params in hidden input fields ). 
+        Store those input filed value in session storage . 
+        
+                    =>  // Store the form data in the session: 
+                            Session::put('life_health', [
+                                'id' => $lifeHealthId,
+                                'hospital_card' => $request->hospital_card,
+                                'teli_medicine_charge' => $request->teli_medicine_charge,
+                                'billing_frequency' => $request->billing_frequency,
+                            ]);
+                    => **** if form input field is hidden no need to use session . cause hidden inupt filed pass to the next route . 
+                            
+                             =>  Route::get('/addTo_cart/{id}', [cart_all::class, 'addTo_cart'])->name('addTo_cart'); [can receive all input fields , so no need to handle session . ]
+                
+
+
+================================================================Main coding part ===============================================================
 1. From 'view' pass all data to addTo_cart route (*** add to cart must be get method): 
 ----------------------------------------------------------------------------------------
 
