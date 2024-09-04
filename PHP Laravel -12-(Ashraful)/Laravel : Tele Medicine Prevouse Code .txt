@@ -1,0 +1,1671 @@
+#Tele-Medicine (Admin): 
+--------------------------
+admin view :
+--------------
+ {{-- ================================================Teli Medicine:================================================================ --}}
+                                <div class="col">
+                                    <!-- Telimedi service  -->
+                                    <label for="teliMedicineCardAmount">Teli-Medicine Card Amount:</label>
+                                    <select name="teli_medi_fee" id="teliMedicineCardAmount"
+                                        onchange="showOptionsTeli()">
+                                        <option value="free">Free </option>
+                                        <option value="paid">Paid</option>
+                                    </select>
+                                    <div id="optionsContainer"></div>
+
+                                    <script>
+                                        function showOptionsTeli() {
+                                            var amountType = document.getElementById("teliMedicineCardAmount").value;
+                                            var optionsContainer = document.getElementById("optionsContainer");
+                                            optionsContainer.innerHTML = "";
+
+                                            if (amountType === "paid") {
+                                                for (var i = 1; i <= 9; i++) {
+                                                    var label = document.createElement("label");
+                                                    label.htmlFor = "teli_medi_fee_" + i;
+                                                    // label.appendChild(document.createTextNode("Teli_medicine_amount_" + i));
+                                                    // label.appendChild(document.createTextNode(i +" "));
+
+                                                    var selectOption = document.createElement("select");
+                                                    selectOption.name = "column_number_" + i;
+                                                    selectOption.innerHTML = "<option value='" + i + "'>" + i + "</option>";
+
+                                                    var inputField = document.createElement("input");
+                                                    inputField.type = "number";
+                                                    inputField.name = "teli_medi_fee_" + i;
+                                                    inputField.placeholder = "Amount for " + i;
+
+                                                    optionsContainer.appendChild(label);
+                                                    // optionsContainer.appendChild(selectOption);
+                                                    optionsContainer.appendChild(inputField);
+                                                    optionsContainer.appendChild(document.createElement("br"));
+                                                }
+
+                                                // Add unlimited option
+                                                var labelUnlimited = document.createElement("label");
+                                                labelUnlimited.htmlFor = "unlimited";
+                                                labelUnlimited.appendChild(document.createTextNode("Unlimited"));
+
+                                                var inputFieldUnlimited = document.createElement("input");
+                                                inputFieldUnlimited.type = "checkbox";
+                                                inputFieldUnlimited.name = "unlimited";
+                                                inputFieldUnlimited.value = "unlimited";
+                                                inputFieldUnlimited.id = "unlimited";
+
+                                                optionsContainer.appendChild(labelUnlimited);
+                                                optionsContainer.appendChild(inputFieldUnlimited);
+
+                                                // Add input field for Teli_medicine_price
+                                                var labelTeliMedicinePrice = document.createElement("label");
+                                                labelTeliMedicinePrice.htmlFor = "teli_medi_fee_unlimited";
+                                                // labelTeliMedicinePrice.appendChild(document.createTextNode("Teli Medicine Price:"));
+
+                                                var inputFieldTeliMedicinePrice = document.createElement("input");
+                                                inputFieldTeliMedicinePrice.type = "number";
+                                                inputFieldTeliMedicinePrice.name = "teli_medi_fee_unlimited"; // variable for unlimited
+                                                inputFieldTeliMedicinePrice.placeholder = "Enter Teli Medicine Price";
+
+                                                optionsContainer.appendChild(labelTeliMedicinePrice);
+                                                optionsContainer.appendChild(inputFieldTeliMedicinePrice);
+                                            }
+                                        }
+                                    </script>
+
+                                    <!-- Telimedi service  -->
+                                    <!-- Telimedi service  -->
+                                    {{-- <label for="teliMedicineCardAmount">Teli-Medicine Card Amount:</label>
+                                    <select name="teli_medi_fee" id="teliMedicineCardAmount" onchange="showOptionsTeli()">
+                                        <option value="free">Free Amount</option>
+                                        <option value="paid">Paid</option>
+                                    </select>
+                                    <div id="optionsContainer"></div>
+
+                                    <script>
+                                        function showOptionsTeli() {
+                                            var amountType = document.getElementById("teliMedicineCardAmount").value;
+                                            var optionsContainer = document.getElementById("optionsContainer");
+                                            optionsContainer.innerHTML = "";
+
+                                            if (amountType === "paid") {
+                                                for (var i = 1; i <= 9; i++) {
+                                                    var label = document.createElement("label");
+                                                    label.htmlFor = "amount_for_column_" + i;
+                                                    // label.appendChild(document.createTextNode(i + ". Teli_medicine_amount_" + i));
+
+                                                    var selectOption = document.createElement("select");
+                                                    selectOption.name = "column_number_" + i;
+                                                    selectOption.innerHTML = "<option value='" + i + "'>" + i + "</option>";
+
+                                                    var inputField = document.createElement("input");
+                                                    inputField.type = "number";
+                                                    inputField.name = "teli_medi_fee_" + i;
+                                                    inputField.placeholder = "Amount for " + i;
+
+                                                    optionsContainer.appendChild(label);
+                                                    optionsContainer.appendChild(selectOption);
+                                                    optionsContainer.appendChild(inputField);
+                                                    optionsContainer.appendChild(document.createElement("br"));
+                                                }
+
+                                                // Add unlimited option
+                                                var labelUnlimited = document.createElement("label");
+                                                labelUnlimited.htmlFor = "unlimited";
+                                                labelUnlimited.appendChild(document.createTextNode("Unlimited"));
+
+                                                var inputFieldUnlimited = document.createElement("input");
+                                                inputFieldUnlimited.type = "checkbox";
+                                                inputFieldUnlimited.name = "unlimited";
+                                                inputFieldUnlimited.value = "unlimited";
+                                                inputFieldUnlimited.id = "unlimited";
+
+                                                optionsContainer.appendChild(labelUnlimited);
+                                                optionsContainer.appendChild(inputFieldUnlimited);
+
+                                                // Add input field for Teli_medicine_price
+                                                var labelTeliMedicinePrice = document.createElement("label");
+                                                labelTeliMedicinePrice.htmlFor = "teli_medicine_price";
+                                                labelTeliMedicinePrice.appendChild(document.createTextNode("Teli Medicine Price:"));
+
+                                                var inputFieldTeliMedicinePrice = document.createElement("input");
+                                                inputFieldTeliMedicinePrice.type = "number";
+                                                inputFieldTeliMedicinePrice.name = "teli_medi_fee_unlimited"; // varibale for unlimited
+                                                inputFieldTeliMedicinePrice.placeholder = "Enter Teli Medicine Price";
+
+                                                optionsContainer.appendChild(labelTeliMedicinePrice);
+                                                optionsContainer.appendChild(inputFieldTeliMedicinePrice);
+                                            }
+                                        }
+                                    </script> --}}
+
+
+                                    <!-- Telimedi service  -->
+                                    <!-- Telimedi service  -->
+                                    {{-- <label for="teliMedicineCardAmount">Teli-Medicine Card Amount:</label>
+                                    <select id="teliMedicineCardAmount" onchange="showOptionsTeli()">
+                                        <option value="free">Free Amount</option>
+                                        <option value="paid">Paid</option>
+                                    </select>
+                                    <div id="optionsContainer"></div>
+
+                                    <script>
+                                        function showOptionsTeli() {
+                                            var amountType = document.getElementById("teliMedicineCardAmount").value;
+                                            var optionsContainer = document.getElementById("optionsContainer");
+                                            optionsContainer.innerHTML = "";
+
+                                            if (amountType === "paid") {
+                                                for (var i = 1; i <= 9; i++) {
+                                                    var label = document.createElement("label");
+                                                    label.htmlFor = "amount_for_column_" + i;
+                                                    // label.appendChild(document.createTextNode(i ));
+
+                                                    var selectOption = document.createElement("select");
+                                                    selectOption.name = "column_number_" + i;
+                                                    selectOption.innerHTML = "<option value='" + i + "'>" + i + "</option>";
+
+                                                    var inputField = document.createElement("input");
+                                                    inputField.type = "number";
+                                                    inputField.name = "amount_for_column_" + i;
+                                                    inputField.placeholder = "Amount for " + i;
+
+                                                    optionsContainer.appendChild(label);
+                                                    optionsContainer.appendChild(selectOption);
+                                                    optionsContainer.appendChild(inputField);
+                                                    optionsContainer.appendChild(document.createElement("br"));
+                                                }
+
+                                                // Add unlimited option
+                                                var labelUnlimited = document.createElement("label");
+                                                labelUnlimited.htmlFor = "unlimited";
+                                                labelUnlimited.appendChild(document.createTextNode("Unlimited"));
+
+                                                var inputFieldUnlimited = document.createElement("input");
+                                                inputFieldUnlimited.type = "checkbox";
+                                                inputFieldUnlimited.name = "unlimited";
+                                                inputFieldUnlimited.value = "unlimited";
+                                                inputFieldUnlimited.id = "unlimited";
+
+                                                optionsContainer.appendChild(labelUnlimited);
+                                                optionsContainer.appendChild(inputFieldUnlimited);
+                                            }
+                                        }
+                                    </script> --}}
+
+
+                                    <!-- Telimedi service  -->
+
+
+                                    <!-- Telimedi service  -->
+
+
+                                    <!-- Telimedi service  -->
+                                    {{-- <input type="number" name="teli_medi_fee"
+                                        value="{{ old('teli_medi_fee') }}" nothing class="form-control"
+                                        placeholder="Teli-Medicine Card Amount">
+                                    <label class="form-label" for="form1Example2">Teli-Medicine Card Amount</label> --}}
+
+                                </div>
+                                {{-- ================================================================================================================ --}}
+
+admin controller: 
+-------------------
+
+ public function store(Request $request)
+    {
+
+        // dd($request);
+
+        $parentDelar_category_comission = "{" . $request->category_id . ":" . $request->parent_commission . "}";
+        $parentDelar_category_comission = json_encode($parentDelar_category_comission, true);
+
+        // dd($parentDelar_category_comission);
+
+        //update the commision with the parent_dealer_id:
+        Dealer::where('user_id', $request->parent_dealer_id)->update(['commission_type' => 'percentage', 'parentDelar_category_comission' => $parentDelar_category_comission]);
+
+        // File Upload
+        $imageName = '';
+        if ($image = $request->file('image')) {
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move('images/packages', $imageName);
+        }
+
+        // Data Insertion
+        $life = new LifeAndHealth;
+        $life->category_id = $request->category_id;
+        $life->Pname = $request->Pname;
+        $life->image = $imageName;
+
+        // Constructing the teli_medicine_fee value
+        $teliMedicineFee = [];
+
+        // Loop through teli_medi_fee_1 to teli_medi_fee_9
+        for ($i = 1; $i <= 9; $i++) {
+            if ($request->has("teli_medi_fee_$i")) {
+                $teliMedicineFee["teli_medi_fee_$i"] = $request->input("teli_medi_fee_$i");
+            }
+        }
+
+        // Add the unlimited value if present
+        if ($request->has('unlimited')) {
+            $teliMedicineFee['unlimited'] = $request->input('teli_medi_fee_unlimited');
+        }
+
+        // Assign teli_medi_fee_unlimited value
+        $teliMedicineFee['teli_medi_fee_unlimited'] = $request->input('teli_medi_fee_unlimited');
+
+        // Serialize the teliMedicineFee array into JSON format
+        $jsonTeliMedicineFee = json_encode($teliMedicineFee);
+
+        // Assign the serialized JSON data to the teli_medicine_fee column
+        $life->teli_medi_fee = $jsonTeliMedicineFee;
+
+
+        if ($request->teli_medi_fee == 'free') {
+            //if teli_medicine_free:
+            $life->teli_medi_fee = $request->teli_medi_fee;
+        }
+
+        // dd($request->teli_medi_fee);
+
+        // if ($request->teli_medi_fee == 'paid') {
+        //     //if teli_medicine_free:
+        //     $life->teli_medi_fee = $request->teli_medi_fee;
+        // }
+
+        // combo pkg person input===============================================================================
+
+        // dd($request);
+
+        // Save person names as a JSON-encoded array in a column
+        if ($request->has('personName')) {
+            $life->personName = json_encode($request->personName);
+        }
+
+
+        // =========================================================
+
+
+
+
+
+        // Dynamically add other fields based on request variables
+        foreach ($request->except('_token', 'Pname', 'image', 'teli_medi_fee', 'unlimited', 'teli_medi_fee_unlimited', 'personName') as $key => $value) {
+            // Exclude checkbox fields and other unwanted fields
+            if (!Str::endsWith($key, 'Checkbox')) {
+                $life->{$key} = $value;
+            }
+        }
+
+        $life->save();
+
+        // Redirect with success message
+        return redirect()->route('admin.life_and_health_show')->with('msg', 'Package Successfully Added!');
+    }
+    
+====================================================================================================== Client site ================================================================
+customer view: 
+----------------------
+@extends('frontend.layouts.app')
+@section('title', 'Dashboard')
+@push('css')
+    <style>
+        .single-pricing-box .pricing-header.bg2 {
+            background-image: url(https://t4.ftcdn.net/jpg/01/19/11/55/360_F_119115529_mEnw3lGpLdlDkfLgRcVSbFRuVl6sMDty.jpg);
+        }
+
+        .ptb-100 {
+            padding-top: 25px;
+            padding-bottom: 100px;
+        }
+
+        .single-pricing-box {
+            padding-bottom: 19px;
+        }
+
+        .single-pricing-box .pricing-header {
+            background-color: #002e5b;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            padding-top: 25px;
+            padding-bottom: 25px;
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        @media only screen and (max-width: 767px) {
+            .page-title-area {
+                height: -14%;
+                padding-top: 214px;
+                padding-bottom: 32px;
+            }
+        }
+
+        .src-image {
+            display: none;
+        }
+
+        .card2 {
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+            padding: 0;
+            color: #fff;
+
+        }
+
+        .card2 .header-bg {
+            /* This stretches the canvas across the entire hero unit */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            border-bottom: 1px #FFF solid;
+            /* This positions the canvas under the text */
+            z-index: 1;
+        }
+
+        .card2 .avatar {
+            position: relative;
+            z-index: 100;
+        }
+
+        .card2 .avatar img {
+            width: 100px;
+            height: 100px;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            border: 5px solid rgba(0, 0, 30, 0.8);
+        }
+
+        #hoverMe {
+            border-bottom: 1px dashed #e5e5e5;
+            text-align: left;
+            padding: 13px 20px 11px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #002e5b;
+
+        }
+
+        #hoverMe:hover {
+            border-left: 3px solid #002e5b;
+            background-color: #ebebeb;
+            color: #002e5b;
+
+        }
+
+        .text-white a {
+            color: #fff !important;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+
+    {{-- ifti css  --}}
+    {{-- <style>
+        .single-pricing-box .pricing-header.bg2 {
+            background-image: url(https://t4.ftcdn.net/jpg/01/19/11/55/360_F_119115529_mEnw3lGpLdlDkfLgRcVSbFRuVl6sMDty.jpg);
+        }
+
+        .ptb-100 {
+            padding-top: 25px;
+            padding-bottom: 100px;
+        }
+
+        .single-pricing-box {
+            padding-bottom: 19px;
+        }
+
+        .single-pricing-box .pricing-header {
+            background-color: #002e5b;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            padding-top: 25px;
+            padding-bottom: 25px;
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        @media only screen and (max-width: 767px) {
+            .page-title-area {
+                height: -14%;
+                padding-top: 214px;
+                padding-bottom: 32px;
+            }
+        }
+
+        .src-image {
+            display: none;
+        }
+
+        .card2 {
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+            padding: 0;
+            color: #fff;
+
+        }
+
+        .card2 .header-bg {
+            /* This stretches the canvas across the entire hero unit */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            border-bottom: 1px #FFF solid;
+            /* This positions the canvas under the text */
+            z-index: 1;
+        }
+
+        .card2 .avatar {
+            position: relative;
+            z-index: 100;
+        }
+
+        .card2 .avatar img {
+            width: 100px;
+            height: 100px;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            border: 5px solid rgba(0, 0, 30, 0.8);
+        }
+
+        #hoverMe {
+            border-bottom: 1px dashed #e5e5e5;
+            text-align: left;
+            padding: 13px 20px 11px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #002e5b;
+
+        }
+
+        #hoverMe:hover {
+            background-color: #ebebeb;
+            color: #002e5b;
+            border-left: 3px solid #002e5b;
+
+        }
+
+        /* Sajid Anam Ifti */
+        .card-text p {
+            display: flex !important;
+            justify-content: space-between !important;
+        }
+
+
+        .individual-package {
+            transition: 0.5s;
+        }
+
+        .individual-package:hover {
+            transform: scale(1.1);
+        }
+    </style> --}}
+    {{-- ifti css  --}}
+@endpush
+
+
+
+
+
+@section('content')
+    <!-- Start Page Title Area -->
+    <div
+        class="page-title-area page-title-bg1 d-lg-block d-none {{ Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') || Session::has('RobiMicrosite') ? ' d-lg-block d-none' : '' }} wow animate__zoomIn">
+        <div class="d-table">
+            <div class="d-table-cell">
+                <div class="container">
+                    <div class="page-title-content wow animate__zoomIn">
+                        <h2>Dashboard</h2>
+                        <ul>
+                            <li><a href="{{ url('/') }}">Home</a></li>
+                            <li>Dashboard - Life and Health Insurance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Page Title Area -->
+
+    <section class="pricing-area ptb-20 pb-70">
+        <div class="container">
+            <div class="row">
+
+                <div
+                    class="col-lg-3 col-md-2 col-sm-2 {{ Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') || Session::has('RobiMicrosite') ? ' d-lg-block d-none' : '' }}">
+                    @include('frontend.partials.customer_dashboard_sidebar')
+                </div>
+
+                {{-- Insurance Details  --}}
+                <div class="col-lg-9 col-md-10 col-sm-10 ">
+                    <section>
+                        <div class="container-fluid">
+                            <div class="row align-items-center">
+                                <div
+                                    class="  col-lg-12 col-md-12  {{ Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') ? ' mt-0 ' : '' }}">
+                                    <div class="content mb-5 text-center ">
+                                        {{-- <img src="{{asset('frontend/coming-soon.jpg')}}" width="350" height="300"> --}}
+                                        {{-- All the life insurance showing here  ... --}}
+                                        @if (Session::has('msg'))
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                <strong>{{ session('msg') }}</strong>
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                        @endif
+
+                                        @if ($life_health)
+                                            {{-- ====================================================== --}}
+                                            <div class="col-md-12 card-group ">
+
+                                                @foreach ($life_health as $life_health)
+                                                    {{-- ====================================================== --}}
+
+                                                    <div class="col-md-6    ">
+                                                        <div class=" card mx-5  my-2 mb-5 text-center shadow"
+                                                            style="border-radius: 15px">
+                                                            <div class="">
+
+                                                                <img src="{{ asset('images/packages/' . $life_health->image) }}"
+                                                                    alt="avatar"
+                                                                    class="img-fluid wow animate__zoomIn text-center"
+                                                                    style="width: 150px;">
+                                                            </div>
+
+                                                            <div class="card-body">
+                                                                <div>
+                                                                    <div class="col">
+                                                                        <p class="text-dark fw-bold fs-6">
+                                                                            {{ $life_health->Pname }}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        @if ($life_health->price)
+                                                                            <b class="text-danger">Price:
+                                                                                {{ $life_health->price }} TK</b>
+                                                                        @endif
+                                                                    </div>
+                                                                    @if ($life_health->duration)
+                                                                        {{-- <p class="text-muted mb-1">Package Duration:
+                                                                            {{ $life_health->duration }} Year</p> --}}
+                                                                            <span class="badge " style="background-color: #002e5b; color: #f4e615 !important;">Package Duration: {{ $life_health->duration }} Year</span>
+                                                                    @endif
+
+
+                                                                </div>
+                                                                <hr>
+                                                                <ul class="list-unstyled">
+                                                                    {{-- <li class="text-dark fw-bold">Life Coverage:
+                                                                        {{ $life_health->life_coverage_amount }} TK</li>
+                                                                    @if ($life_health->hospital_coverage_amount > 0)
+                                                                        <li class="text-dark fw-bold">Health Coverage:
+                                                                            {{ $life_health->hospital_coverage_amount }}
+                                                                            TK</li>
+                                                                    @endif
+
+                                                                    <hr>
+
+                                                                    @if ($life_health->monthly_fee > 0)
+                                                                        <li class="text-dark fw-bold">
+                                                                            <input type="radio"
+                                                                                name="billing_frequency_{{ $life_health->id }}"
+                                                                                value="monthly">
+                                                                            Monthly:
+                                                                            {{ $life_health->monthly_fee > 0 ? $life_health->monthly_fee : 'N/A' }}
+                                                                            TK
+                                                                        </li>
+                                                                    @endif --}}
+
+                                                                    {{-- @if ($life_health->quarterly_fee > 0)
+                                                                        <li class="text-dark fw-bold">
+                                                                            <input type="radio"
+                                                                                name="billing_frequency_{{ $life_health->id }}"
+                                                                                value="quarterly">
+                                                                            Quarterly:
+                                                                            {{ $life_health->quarterly_fee > 0 ? $life_health->quarterly_fee : 'N/A' }}
+                                                                            TK
+                                                                        </li>
+                                                                    @endif
+
+                                                                    @if ($life_health->half_yearly_fee > 0)
+                                                                        <li class="text-dark fw-bold">
+                                                                            <input type="radio"
+                                                                                name="billing_frequency_{{ $life_health->id }}"
+                                                                                value="half_yearly">
+                                                                            Half Yearly:
+                                                                            {{ $life_health->half_yearly_fee > 0 ? $life_health->half_yearly_fee : 'N/A' }}
+                                                                            TK
+                                                                        </li>
+                                                                    @endif
+
+                                                                    @if ($life_health->yearly_fee > 0)
+                                                                        <li class="text-dark fw-bold">
+                                                                            <input type="radio"
+                                                                                name="billing_frequency_{{ $life_health->id }}"
+                                                                                value="yearly" checked>
+                                                                            Yearly:
+                                                                            {{ $life_health->yearly_fee > 0 ? $life_health->yearly_fee : 'N/A' }}
+                                                                            TK
+                                                                        </li>
+                                                                    @endif --}}
+                                                                    {{-- <hr> --}}
+                                                                </ul>
+                                                                {{-- <div class="col">
+                                                                    <marquee>
+                                                                        <p style="text-transform: capitalize;"> List of
+                                                                            Uncoverage:
+                                                                            {{ $life_health->natural_death_amount <= 0 ? 'Natural Death,' : '' }}
+                                                                            {{ $life_health->major_diseases_amount <= 0 ? 'Mejor Disease,' : '' }}
+                                                                            {{ $life_health->accidental_death_amount <= 0 ? 'Accidental Death,' : '' }}
+                                                                            {{ $life_health->ppd_claim_coverage_amount <= 0 ? ' Permanent partial disability,' : '' }}
+                                                                            {{ $life_health->ptd_amount <= 0 ? ' Permanent temporary disability,' : '' }}
+                                                                            {{ $life_health->critical_illness_coverage_amount <= 0 ? 'Critical Illness,' : '' }}
+                                                                            {{ $life_health->hospital_coverage_amount <= 0 ? 'Hospital Coverage,' : '' }}
+                                                                            {{ $life_health->ipd_coverage_amount <= 0 ? 'IPD Coverage,' : '' }}
+                                                                            {{ $life_health->ipd_accommodation_claim_amount <= 0 ? 'IPD Accommodation,' : '' }}
+                                                                            {{ $life_health->ipd_treatment_claim_amount <= 0 ? 'IPD Treatment,' : '' }}
+                                                                            {{ $life_health->ipd_treatment_claim_amount <= 0 ? 'IPD Treatment,' : '' }},
+                                                                            {{ $life_health->ipd_treatment_consultant_amount <= 0 ? 'IPD Consultant,' : '' }}
+                                                                            {{ $life_health->ipd_treatment_medicine_amount <= 0 ? 'IPD medicine,' : '' }}
+                                                                            {{ $life_health->ipd_treatment_surgical_amount <= 0 ? 'IPD Surgical,' : '' }}
+                                                                            {{ $life_health->ipd_treatment_ancillary_amount <= 0 ? 'IPD Ancillary,' : '' }}
+                                                                            {{ $life_health->opd_coverage_amount <= 0 ? 'OPD Coverage,' : '' }}
+                                                                            {{ $life_health->opd_consultation_claim_amount <= 0 ? 'OPD Consultation,' : '' }}
+                                                                            {{ $life_health->opd_test_claim_amount <= 0 ? 'OPD Lab Test,' : '' }}
+                                                                            {{ $life_health->opd_medicines_claim_amount <= 0 ? 'OPD Medicines,' : '' }}
+                                                                            {{ $life_health->opd_medicine_presription_amount <= 0 ? 'OPD Medicines Prescription,' : '' }}
+                                                                            {{ $life_health->dental_consultation_claim_amount <= 0 ? 'Dental Consultation,' : '' }}
+                                                                            {{ $life_health->dental_temporary_permanent_filling_amount <= 0 ? 'Dental Filling,' : '' }}
+                                                                            {{ $life_health->dental_routine_surgical_extraction_amount <= 0 ? 'Dental Surgical,' : '' }}
+                                                                            {{ $life_health->dental_medication_amount <= 0 ? 'Dental Medication,' : '' }}
+                                                                            {{ $life_health->dental_xray_amount <= 0 ? 'Dental Xray,' : '' }}
+                                                                            {{ $life_health->dental_root_canal_amount <= 0 ? 'Dental Root Canal,' : '' }}
+                                                                            {{ $life_health->dental_scaling_amount <= 0 ? 'Dental Scaling,' : '' }}
+                                                                            {{ $life_health->eye_optiocal_claim_amount <= 0 ? 'Eye Optical,' : '' }}
+                                                                            {{ $life_health->eye_vision_test_claim_amount <= 0 ? 'Eye Vision,' : '' }}
+                                                                            {{ $life_health->eye_medication_claim_amount <= 0 ? 'Eye Medication,' : '' }}
+                                                                            {{ $life_health->eye_lens_claim_amount <= 0 ? 'Eye Lens,' : '' }}
+                                                                            {{ $life_health->eye_frame_claim_amount <= 0 ? 'Eye Frame,' : '' }}
+                                                                            {{ $life_health->maternity_uterine_preganancy_amount <= 0 ? 'Maternity Preganancy,' : '' }}
+                                                                            {{ $life_health->maternity_normal_delivery_amount <= 0 ? 'Maternity Delivery,' : '' }}
+                                                                            {{ $life_health->maternity_legal_abortion_miscarriage_amount <= 0 ? 'Maternity Abortion,' : '' }}
+                                                                            {{ $life_health->maternity_pre_post_hospitalization_amount <= 0 ? 'Maternity Hospitalization,' : '' }}
+                                                                            {{ $life_health->maternity_pre_post_natal_amount <= 0 ? 'Maternity Natal,' : '' }}
+                                                                            {{ $life_health->maternity_baby_amount <= 0 ? 'Maternity Baby,' : '' }}
+                                                                            {{ $life_health->maternity_vaccination_amount <= 0 ? 'Maternity Vaccination,' : '' }}
+                                                                            {{ $life_health->ambulance_claim_amount <= 0 ? 'Ambulance,' : '' }}
+
+                                                                        </p>
+                                                                    </marquee>
+                                                                </div>
+                                                                <hr>
+                                                                --}}
+                                                                {{-- <div class="col">
+                                                                    <p class="text-danger"
+                                                                        style="text-transform: capitalize;">"No Coverage
+                                                                        Allow if customers are previously sick!" </p>
+
+                                                                </div>
+                                                                        <hr> --}}
+
+
+
+                                                            </div>
+
+                                                            {{-- <div class="card-footer text-center">
+                                    <h5 class="text-danger">Price: {{ $life_health->price }} TK</h5>
+                                    @if ($life_health->discount)
+                                        <p>Discount: {{ $life_health->discount }}%</p>
+                                    @endif
+                                </div> --}}
+
+                                                            <div class="">
+                                                                {{-- <p
+                                                                    class=" fs-5 fw-bold  text-bolder text-dark text-decoration-underline text-center">
+                                                                    Additional Features:</p> --}}
+                                                                <div class="text-center">
+
+                                                                    {{-- apply promo code  --}}
+                                                                    {{-- apply promo code  --}}
+                                                                    <input type="text" name="promo_code"
+                                                                        placeholder="Apply Promo Code"
+                                                                        class="btn btn-outline-primary custom-outline-color rounded-pill"
+                                                                        id="promo_code_{{ $life_health->id }}">
+                                                                    <br>
+                                                                    <span id="promo_code_msg_{{ $life_health->id }}"
+                                                                        class="text-danger"></span>
+                                                                    <br>
+
+                                                                    {{-- apply promo code  --}}
+                                                                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                                                    <script>
+                                                                        $(document).ready(function() {
+                                                                            // Target all promo code input fields by name
+                                                                            $('input[name="promo_code"]').on('blur', function() {
+                                                                                var promoCode = $(this).val();
+                                                                                var promoCodeId = $(this).attr('id').split('_').pop(); // Extract the ID part
+                                                                                var promoCodeMsgId = '#promo_code_msg_' + promoCodeId;
+
+                                                                                $.ajax({
+                                                                                    url: '{{ route('check-promo-code') }}',
+                                                                                    method: 'POST',
+                                                                                    data: {
+                                                                                        _token: '{{ csrf_token() }}',
+                                                                                        promo_code: promoCode
+                                                                                    },
+                                                                                    success: function(response) {
+                                                                                        if (response.status == 'error') {
+                                                                                            $(promoCodeMsgId).text(response.message);
+                                                                                        } else {
+                                                                                            $(promoCodeMsgId).text('');
+                                                                                        }
+                                                                                    }
+                                                                                });
+                                                                            });
+                                                                        });
+                                                                    </script>
+
+
+
+
+                                                                    {{-- =========================Don't delete the previous Hospital Code==================================== --}}
+                                                                    {{-- <button
+                                                class="btn btn-outline-primary custom-outline-color rounded-pill  my-2">
+                                                <input type="checkbox" name="hospital_card_fee"
+                                                    id="hospital_card_{{ $life_health->id }}">
+                                                Hospital Card
+                                            </button> --}}
+
+                                                                    {{-- ====================================hospital card================================================================ --}}
+
+                                                                    @if ($life_health->hospital_card_pkg_id !== null)
+                                                                        <button style="background-color: #002e5b; "
+                                                                            class="btn  rounded-pill p-1">
+                                                                            <input type="checkbox" name="hospital_card_fee"
+                                                                                id="hospital_card_{{ $life_health->id }}">
+                                                                                <span class="badge " style="background-color: #002e5b; color: #ffffff !important;">Select Hospital Card</span>
+                                                                                {{-- <span class="badge " style="background-color: #002e5b; color: #f4e615 !important;">Select Hospital Card</span> --}}
+
+
+                                                                        </button>
+                                                                        @php
+
+                                                                            $hdc_packages_id =
+                                                                                $life_health->hospital_card_pkg_id;
+                                                                            // dd($hdc_packages_id);
+                                                                            $hdc_package = App\HDCPackages::where(
+                                                                                'is_active',
+                                                                                1,
+                                                                            )
+                                                                                ->where('brand_id', 46)
+                                                                                ->where('id', $hdc_packages_id)
+                                                                                ->first();
+                                                                            // dd($hdc_package->cardTheme->demo_card,$hdc_package);
+                                                                        @endphp
+
+                                                                        <!-- Button trigger modal -->
+                                                                        <button type="button"
+                                                                            class="btn rounded-pill p-1" style="background-color: #002e5b;"
+                                                                            data-bs-toggle="modal" data-bs-target="#HDC">
+                                                                            <span class="badge " style="background-color: #002e5b; color: #fffef7 !important;"> Show Hospital Card</span>
+
+                                                                        </button>
+                                                                        <br>
+
+                                                                        <!-- Modal -->
+                                                                        <div class="modal fade " id="HDC"
+                                                                            tabindex="-1"
+                                                                            aria-labelledby="exampleModalLabel"
+                                                                            aria-hidden="true">
+                                                                            <div
+                                                                                class="modal-dialog  modal-dialog-centered modal-xl">
+                                                                                <div class="modal-content">
+                                                                                    <div class="modal-header">
+                                                                                        <h5 class=" text-center"
+                                                                                            id="exampleModalLabel">
+                                                                                            Choose Hospital Card
+                                                                                        </h5>
+                                                                                        <button type="button"
+                                                                                            class="btn-close"
+                                                                                            data-bs-dismiss="modal"
+                                                                                            aria-label="Close">
+                                                                                        </button>
+                                                                                    </div>
+                                                                                    <div class="modal-body">
+                                                                                        {{-- ---------------------- hospital card  ---------------------------------- --}}
+                                                                                        <div
+                                                                                            class="row row-cols-1 row-cols-md-3 g-4">
+                                                                                            @if ($hdc_package->count() > 0)
+                                                                                                {{-- @foreach ($hdc_packages as $hdc_package) --}}
+
+
+                                                                                                <div class="">
+                                                                                                    <div
+                                                                                                        class="col individual-package">
+                                                                                                        <div
+                                                                                                            class="card h-100 ">
+                                                                                                            <img src="{{ asset($hdc_package->cardTheme->demo_card) }}"
+                                                                                                                class="card-img-top"
+                                                                                                                alt="Hollywood Sign on The Hill" />
+                                                                                                            <div
+                                                                                                                class="card-body">
+                                                                                                                @php
+                                                                                                                    // dd($hdc_package->price_physical,$hdc_package->price_virtual);
+
+                                                                                                                    $price =
+                                                                                                                        $hdc_package->physical_virtual_type ==
+                                                                                                                        'Physical'
+                                                                                                                            ? $hdc_package->price_physical
+                                                                                                                            : $hdc_package->price_virtual;
+                                                                                                                @endphp
+                                                                                                                <h5
+                                                                                                                    class="card-title text-capitalize">
+                                                                                                                    {{ $hdc_package->card_category }}
+                                                                                                                </h5>
+                                                                                                                <div
+                                                                                                                    class="card-text">
+                                                                                                                    <p><span>Price:
+                                                                                                                        </span><b>
+                                                                                                                            {{-- {{ $hdc_package->price }} --}}
+                                                                                                                            {{ $price }}
+                                                                                                                            TK</b>
+                                                                                                                    </p>
+                                                                                                                    <p><span>Validity:
+                                                                                                                        </span><b>{{ $hdc_package->validity }}
+                                                                                                                            Days</b>
+                                                                                                                    </p>
+                                                                                                                </div>
+                                                                                                                {{-- pass the card_id to the controller --}}
+                                                                                                                <input
+                                                                                                                    name="hospital_card_pkg_id"
+                                                                                                                    id="hospital_card_pkg_{{ $life_health->id }}"
+                                                                                                                    value="{{ $hdc_package->id }} "
+                                                                                                                    hidden>
+
+                                                                                                                {{-- pass the card_id to the controller --}}
+
+                                                                                                                {{-- <input type="checkbox"
+                                                                                    name="hospital_card_fee"
+                                                                                    id="hospital_card_{{ $life_health->id }}">
+                                                                                Select Card --}}
+
+
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                {{-- @endforeach --}}
+                                                                                            @else
+                                                                                                <h3>No Hdc Packages
+                                                                                                    Available</h3>
+                                                                                            @endif
+                                                                                        </div>
+                                                                                        {{-- ---------------------- End hospital card  ------------------------------ --}}
+                                                                                    </div>
+                                                                                    <div class="modal-footer">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-secondary"
+                                                                                            data-bs-dismiss="modal">Close</button>
+                                                                                        {{-- <button type="button" class="btn btn-primary">Save changes</button> --}}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endif
+
+
+
+
+
+                                                                    {{-- ==================================hospital card================================================================== --}}
+
+                                                                    {{-- <a href="{{ route('life_health.details', $life_health->id) }}">
+                                            <button class="btn btn-outline-secondary  p-2 my-2 ms-1 d-inline form-control  ">More
+                                                Details</button>
+                                        </a> --}}
+
+
+
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="card-body text-center">
+
+                                                                <a
+                                                                    href="{{ route('life-insurance-pkg-details', $life_health->id) }}">
+                                                                    <button
+                                                                        class="btn  btn-sm p-1  ms-1 d-inline form-control  text-white rounded-pill" style="background-color:#002e5b">More
+                                                                        Details</button>
+                                                                </a>
+
+                                                                <hr>
+
+                                                                <form action="{{ route('addTo_cart', $life_health->id) }}"
+                                                                    method="get">
+                                                                    @csrf
+
+                                                                    {{-- apply promo code hidden fields  --}}
+                                                                    <input type="hidden" name="promo_code_hidden"
+                                                                        value="0"
+                                                                        id="hidden_promo_code_{{ $life_health->id }}">
+
+                                                                    {{-- apply promo code hidden fields  --}}
+
+                                                                    <input type="hidden" name="hospital_card"
+                                                                        value="0"
+                                                                        id="hidden_hospital_card_{{ $life_health->id }}">
+
+                                                                    <input type="hidden" name="hospital_card_pkg_id"
+                                                                        id="hidden_hospital_card_pkg_id_{{ $life_health->id }}">
+
+                                                                    {{-- <input type="hidden" name="hospital_card_pkg_id" value="0"
+                                            id="hidden_hospital_card_pkg_id_{{ $life_health->id }}"> --}}
+
+                                                                    <input type="hidden" name="teli_medicine"
+                                                                        value="0"
+                                                                        id="hidden_teli_medicine_{{ $life_health->id }}">
+
+                                                                    <input type="hidden" name="billing_frequency"
+                                                                        id="hidden_billing_frequency_{{ $life_health->id }}"
+                                                                        value=" ">
+
+
+                                                                    @php
+                                                                        $teli_medicine_fees = \App\Model\LifeAndHealth::where(
+                                                                            'id',
+                                                                            $life_health->id,
+                                                                        )
+                                                                            ->pluck('teli_medi_fee')
+                                                                            ->filter();
+
+                                                                        $teli_medicine_fees = json_decode(
+                                                                            $teli_medicine_fees,
+                                                                        );
+                                                                        $teli_medicine_array_value =
+                                                                            $teli_medicine_fees[0]; // Define the variable properly here
+
+                                                                        $teli_medicine_fees = \App\Model\LifeAndHealth::where(
+                                                                            'id',
+                                                                            $life_health->id,
+                                                                        )
+                                                                            ->pluck('teli_medi_fee')
+                                                                            ->filter();
+                                                                        $teli_medicine_fees = json_decode(
+                                                                            $teli_medicine_fees,
+                                                                        );
+                                                                        $teli_medicine_array_value =
+                                                                            $teli_medicine_fees[0]; // Define the variable properly here
+
+                                                                    @endphp
+
+                                                                    @if ($teli_medicine_fees[0] == 'free')
+                                                                        {{-- <p
+                                                                            class="btn rounded-pill text-white"
+                                                                            style="background-color:#002e5b">
+                                                                            Teli Medicine Service is Free!
+                                                                        </p> --}}
+                                                                        <span class="badge " style="background-color: #002e5b; color: #f4e615 !important;">Teli Medicine Service is Free!</span>
+                                                                        <input type="hidden" name="teli_medicine_charge"
+                                                                            value="free"
+                                                                            id="hidden_teli_medicine_{{ $life_health->id }}">
+                                                                    @else
+                                                                        <button type="button"
+                                                                            class="btn text-white rounded-pill p-1"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#telmediModal"
+                                                                            style="background-color: #002e5b;">
+                                                                            <span class="badge " style="background-color: #002e5b; color: #ffffff !important;">Choose Tele Medicine Service</span>
+
+                                                                        </button>
+                                                                        <input type="hidden" name="teli_medicine_charge"
+                                                                            value="{{ $teli_medicine_fees[0] }}"
+                                                                            id="hidden_teli_medicine_{{ $life_health->id }}">
+                                                                        @php
+
+                                                                            // dd( $teli_medicine_array_value);
+
+                                                                            // $lh_id = $life_health->id;
+
+                                                                            // dd($lh_id,$teli_medicine_fees[0]); //according to the this  $life_health->id = 2 ; dd($teli_medicine_fees[0]) => "{"teli_medi_fee_1":"5656554","teli_medi_fee_2":"454","teli_medi_fee_3":"45","teli_medi_fee_4":"45","teli_medi_fee_5":"45","teli_medi_fee_6":"45","teli_medi_fee_7":"45","teli_medi_fee_8":"45","teli_medi_fee_9":"4","unlimited":"526565"} ◀"
+                                                                        @endphp
+                                                                        <!-- Modal -->
+                                                                        <div class="modal fade" id="telmediModal"
+                                                                            tabindex="-1"
+                                                                            aria-labelledby="telmediModalLabel"
+                                                                            aria-hidden="true">
+                                                                            <div
+                                                                                class="modal-dialog modal-dialog-centered">
+                                                                                <div class="modal-content">
+                                                                                    <div class="modal-header">
+                                                                                        <h5 class="modal-title"
+                                                                                            id="telmediModalLabel">
+                                                                                            Select
+                                                                                            Teli
+                                                                                            Medicine Service</h5>
+                                                                                        <button type="button"
+                                                                                            class="btn-close"
+                                                                                            data-bs-dismiss="modal"
+                                                                                            aria-label="Close"></button>
+                                                                                    </div>
+                                                                                    <div class="modal-body text-start">
+                                                                                        @foreach ($teli_medicine_fees as $key => $jsonData)
+                                                                                            {{-- Decode the JSON data --}}
+                                                                                            @php
+                                                                                                $data = json_decode(
+                                                                                                    $jsonData,
+                                                                                                    true,
+                                                                                                );
+                                                                                            @endphp
+
+                                                                                            {{-- Check if decoding was successful --}}
+                                                                                            @if ($data)
+                                                                                                {{-- Loop through each key-value pair inside the decoded JSON data --}}
+                                                                                                @php
+                                                                                                    $counter = 1;
+
+                                                                                                @endphp
+                                                                                                @foreach ($data as $key => $value)
+                                                                                                    {{-- Output the checkbox --}}
+
+                                                                                                    <div
+                                                                                                        class="form-check">
+                                                                                                        <input
+                                                                                                            class="form-check-input"
+                                                                                                            type="checkbox"
+                                                                                                            name="teli_medicine_charge"
+                                                                                                            value="{{ $counter }}:{{ $value }}">
+                                                                                                        @if ($key == 'unlimited')
+                                                                                                            <label
+                                                                                                                class="form-check-label"
+                                                                                                                for="teli_medicine_{{ $key }}">
+
+                                                                                                                {{ $key }}
+
+
+                                                                                                                Number
+                                                                                                                of call
+
+                                                                                                                =>
+                                                                                                                {{ $value }}
+                                                                                                                Tk
+                                                                                                            </label>
+                                                                                                        @else
+                                                                                                            <label
+                                                                                                                class="form-check-label"
+                                                                                                                for="teli_medicine_{{ $key }}">
+
+                                                                                                                {{ $counter }}
+
+                                                                                                                Number
+                                                                                                                of call
+
+                                                                                                                =>
+                                                                                                                {{ $value }}
+                                                                                                                Tk
+                                                                                                            </label>
+                                                                                                        @endif
+
+                                                                                                    </div>
+                                                                                                    @php
+                                                                                                        $counter++;
+                                                                                                    @endphp
+                                                                                                @endforeach
+                                                                                            @else
+                                                                                                {{-- Handle the case where decoding failed --}}
+                                                                                                <p>Teli medicine is Free
+                                                                                                    !!!</p>
+                                                                                            @endif
+                                                                                        @endforeach
+                                                                                    </div>
+
+                                                                                    <div class="modal-footer">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-secondary"
+                                                                                            data-bs-dismiss="modal">Close</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endif
+
+
+
+                                                                    @auth
+                                                                        <button type="submit"
+                                                                            class="btn btn-sm  p-1 my-2 ms-1 d-inline text-white form-control rounded-pill"
+                                                                            style="background-color: #002e5b;"
+                                                                            onclick="setHiddenValues({{ $life_health->id }})">Add
+                                                                            To
+                                                                            Cart</button>
+                                                                    @endauth
+                                                                    @guest
+                                                                        <button type="submit"
+                                                                            class="btn btn-danger p-2 my-2 ms-1 d-inline form-control"
+                                                                            onclick="setHiddenValues({{ $life_health->id }})">Buy
+                                                                            Now
+                                                                            Cart</button>
+                                                                    @endguest
+                                                                </form>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- end mobile version  --}}
+                                                @endforeach
+
+                                            </div>
+
+                                            {{-- ====================================================== --}}
+
+
+                                            @php
+                                                $life_health = App\Model\LifeAndHealth::all();
+                                            @endphp
+
+                                            @if ($life_health->isEmpty())
+                                                <div class="container">
+                                                    <div class="row">
+                                                        <div class="col mt-5" style="height: 250px">
+                                                            <h1 class="text-danger ">Package Not Available</h1>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            {{-- ====================================================== --}}
+
+
+
+
+                                        @endif
+
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+                </div>
+
+
+
+
+
+            </div>
+    </section>
+
+    {{-- =================================================================================================================================== --}}
+
+
+
+    {{-- ------------------JavaScript for life and health -------------------------------- --}}
+
+    {{-- for the life and health : Ashraful --}}
+    <script>
+        function setHiddenValues(planId) {
+            const hospitalCardCheckbox = document.getElementById(`hospital_card_${planId}`);
+            const promoCodeInput = document.getElementById(`promo_code_${planId}`).value; //promo code input value
+            const hospitalCardPkgId = document.getElementById(`hospital_card_pkg_${planId}`)
+                .value; //hospital card value pass to the route.
+            const teliMediCheckbox = document.getElementById(`telmedi_card_${planId}`);
+            const billingFrequencyInputs = document.getElementsByName(`billing_frequency_${planId}`);
+
+            const hiddenHospitalCardInput = document.getElementById(`hidden_hospital_card_${planId}`);
+            const hiddenTeliMediInput = document.getElementById(`hidden_teli_medicine_${planId}`);
+            const hiddenPromoCodeInput = document.getElementById(`hidden_promo_code_${planId}`);
+
+            let selectedBillingFrequency = '';
+
+            for (const input of billingFrequencyInputs) {
+                if (input.checked) {
+                    selectedBillingFrequency = input.value;
+                    break;
+                }
+            }
+
+
+            console.log("Selected Billing Frequency:", selectedBillingFrequency);
+            console.log("Hospital Card Pkg Id:", hospitalCardPkgId); //hospital card value check.
+            console.log("promo Code : ", promoCodeInput);
+
+            // Add the selected billing frequency to the form
+            document.getElementById(`hidden_billing_frequency_${planId}`).value = selectedBillingFrequency;
+
+            let hiddenHospitalCardPkgIdValue = document.getElementById(
+                `hidden_hospital_card_pkg_id_${planId}`); //hospital card value pass to the route.
+            hiddenHospitalCardPkgIdValue.value = hospitalCardPkgId; //hospital card value pass to the route.
+
+            hiddenPromoCodeInput.value = promoCodeInput;
+
+            hiddenHospitalCardInput.value = hospitalCardCheckbox.checked ? '1' : '0';
+            hiddenTeliMediInput.value = teliMediCheckbox.checked ? '1' : '0';
+        }
+    </script>
+
+    {{-- for the life and health --}}
+
+
+    {{-- previous js function --------------------------------------------------------- --}}
+    {{-- <script>
+        function setHiddenValues(planId) {
+            const hospitalCardCheckbox = document.getElementById(`hospital_card_${planId}`);
+            const hospitalCardPkgId = document.getElementsByName(`hospital_card_pkg_${planId}`); //hospital card package id
+            const teliMediCheckbox = document.getElementById(`telmedi_card_${planId}`);
+            const billingFrequencyInputs = document.getElementsByName(`billing_frequency_${planId}`);
+
+
+            const hiddenHospitalCardInput = document.getElementById(`hidden_hospital_card_${planId}`);
+            const hiddenTeliMediInput = document.getElementById(`hidden_teli_medicine_${planId}`);
+            let selectedBillingFrequency = '';
+
+            for (const input of billingFrequencyInputs) {
+                if (input.checked) {
+                    selectedBillingFrequency = input.value;
+                    break;
+                }
+            }
+
+            const hiddenHospitalCardPkgIdValue =document.getElementById(`hidden_hospital_card_pkg_id_${planId}`);
+
+            console.log("Selected Billing Frequency:", selectedBillingFrequency);
+            console.log("Hospital Card Pkg Id:", hospitalCardPkgId.value);
+
+            // Add the selected billing frequency to the form
+            document.getElementById(`hidden_billing_frequency_${planId}`).value = selectedBillingFrequency;
+
+            hiddenHospitalCardInput.value = hospitalCardCheckbox.checked ? '1' : '0';
+            hiddenTeliMediInput.value = teliMediCheckbox.checked ? '1' : '0';
+            hiddenHospitalCardPkgIdValue.value = hospitalCardPkgId.value; //hospital card value pass to the route .
+
+
+
+
+
+        }
+    </script> --}}
+
+
+
+
+
+
+
+
+
+@stop
+
+----------------------
+customer controller : 
+----------------------
+  public static function addTo_cart(Request $request, $id) #have to fix the teli_medicine_amount for the call ....
+    {
+
+        // dd($request, $id);
+
+        //     array:7 [▼
+        //     "_token" => "sKixq4mtzU0Zkf7F6chicEvQiltCTVYe1ZVAsKk1"
+        //     "promo_code_hidden" => "UCFVYH9IBHS"
+        //     "hospital_card" => "1"
+        //     "hospital_card_pkg_id" => "17"
+        //     "teli_medicine" => "0"
+        //     "billing_frequency" => "yearly"
+        //     "teli_medicine_charge" => "3:150"
+        //   ]
+        // dd($request,$id);
+        // Initialize the promo code used limit variable
+        $promo_code_used_limit = 0;
+
+
+
+
+
+        if ($request->hospital_card == 1) //hospital_card
+        {
+            // code for the hospital card : ----------------------------
+            // ---------------------------------------------------------
+            $life_health = LifeAndHealth::find($id);
+
+            $hdc_package_id = $life_health->hospital_card_pkg_id;
+
+            $hdc_package = HDCPackages::findOrFail($hdc_package_id);
+
+            // ---------------------------------------------------------
+            $hdc_price = $hdc_package->physical_virtual_type == 'Physical' ? $hdc_package->price_physical : $hdc_package->price_virtual;
+        } else {
+
+            $hdc_price = 0;
+        }
+
+        // dd($request->hospital_card, $hdc_price, $request, $id);
+
+
+
+        // ---------------------------------------------------------
+
+        // dd(Session::all());
+
+        //this Session use for show the package for all users.
+
+        if (Session::has('life_health')) {
+
+
+            $lf_session = Session::get('life_health');
+
+
+
+            //    --------------------------------------------
+            $teli_medicine_charge = $lf_session['teli_medicine_charge'];
+            $id = $lf_session['id'];
+            $billing_frequency = $lf_session['billing_frequency'] ?? '';
+            // $hospitalCardFee = $lf_session['hospital_card'];
+            // code for the hospital card : ----------------------------
+            // ---------------------------------------------------------
+            $life_health = LifeAndHealth::find($id);
+
+            $hdc_package_id = $life_health->hospital_card_pkg_id;
+
+            $hdc_package = HDCPackages::findOrFail($hdc_package_id);
+
+            $hospitalCardFee = $hdc_price = $hdc_package->physical_virtual_type == 'Physical' ? $hdc_package->price_physical : $hdc_package->price_virtual;
+            // ---------------------------------------------------------
+        } else {
+
+            $billing_frequency = '';
+        }
+
+
+
+
+
+
+
+
+        // dd($teli_medicine_charge,$id,$billing_frequency,$hospitalCardFee);
+
+
+
+
+        // dd("hello");
+        // dd($request,Auth::user());
+        // dd($request->teli_medicine_charge);
+
+        $teli_medicine_charge = $request->teli_medicine_charge ?? $teli_medicine_charge; // Assuming $request->teli_medicine_charge contains "9:400"
+
+        $json_decoded = json_decode($request->teli_medicine_charge ?? $teli_medicine_charge);
+
+        // dd($json_decoded);
+
+        if ($json_decoded !== null) {
+            // If the input is valid JSON, set $teli_medicine_fee to 0
+            $teli_medicine_fee = 0;
+        } elseif ($request->teli_medicine_charge  == 'free' || $teli_medicine_charge == 'free') {
+            $teli_medicine_fee = 0;
+        } elseif ($json_decoded === null) {
+            list($teli_medi_call, $teli_medicine_fee) = explode(':', $teli_medicine_charge);
+        }
+
+        // dd($teli_medicine_fee);
+
+        // "_token" => "wJ72tFiYLG1AkqDLrOS5IdKzqyCNoqiGym1Ed5es"
+        // "hospital_card" => "0"
+        // "teli_medicine" => "1"
+        // "billing_frequency" => "yearly"
+
+        // dd($request);
+
+
+
+        $package = LifeAndHealth::findOrFail($id);
+
+
+
+
+
+        // if packages already exist in card then don't make the duplicate packages :--------------------------------------------
+
+
+
+        //*** getting error for the header container single line  */
+        if (!Session::has('life_health')) {
+
+            $existingCartItem = Cart::where('product_id', $package->id)
+                ->where('customer_id', Auth::user()->id)
+                ->first();
+
+            if ($existingCartItem) {
+                return redirect()->back()->with('msg', 'Package is already in the cart!');
+            }
+        }
+
+
+        // dd($package,$billing_frequency);
+
+
+
+
+        // // Check if the package_id already exists in the cart for the current user
+        // $existingCartItem = Cart::where('product_id', $package->id)
+        //     ->where('customer_id', Auth::user()->id)
+        //     ->first();
+
+        // if ($existingCartItem) {
+        //     // If the package is already in the cart, you might want to update its quantity or show a message
+        //     return redirect()->back()->with('msg', 'Package is already in the cart!');
+        // }
+
+
+        // ---------------------------------------------------------------------------
+
+
+        //------------------fields for add into DB--------------------------------------
+        $product_id = $package->id;
+        $user_id = Auth::user()->id;
+        $Pname = $package->Pname;
+        $image = $package->image;
+        $quantity = 1;
+        $price = $package->price;
+
+
+
+        if ($request->billing_frequency == "yearly" || $billing_frequency == "yearly") {
+            $price = $package->yearly_fee;
+            $payment_frequency = 1;
+        } elseif ($request->billing_frequency == "half_yearly" || $billing_frequency == "half_yearly") {
+            $price = $package->half_yearly_fee;
+            $payment_frequency = 2;
+        } elseif ($request->billing_frequency == "quarterly" || $billing_frequency == "quarterly") {
+            $price = $package->quarterly_fee;
+            $payment_frequency = 4;
+        } elseif ($request->billing_frequency == "monthly" || $billing_frequency == "monthly") {
+            $price = $package->monthly_fee;
+            $payment_frequency = 12;
+        } else {
+            $price = $package->yearly_fee;
+            $payment_frequency = 1;
+        }
+
+
+        $duration = $package->duration;
+        $discount = $package->discount; // if pkg has discount then apply the discount from pkg .
+
+
+
+        $hospitalCardFee = $request->hospital_card ?? $hospitalCardFee;
+        $teliMediFee = $teli_medicine_fee;
+
+        // dd($hospitalCardFee,$teliMediFee);
+
+
+        // Calculate hospital Card Fee:
+        if ($hospitalCardFee == 1) {
+            // $hospitalCardFee = $package->hospital_card_fee;
+            // $hospitalCardFee = $hdc_packages->price; // hospital card price get from HDCPackages model
+            $hospitalCardFee = $hdc_price; // hospital card price get from HDCPackages model
+        }
+
+        // Calculate TeliMedi Fee:
+        if ($teliMediFee == 1) {
+            // $teliMediFee = $package->teli_medicine_fee;
+            $teliMediFee = $teli_medicine_fee;
+        }
+
+
+
+
+
+        // Calculate total price with discount:
+        $before_discount_pirce = $price + ($hospitalCardFee / $payment_frequency)  + ($teliMediFee / $payment_frequency);
+        $with_discount_pirce = $before_discount_pirce * (1 - ($discount / 100)); //have to fix this line
+
+
+        // dd("before Discount Price : ", $with_discount_pirce);
+        // echo "before Discount Price : ", $with_discount_pirce;
+
+        // ------------------------------------Promo Code ----------------------------------------------------
+        #discount  = promo code amount .
+
+
+        //here life and health pkg have model function : promo__codes__alls()
+
+        if ($package->promo__codes__alls->isNotEmpty()) {
+
+            $promo_code = $request->promo_code_hidden; // get all promo code in pkg .
+            // --------------------------------------------------
+            $backend_promoCodes = $package->promo__codes__alls;
+
+            foreach ($backend_promoCodes as $promoCode) {
+
+                // echo $promoCode->unique_code,"<br>";
+                if ($promoCode->unique_code === $request->promo_code_hidden) {
+                    // Apply the discount here
+                    $discount = $promoCode->discount; // adjust based on your discount logic
+                    $discountType = $promoCode->discount_type;
+                    $discountAmount = $promoCode->discount;
+                    $promo_code_used_limit = $promoCode->apply_quantity_limit;
+                    $discountApplied = true;
+                    break; // Exit loop if a matching promo code is found
+                }
+            }
+
+            $discount = $discount;
+
+            //if discount type == percentage : apply discount on pkg price .
+            $discount_type = $discountType ?? '';
+            $discount_type == 'percentage' ? $with_discount_pirce = $before_discount_pirce * (1 - ($discount / 100)) : $with_discount_pirce = $before_discount_pirce - $discount;
+
+            //update the promo code used limit: -------------------------------------------------------------
+            // if the promo code exist on the table the update the used limit:
+            // if the promo code not exist on the table the insert the promo code used limit:
+            $promo_code_limit = Promo_Code_All_Used::where('promo_code', $request->promo_code_hidden)->where('user_id', Auth::user()->id)->first();
+
+            // dd($promo_code_limit->used_limit, $promo_code_used_limit);
+
+            // echo "after Discount Price : ", $with_discount_pirce;
+
+            if ($promo_code_limit == null) {
+                $promo_code_limit = Promo_Code_All_Used::create([
+                    'promo_code' => $request->promo_code_hidden,
+                    'used_limit' => 1,
+                    'user_id' => Auth::user()->id
+                ]);
+            } elseif ($promo_code_limit->used_limit < $promo_code_used_limit) {
+
+                $promo_code_limit->update(['promo_code' => $request->promo_code_hidden, 'used_limit' => $promo_code_limit->used_limit + 1, 'user_id' => Auth::user()->id]);
+            }
+
+
+            // dd($discountType, $discountAmount, $discountApplied);
+
+        }
+
+
+        // -----------------------------------Promo Code-----------------------------------------------------
+        // dd("after Discount Price : ", $with_discount_pirce);
+
+
+
+
+
+
+        // ---------------------------------------------------------------------------------
+
+        $vatPercentage = $package->vat; // 15% VAT
+        $with_discount_pirce = $with_discount_pirce + ($with_discount_pirce * ($vatPercentage / 100));
+
+        // ---------------------------------------------------------------------------------
+        #for the combo pkg :
+
+        if ($package->combo_pkg == 'on') {
+            $quantity = $package->combo_person;
+        }
+
+        // ---------------------------------------------------------------------------------
+
+
+        // dd($hospitalCardFee,$teliMediFee,$before_discount_pirce,$with_discount_pirce);
+
+        // dd("pname:".$Pname,"quantity:".$quantity,"hospital_card_fee:".$hospitalCardFee,"telmedi_fee:".$teliMediFee,"discount:".$discount,"price:".$price,"before_discount_price:".$before_discount_pirce, "with_discount_price:".$with_discount_pirce,"duration:".$duration);
+
+
+        Cart::create([
+            'product_id' => $product_id,
+            'vat' => $package->vat,
+            'customer_id' =>  $user_id,
+            'Pname' => $Pname,
+            'image' => $image,
+            'quantity' => $quantity,
+            'price' => $price,
+            'duration' => $duration,
+            'discount' => $discount,
+            'hospital_card_id' => $hdc_package_id ?? 0,
+            'hospital_card_fee' => $hospitalCardFee ?? 0,
+            'teli_medicine_fee' => $teliMediFee,
+            'before_discount_price' => $before_discount_pirce,
+            'with_discount_price' => $with_discount_pirce,
+            'payment_frequency' => $payment_frequency,
+            'promo_code' => $request->promo_code_hidden ?? null,
+            // Add other necessary fields
+        ]);
+
+        //remove the session life and health if exits : ______________________________________________
+        // if (Session::has('life_health')) {
+
+
+        //     $lf_session = Session::forget('life_health');
+        // }
+        // -------------------------------------------------------------------------------------------
+
+
+
+
+        return redirect(route('cart_all'))->send();
+
+
+        // return redirect('cart_all')->with('msg', 'Package Add to Cart Successfully!')->send(); //main line
+
+
+
+
+
+        // return redirect()->back()->with('msg', 'Package Add to Cart Successfully!');
+    }
