@@ -1,3 +1,5 @@
+#laravel php varibale pass to javaScript  inside blade
+---------------------------------------------
 To use a Laravel Blade variable within a `<script>` tag, you can pass the Blade variable directly into the JavaScript code by using the `{{ }}` Blade syntax to output the variable's value. Here's how you can do it:
 
 ### Example:
