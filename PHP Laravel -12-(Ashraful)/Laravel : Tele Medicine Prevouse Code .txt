@@ -1663,9 +1663,2358 @@ customer controller :
 
         // return redirect('cart_all')->with('msg', 'Package Add to Cart Successfully!')->send(); //main line
 
+-----------------------------------------------------------------------
+edit controller: 
+---------------------
+ public function edit($id)
+    {
 
+
+        $life_health = LifeAndHealth::findOrFail($id);
+
+        // dd($life_health->teli_medi_fee);
+
+        // Extract teli_medicine_fee values for display
+        $teliMedicineFeeValues = explode(', ', $life_health->teli_medi_fee);
+
+        // dd($teliMedicineFeeValues);
+
+
+
+        if ($life_health->teli_medi_fee == "free") {
+            $teliMedicineFree = 'free';
+        } else {
+            $teliMedicineFree = 'nothing';
+        }
+
+        // dd($life_health->teli_medicine_fee);
+
+
+        return view('backend.admin.lifeAndHealth_insurance.lifeAndHealth_insurance_edit', compact('life_health', 'teliMedicineFeeValues', 'teliMedicineFree'));
+    }
 
 
 
         // return redirect()->back()->with('msg', 'Package Add to Cart Successfully!');
+    }
+
+---------------------
+edit page tele medicine :
+-------------------------
+<section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-info card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title float-left">Life and Health Package Edit</h3>
+                        <div class="float-right">
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body ">
+
+                        {{-- validation error  --}}
+
+                        <form action="{{ route('admin.life_and_health_update', $life_health->id) }}" method="POST"
+                            enctype="multipart/form-data" class="form-control p-3">
+                            @csrf
+
+
+                            {{-- category_id --}}
+                            <input type="number" id="form1Example1" class="form-control" name="category_id" hidden
+                                value="8" />
+                            {{-- category_id --}}
+                            <!-- Email input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="text" name="Pname" id="form1Example1" class="form-control"
+                                    value="{{ $life_health->Pname }}" placeholder="Package Name" nothing />
+                                <label class="form-label" for="form1Example1">Package Name</label>
+                            </div>
+
+
+
+                            <!-- Image input -->
+
+
+                            <!-- Image input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <img style="height:100px; width:100px" class="img-fluid rounded circle m-2"
+                                    src="{{ asset('images/packages/' . $life_health->image) }}" alt="Image not Found">
+
+
+                                <input type="file" name="image" id="form1Example2" class="form-control"
+                                    value="{{ $life_health->image }}" />
+                                <label class="form-label" for="form1Example2">Package Image</label>
+                            </div>
+
+
+                            <!-- Feature input -->
+
+
+                            <!-- Feature input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <textarea class="form-control" value="{{ $life_health->feature }}" rows="3" name="feature">{{ $life_health->feature }}</textarea>
+
+                                <label class="form-label" for="form1Example2">Package Features</label>
+                            </div>
+                            <!-- benefit input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <textarea class="form-control" value="{{ $life_health->benefit }}" rows="3" name="benefit">{{ $life_health->benefit }}</textarea>
+
+                                <label class="form-label" for="form1Example2">Package Benefits</label>
+                            </div>
+                            <!-- benefit input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <textarea class="form-control" value="{{ $life_health->benefit }}" rows="3" name="claim_process">{{ $life_health->claim_process }}</textarea>
+
+                                <label class="form-label" for="form1Example2">Claim Process</label>
+                            </div>
+
+                            <!-- Duration input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="number" name="duration" id="form1Example2" class="form-control"
+                                    value="{{ $life_health->duration }}" nothing placeholder="Package Duration" />
+                                <label class="form-label" for="form1Example2">Package Duration</label>
+                            </div>
+                            <!-- Price input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="price" name="price" id="form1Example2" class="form-control"
+                                    value="{{ $life_health->price }}" nothing placeholder="Package Price" />
+                                <label class="form-label" for="form1Example2">Package Price</label>
+                            </div>
+
+                            <!-- Fees input -->
+                            <div class="form-row mb-4">
+                                <div class="col">
+                                    <!-- yearly fee -->
+                                    <input type="number" name="yearly_fee" value="{{ $life_health->yearly_fee }}"
+                                        class="form-control" placeholder="Yearly Fee" nothing>
+                                    <label class="form-label" for="form1Example2">Yearly Fee</label>
+                                </div>
+                                <div class="col">
+                                    <!-- half yearly fee -->
+                                    <input type="number" name="half_yearly_fee"
+                                        value="{{ $life_health->half_yearly_fee }}" class="form-control"
+                                        placeholder="Half Yearly Fee">
+                                    <label class="form-label" for="form1Example2">Half Yearly Fee</label>
+                                </div>
+                                <div class="col">
+                                    <!-- quarterly fee -->
+                                    <input type="number" name="quarterly_fee" value="{{ $life_health->quarterly_fee }}"
+                                        class="form-control" placeholder="Quarterly Fee">
+                                    <label class="form-label" for="form1Example2">Quarterly Fee</label>
+                                </div>
+                                <div class="col">
+                                    <!-- monthly fee -->
+                                    <input type="number" name="monthly_fee" value="{{ $life_health->monthly_fee }}"
+                                        class="form-control" placeholder="Monthly Fee">
+                                    <label class="form-label" for="form1Example2">Monthly Fee</label>
+                                </div>
+                            </div>
+
+                            <!-- -------------------------------Life and Hospital Fees input ------------------------------------------------------------------- -->
+                            <div class="form-row mb-4">
+
+
+                                {{-- Life Coverage Customizable part ---------------------------------------------------------------- --}}
+
+                                <div class="col">
+                                    <select class="form-select form-control text-center"
+                                        aria-label="Default select example" onchange="showLifeInputFields()">
+                                        <option value="" selected disabled>:: Set Life Coverage :: </option>
+                                        <option value="lifeAndHealth">Life Coverage Amount</option>
+                                    </select>
+                                </div>
+
+                                <div id="inputFields" style="display: none;" class="col border border-dark rounded">
+                                    <div class="col">
+                                        <br>
+                                        <label for="naturalDeathAmount">Life Coverage Amount:</label>
+                                        <input type="number" id="naturalDeathAmount" name="life_coverage_amount"
+                                            class="form-control" placeholder="Life Coverage Amount"
+                                            value="{{ $life_health->life_coverage_amount ?? '' }}"><br>
+
+                                        <hr>
+
+                                        <label for="naturalDeathAmount">Natural Death Amount:</label>
+                                        <input type="number" id="naturalDeathAmount" name="natural_death_amount"
+                                            class="form-control" placeholder="Natural Death Amount"
+                                            value="{{ $life_health->natural_death_amount ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount"> Charge Back Amount:</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="natural_death_claim_chargeback_amount" class="form-control"
+                                            placeholder="Natural Death Claim Charge Back Amount"
+                                            value="{{ $life_health->natural_death_claim_chargeback_amount ?? '' }}"><br>
+
+                                        {{-- ------------------------------------------------------------------------------ --}}
+
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2"> Exclusions</label>
+                                            <textarea type="text" class="form-control" rows="3" name="natural_death_exclusion">{{ $life_health->natural_death_exclusion ?? '' }}</textarea>
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">Document for Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" rows="3" name="natural_death_claim_process">{{ $life_health->natural_death_claim_process ?? '' }}</textarea>
+                                        </div>
+
+                                        {{-- ------------------------------------------------------------------------------ --}}
+
+                                        <hr>
+                                    </div>
+                                    <div class="col">
+                                        <label for="accidentalDeathAmount">Accidental Death Amount:</label><br>
+                                        <input type="number" id="accidentalDeathAmount" name="accidental_death_amount"
+                                            class="form-control" placeholder="Accidental Death Amount"
+                                            value="{{ $life_health->accidental_death_amount ?? '' }}"> <br>
+
+                                        <label for="naturalDeathAmount">Accidental Death Claim Charge Back
+                                            Amount:</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="accidental_death_claim_chargeback_amount" class="form-control"
+                                            placeholder="Accidental Death Claim Charge Back Amount"
+                                            value="{{ $life_health->accidental_death_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">Accidental Death Claim (waiting period or effective
+                                            date):</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="accidental_death_claim_waiting_date" class="form-control"
+                                            placeholder="Accidental Death Claim (waiting period or effective date)"
+                                            value="{{ $life_health->accidental_death_claim_waiting_date ?? '' }}"><br>
+                                        {{-- ----------------------------------------------------------------------------------- --}}
+
+
+                                        {{-- <div data-mdb-input-init class="form-outline mb-4">
+
+                                            <label class="form-label" for="form1Example2"> Exclusions</label>
+                                            <textarea class="form-control" value="{{ $life_health->accidental_death_exclusion ?? '' }}" rows="3"
+                                                placeholder="Accidental Death Exclusions" name="accidental_death_exclusion" nothing>
+                                                </textarea>
+                                        </div>
+
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">Document for Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" value="{{ $life_health->accidental_death_claim_process_doc ?? '' }}"
+                                                rows="3" placeholder="Claim Process" name="accidental_death_claim_process_doc" nothing></textarea>
+                                        </div> --}}
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2"> Exclusions</label>
+                                            <textarea type="text" class="form-control" rows="3" name="accidental_death_exclusion">{{ $life_health->accidental_death_exclusion }}</textarea>
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">Document for Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" rows="3" name="accidental_death_claim_process_doc">{{ $life_health->accidental_death_claim_process_doc }}</textarea>
+                                        </div>
+
+                                        {{-- ----------------------------------------------------------------------------------- --}}
+
+                                        <hr>
+                                    </div>
+
+                                    {{-- -----------------------------------------------------Mejor Disease------------------------------------------- --}}
+
+                                    <label for="naturalDeathAmount">Major Deases Benefit Amount
+                                        :</label><br>
+                                    <input type="number" id="naturalDeathAmount" name="major_diseases_amount"
+                                        class="form-control" placeholder="Major Deases Benefit Amount"
+                                        value="{{ $life_health->major_diseases_amount ?? '' }}"><br>
+
+                                    <label for="naturalDeathAmount"> Charge Back Amount :</label><br>
+                                    <input type="number" id="naturalDeathAmount"
+                                        name="major_diseases_claim_chargeback_amount" class="form-control"
+                                        placeholder="  Charge Back Amount :"
+                                        value="{{ $life_health->major_diseases_claim_chargeback_amount ?? '' }}"><br>
+
+                                    <label for="naturalDeathAmount"> waiting period or effective date :</label><br>
+                                    <input type="number" id="naturalDeathAmount"
+                                        name="major_diseases_claim_waiting_date" class="form-control"
+                                        value="{{ $life_health->major_diseases_claim_waiting_date }}"><br>
+
+                                    <div data-mdb-input-init class="form-outline mb-4">
+                                        <label class="form-label" for="form1Example2"> Exclusions</label>
+                                        <textarea class="form-control" rows="3" name="major_diseases_exclusion">{{ $life_health->major_diseases_exclusion }}</textarea>
+                                    </div>
+
+                                    <div data-mdb-input-init class="form-outline mb-4">
+
+                                        <label class="form-label" for="form1Example2"> Document for Claim Process</label>
+                                        <textarea type="text" class="form-control" rows="3"name="major_diseases_claim_process_doc" nothing> {{ $life_health->major_diseases_claim_process_doc }}</textarea>
+
+
+                                    </div>
+                                    {{-- -----------------------------------------------------End Mejor Disease------------------------------------------- --}}
+                                    {{-- -----------------------------------------------------ppd------------------------------------------- --}}
+                                    <div class="col">
+                                        <label for="naturalDeathAmount">Permanent Partial Disability Coverage Amount
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ppd_claim_coverage_amount"
+                                            class="form-control"
+                                            value="{{ $life_health->ppd_claim_coverage_amount ?? '' }}"
+                                            placeholder="Permanent Partial Disability Coverage Amount"><br>
+                                        <label for="naturalDeathAmount">Charge Back Amount :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ppd_claim_chargeback_amount"
+                                            class="form-control" placeholder="PPD Claim Charge Back Amount"
+                                            value="{{ $life_health->ppd_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">waiting period or effective date
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ppd_claim_waiting_date"
+                                            class="form-control" value="{{ $life_health->ppd_claim_waiting_date ?? '' }}"
+                                            placeholder="PPD Claim (waiting period or effective date) "><br>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+
+                                            <label class="form-label" for="form1Example2">Exclusion </label>
+                                            <textarea class="form-control" rows="3" name="ppd_exclusion" nothing>
+                                                {{ $life_health->ppd_exclusion }}
+                                            </textarea>
+
+
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+
+                                            <label class="form-label" for="form1Example2">Document for Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" rows="3" name="ppd_claim_process_doc" nothing>{{ $life_health->ppd_claim_process_doc }}</textarea>
+
+
+                                        </div>
+
+
+                                        <hr>
+                                    </div>
+                                    {{-- -----------------------------------------------------End ppd------------------------------------------- --}}
+                                    {{-- ----------------------------------------------------- ptd------------------------------------------- --}}
+                                    <div class="col">
+
+                                        <label for="naturalDeathAmount">Permanent and Total Disability Amount
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ptd_amount"
+                                            value="{{ $life_health->ptd_amount ?? '' }}" class="form-control"
+                                            placeholder="Permanent and Total Disability Amount"><br>
+
+                                        <label for="naturalDeathAmount"> Charge Back Amount
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ptd_claim_chargeback_amount"
+                                            class="form-control"
+                                            value="{{ $life_health->ptd_claim_chargeback_amount ?? '' }}"
+                                            placeholder="  Charge Back Amount
+                                        :"><br>
+
+                                        <label for="naturalDeathAmount">waiting period or
+                                            effective date :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ptd_claim_waiting_date"
+                                            class="form-control" value="{{ $life_health->ptd_claim_waiting_date ?? '' }}"
+                                            placeholder="waiting period or effective
+                                        date "><br>
+
+
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+
+                                            <label class="form-label" for="form1Example2">Exclusion </label>
+                                            <textarea class="form-control" rows="3" name="ptd_exclusion" nothing>
+                                                {{ $life_health->ptd_exclusion }}
+                                            </textarea>
+
+
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+
+                                            <label class="form-label" for="form1Example2">Document for Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" rows="3" name="ptd_claim_process_doc" nothing>{{ $life_health->ptd_claim_process_doc }}</textarea>
+
+
+                                        </div>
+
+
+                                        <hr>
+                                    </div>
+                                    {{-- -----------------------------------------------------End ptd------------------------------------------- --}}
+
+                                    <div class="col">
+                                        <label for="criticalIllnessAmount">Critical Illness Amount:</label><br>
+                                        <input type="number" id="criticalIllnessAmount"
+                                            name="critical_illness_coverage_amount" class="form-control"
+                                            placeholder="Critical Illness Amount"
+                                            value="{{ $life_health->critical_illness_coverage_amount ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">Critical Illness Claim Charge Back
+                                            Amount:</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="critical_illness_claim_chargeback_amount" class="form-control"
+                                            placeholder="Critical Illness Claim Charge Back Amount"
+                                            value="{{ $life_health->critical_illness_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">Critical Illness Claim (waiting period or effective
+                                            date):</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="critical_illness_claim_waiting_date" class="form-control"
+                                            placeholder="Critical Illness Claim (waiting period or effective date)"
+                                            value="{{ $life_health->critical_illness_claim_waiting_date ?? '' }}"><br>
+
+                                        {{-- <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">
+                                                Exclusions</label>
+                                            <textarea type="text" class="form-control" rows="3"
+
+                                                name="critical_illness_exclusion" nothing> {{ $life_health->critical_illness_exclusion}}</textarea>
+
+
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">Document For
+                                                Claim Process</label>
+                                            <textarea type="text" class="form-control"
+                                                rows="3" name="critical_illness_claim_process_doc"
+                                                nothing>{{ $life_health->critical_illness_claim_process_doc}}</textarea>
+
+
+                                        </div> --}}
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+
+                                            <label class="form-label" for="form1Example2">Exclusion </label>
+                                            <textarea class="form-control" rows="3" name="critical_illness_exclusion" nothing>
+                                                {{ $life_health->critical_illness_exclusion }}
+                                            </textarea>
+
+
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+
+                                            <label class="form-label" for="form1Example2">Document for Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" rows="3" name="critical_illness_claim_process_doc" nothing>{{ $life_health->critical_illness_claim_process_doc }}</textarea>
+
+
+                                        </div>
+
+
+
+
+                                        <hr>
+                                    </div>
+                                </div>
+
+
+
+                                {{-- <div id="inputFields" style="display: none;" class="col border border-dark rounded">
+                                    <div class="col">
+                                        <br>
+                                        <label for="naturalDeathAmount">Life Coverage Amount:</label>
+                                        <input type="number" id="naturalDeathAmount" name="life_coverage_amount"
+                                            class="form-control" placeholder="Life Coverage Amount"><br>
+
+                                        <hr>
+
+                                        <label for="naturalDeathAmount">Natural Death Amount:</label>
+                                        <input type="number" id="naturalDeathAmount" name="natural_death_amount"
+                                            class="form-control" placeholder="Natural Death Amount"><br>
+
+                                        <label for="naturalDeathAmount">Natural Death Claim Charge Back Amount
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="natural_death_claim_chargeback_amount" class="form-control"
+                                            placeholder="Natural Death Claim Charge Back Amount"><br>
+
+                                        <label for="naturalDeathAmount">Natural Death Claim (waiting period or effective
+                                            date) :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="natural_death_claim_waiting_date" class="form-control"
+                                            placeholder="Natural Death Claim (waiting period or effective date)"><br>
+                                        <label for="naturalDeathAmount">Natural Death Claim (dely period ) :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="natural_death_claim_delay_date" class="form-control"
+                                            placeholder="Natural Death Claim (dely period )"><br>
+                                        <label for="naturalDeathAmount">Natural Death Claim (cooling period ) :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="natural_death_claim_cooling_date" class="form-control"
+                                            placeholder="Natural Death Claim (cooling period )"><br>
+
+                                        <hr>
+
+                                    </div>
+                                    <div class="col">
+                                        <label for="accidentalDeathAmount">Accidental Death Amount:</label><br>
+                                        <input type="number" id="accidentalDeathAmount" name="accidental_death_amount"
+                                            class="form-control" placeholder="Accidental Death Amount"> <br>
+
+                                        <label for="naturalDeathAmount">Accidental Death Claim Charge Back Amount
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="accidental_death_claim_chargeback_amount" class="form-control"
+                                            placeholder="Accidental Death Claim Charge Back Amount"><br>
+
+                                        <label for="naturalDeathAmount">Accidental Death Claim (waiting period or effective
+                                            date) :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="accidental_death_claim_waiting_date" class="form-control"
+                                            placeholder="Accidental Death Claim (waiting period or effective date) "><br>
+                                        <label for="naturalDeathAmount">Accidental Death Claim (dely period ) :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="accidental_death_claim_delay_date" class="form-control"
+                                            placeholder="Accidental Death Claim (dely period ) "><br>
+                                        <label for="naturalDeathAmount">Accidental Death Claim (cooling period )
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="accidental_death_claim_cooling_date" class="form-control"
+                                            placeholder="Accidental Death Claim (cooling period )"><br>
+
+                                        <hr>
+                                    </div>
+                                    <div class="col">
+                                        <label for="ppdPtdAmount">PPD-PTD Amount:</label>
+                                        <input type="number" id="ppdPtdAmount" name="ppd_ptd_amount"
+                                            class="form-control" placeholder="PPD-PTD Amount"><br>
+
+                                        <label for="naturalDeathAmount">PPD-PTD Claim Charge Back Amount
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="ppd_ptd_claim_chargeback_amount" class="form-control"
+                                            placeholder="PPD-PTD Claim Charge Back Amount"><br>
+
+                                        <label for="naturalDeathAmount">PPD-PTD Claim (waiting period or effective date)
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ppd_ptd_claim_waiting_date"
+                                            class="form-control"
+                                            placeholder="PPD-PTD Claim (waiting period or effective date) "><br>
+                                        <label for="naturalDeathAmount">PPD-PTD Claim (dely period ) :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ppd_ptd_claim_delay_date"
+                                            class="form-control" placeholder="PPD-PTD Claim (dely period ) "><br>
+
+                                        <label for="naturalDeathAmount">PPD-PTD Claim (cooling period ) :</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ppd_ptd_claim_cooling_date"
+                                            class="form-control" placeholder="PPD-PTD Claim (cooling period ) "><br>
+
+                                        <hr>
+
+
+                                    </div>
+                                    <div class="col">
+                                        <label for="criticalIllnessAmount">Critical Illness Amount:</label><br>
+                                        <input type="number" id="criticalIllnessAmount" name="critical_illness_amount"
+                                            class="form-control" placeholder="Critical Illness Amount"><br>
+
+                                        <label for="naturalDeathAmount">Critical Illness Claim Charge Back Amount
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="critical_illness_claim_chargeback_amount" class="form-control"
+                                            placeholder="Critical Illness Claim Charge Back Amount"><br>
+
+                                        <label for="naturalDeathAmount">Critical Illness Claim (waiting period or effective
+                                            date) :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="critical_illness_claim_waiting_date" class="form-control"
+                                            placeholder="Critical Illness  Claim (waiting period or effective date) "><br>
+                                        <label for="naturalDeathAmount">Critical Illness Claim (dely period ) :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="critical_illness_claim_delay_date" class="form-control"
+                                            placeholder="Critical Illness Claim (dely period ) "><br>
+
+                                        <label for="naturalDeathAmount">Critical Illness Claim (cooling period )
+                                            :</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="critical_illness_claim_cooling_date" class="form-control"
+                                            placeholder="Critical Illness Claim (cooling period ) - Day "><br>
+
+                                        <hr>
+                                    </div>
+                                </div> --}}
+
+                                <script>
+                                    function showLifeInputFields() {
+                                        var selectBox = document.querySelector(".form-select");
+                                        var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                        var inputFieldsDiv = document.getElementById("inputFields");
+
+                                        if (selectedValue === "lifeAndHealth") {
+                                            inputFieldsDiv.style.display = "block";
+                                        } else {
+                                            inputFieldsDiv.style.display = "none";
+                                        }
+                                    }
+                                </script>
+                            </div>
+
+                            {{-- -------------------------------EndLife Coverage Customizable part ------------------------------------------------------------- --}}
+
+
+
+
+                            {{-- -------------------------------Hospital Coverage ------------------------------------------------------------ --}}
+
+
+                            {{-- ---------------------------------------fix the error------------------------------------------------------------------ --}}
+                            <div class="form-row mb-4">
+                                {{-- Hospital Coverage Customizable part ---------------------------------------------------------------- --}}
+                                <div class="col">
+                                    <select class="form-select form-control text-center"
+                                        aria-label="Default select example" onchange="showHospitalInputFields(this)">
+                                        <option value="" selected disabled>:: Set Hospital Coverage :: </option>
+                                        <option value="hospitalCoverage">Hospital Coverage Amount</option>
+                                    </select>
+                                </div>
+
+
+                                <div id="Hospital_inputFields" style="display: none;"
+                                    class="col border border-dark rounded">
+                                    <!-- Input fields for hospital coverage -->
+                                    <div class="col">
+                                        <br>
+                                        <label for="hospitalCoverageAmount">Hospital Coverage Amount:</label>
+                                        <input type="number" id="hospitalCoverageAmount" name="hospital_coverage_amount"
+                                            class="form-control" placeholder="Hospital Coverage Amount"
+                                            value="{{ $life_health->hospital_coverage_amount ?? '' }}"><br>
+
+                                        <hr>
+
+                                        <label for="ipdCoverageAmount">IPD Coverage Amount:</label>
+                                        <input type="number" id="ipdCoverageAmount" name="ipd_coverage_amount"
+                                            class="form-control" placeholder="IPD Coverage Amount"
+                                            value="{{ $life_health->ipd_coverage_amount ?? '' }}"><br>
+
+                                        <hr>
+
+                                        {{-- ----------------------------IPD Accommodation ----------------------------------------------- --}}
+
+                                        <label for="ipdAccommodationClaimAmount">IPD Accommodation Claim Amount:</label>
+                                        <input type="number" id="ipdAccommodationClaimAmount"
+                                            name="ipd_accommodation_claim_amount" class="form-control"
+                                            placeholder="IPD Accommodation Claim Amount:"
+                                            value="{{ $life_health->ipd_accommodation_claim_amount ?? '' }}"><br>
+
+                                        <label for="ipdAccommodationClaimChargebackAmount">IPD Accommodation Claim Charge
+                                            Back Amount:</label><br>
+                                        <input type="number" id="ipdAccommodationClaimChargebackAmount"
+                                            name="ipd_accommodation_claim_chargeback_amount" class="form-control"
+                                            placeholder="IPD Accommodation Claim Charge Back Amount"
+                                            value="{{ $life_health->ipd_accommodation_claim_chargeback_amount ?? '' }}"><br>
+
+                                        {{-- ----------------------------------------Add the fileds off ipd-------------------------------------------------- --}}
+                                        <label for="naturalDeathAmount">Charge Back Amount:</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="ipd_accommodation_claim_chargeback_amount" class="form-control"
+                                            placeholder="IPD Accommodation Claim Charge Back Amount"
+                                            value="{{ $life_health->ipd_accommodation_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">Per Night Max Amount:</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ipd_accommodation_max_amount"
+                                            class="form-control" placeholder="IPD Accommodation Per Night Max Amount"
+                                            value="{{ $life_health->ipd_accommodation_max_amount ?? '' }}"><br>
+
+                                        {{-- Change --}}
+                                        <label for="naturalDeathAmount">Maximum night in a row:</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="ipd_accommodation_max_day"
+                                            class="form-control" placeholder="IPD Accommodation Per Night Max (Day)"
+                                            value="{{ $life_health->ipd_accommodation_max_day ?? '' }}"><br>
+
+                                        {{-- Extra fields --}}
+                                        <label for="naturalDeathAmount">Maximum night in CCU / ICU:</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="ipd_accommodation_max_ccu_icu" class="form-control"
+                                            placeholder="Maximum night in CCU / ICU"
+                                            value="{{ $life_health->ipd_accommodation_max_ccu_icu ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">Waiting period or effective date:</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="ipd_accommodation_claim_waiting_date" class="form-control"
+                                            placeholder="IPD Claim (waiting period or effective date)"
+                                            value="{{ $life_health->ipd_accommodation_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">Difference between two claims:</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="ipd_accommodation_claim_delay_date" class="form-control"
+                                            placeholder="Natural Death Claim (delay period)"
+                                            value="{{ $life_health->ipd_accommodation_claim_delay_date ?? '' }}"><br>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">Exclusions</label>
+                                            <textarea type="text" class="form-control" rows="3" placeholder="Permanent and Total Disability Exclusions"
+                                                name="ipd_accommodation_exclusion" nothing>{{ $life_health->ipd_accommodation_exclusion ?? '' }}</textarea>
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">Document For Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" rows="3" placeholder="Permanent and Total Disability Exclusions"
+                                                name="ipd_accommodation_claim_process_doc" nothing>{{ $life_health->ipd_accommodation_claim_process_doc ?? '' }}</textarea>
+                                        </div>
+
+                                        {{-- ----------------------------------------End the Ipd-------------------------------------------------- --}}
+
+                                        <hr>
+
+
+                                        {{-- ----------------------------End IPD Accommodation ----------------------------------------------- --}}
+                                        {{-- ----------------------------IPD treatment ----------------------------------------------- --}}
+
+                                        <label for="ipdTreatmentClaimAmount">IPD Treatment Claim Amount:</label>
+                                        <input type="number" id="ipdTreatmentClaimAmount"
+                                            name="ipd_treatment_claim_amount" class="form-control"
+                                            placeholder="IPD Treatment Claim Amount:"
+                                            value="{{ $life_health->ipd_treatment_claim_amount ?? '' }}"><br>
+
+                                        {{-- <label for="ipdTreatmentClaimChargebackAmount">IPD Treatment Claim Charge Back
+                                            Amount:</label><br>
+                                        <input type="number" id="ipdTreatmentClaimChargebackAmount"
+                                            name="ipd_treatment_claim_chargeback_amount" class="form-control"
+                                            placeholder="IPD Treatment Claim Charge Back Amount"
+                                            value="{{ $life_health->ipd_treatment_claim_chargeback_amount ?? '' }}"><br> --}}
+                                        {{--
+                                        <label for="ipdTreatmentMaxDay">IPD Treatment Max Day:</label><br>
+                                        <input type="number" id="ipdTreatmentMaxDay" name="ipd_treatment_max_day"
+                                            class="form-control" placeholder="IPD Treatment Max Day"
+                                            value="{{ $life_health->ipd_treatment_max_day ?? '' }}"><br> --}}
+
+                                        {{-- <label for="ipdTreatmentClaimWaitingDate">IPD Treatment Claim (waiting period or
+                                            effective date):</label><br>
+                                        <input type="number" id="ipdTreatmentClaimWaitingDate"
+                                            name="ipd_treatment_claim_waiting_date" class="form-control"
+                                            placeholder="IPD Treatment Claim (waiting period or effective date)"
+                                            value="{{ $life_health->ipd_treatment_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="ipdTreatmentClaimDelayDate">IPD Treatment Claim (delay
+                                            period):</label><br>
+                                        <input type="number" id="ipdTreatmentClaimDelayDate"
+                                            name="ipd_treatment_claim_delay_date" class="form-control"
+                                            placeholder="IPD Treatment Claim (delay period)"
+                                            value="{{ $life_health->ipd_treatment_claim_delay_date ?? '' }}"><br> --}}
+                                        {{-- ----------------------------------ipd treatment add fields ------------------------- --}}
+
+                                        <label class="form-label" for="form3Example2">Consultant's Fee</label>
+                                        <div data-mdb-input-init class="form-outline">
+                                            <input type="number" name="ipd_treatment_consultant_amount"
+                                                id="form3Example2" class="form-control" placeholder="Ex: 15000"
+                                                value="{{ $life_health->ipd_treatment_consultant_amount ?? '' }}">
+                                        </div>
+
+
+                                        <label class="form-label" for="form3Example2">Routine Investigation</label>
+                                        <div data-mdb-input-init class="form-outline">
+                                            <input type="number" name="ipd_treatment_routen_investigation_amount"
+                                                id="form3Example2" class="form-control" placeholder="Ex: 15000"
+                                                value="{{ $life_health->ipd_treatment_routen_investigation_amount ?? '' }}">
+                                        </div>
+
+
+                                        <label class="form-label" for="form3Example2">Medicine/Drugs</label>
+                                        <div data-mdb-input-init class="form-outline">
+                                            <input type="number" name="ipd_treatment_medicine_amount" id="form3Example2"
+                                                class="form-control" placeholder="Ex: 15000"
+                                                value="{{ $life_health->ipd_treatment_medicine_amount ?? '' }}">
+                                        </div>
+
+
+                                        <label class="form-label" for="form3Example2">Surgical Charges</label>
+                                        <div data-mdb-input-init class="form-outline">
+                                            <input type="number" name="ipd_treatment_surgical_amount" id="form3Example2"
+                                                class="form-control" placeholder="Ex: 15000"
+                                                value="{{ $life_health->ipd_treatment_surgical_amount ?? '' }}">
+                                        </div>
+
+
+                                        <label class="form-label" for="form3Example2">Ancillary Services</label>
+                                        <div data-mdb-input-init class="form-outline">
+                                            <input type="number" name="ipd_treatment_ancillary_amount"
+                                                id="form3Example2" class="form-control" placeholder="Ex: 15000"
+                                                value="{{ $life_health->ipd_treatment_ancillary_amount ?? '' }}">
+                                        </div>
+
+
+                                        <label class="form-label" for="form3Example2">Others</label>
+                                        <div data-mdb-input-init class="form-outline">
+                                            <input type="number" name="ipd_treatment_others_amount" id="form3Example2"
+                                                class="form-control" placeholder="Ex: 15000"
+                                                value="{{ $life_health->ipd_treatment_others_amount ?? '' }}">
+                                        </div>
+
+
+                                        <label for="ipdTreatmentClaimWaitingDate">waiting period or effective
+                                            date:</label><br>
+                                        <input type="number" id="ipdTreatmentClaimWaitingDate"
+                                            name="ipd_treatment_claim_waiting_date" class="form-control"
+                                            placeholder="IPD Treatment Claim (waiting period or effective date)"
+                                            value="{{ $life_health->ipd_treatment_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="ipdTreatmentClaimDelayDate">difference between two claims:</label><br>
+                                        <input type="number" id="ipdTreatmentClaimDelayDate"
+                                            name="ipd_treatment_claim_delay_date" class="form-control"
+                                            placeholder="IPD Treatment Claim (delay period )"
+                                            value="{{ $life_health->ipd_treatment_claim_delay_date ?? '' }}"><br>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">Exclusions</label>
+                                            <textarea type="text" class="form-control" rows="3"
+                                                placeholder="Permanent and Total Disability  Exclusions" name="ipd_treatment_exclusion">{{ $life_health->ipd_treatment_exclusion }}</textarea>
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="form1Example2">Document For Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" rows="3"
+                                                placeholder="Permanent and Total Disability  Exclusions" name="ipd_treatment_claim_process_doc">{{ $life_health->ipd_treatment_claim_process_doc }}</textarea>
+                                        </div>
+
+
+
+
+
+                                        {{-- ----------------------------------End ipd treatment add fields ------------------------- --}}
+
+                                        <hr>
+
+                                        {{-- ----------------------------End IPD treatment ----------------------------------------------- --}}
+
+
+
+                                        {{-- ----------------------------OPD treatment ----------------------------------------------- --}}
+
+                                    </div>
+
+
+                                    <div class="col">
+
+                                        <label for="opdCoverageAmount">OPD Coverage Amount:</label>
+                                        <input type="number" id="opdCoverageAmount" name="opd_coverage_amount"
+                                            class="form-control" placeholder="IPD Coverage Amount"
+                                            value="{{ $life_health->opd_coverage_amount ?? '' }}"><br>
+
+                                        <hr>
+
+                                        {{-- ----------------------------OPD Consultation ----------------------------------------------- --}}
+
+
+                                        <label for="opdConsultationClaimAmount">Total Consultation Amount:</label>
+                                        <input type="number" id="opdConsultationClaimAmount"
+                                            name="opd_consultation_claim_amount" class="form-control"
+                                            placeholder="OPD Consultation Claim Amount:"
+                                            value="{{ $life_health->opd_consultation_claim_amount ?? '' }}"><br>
+
+                                        <label for="opdConsultationClaimChargebackAmount">Charge Back Amount:</label><br>
+                                        <input type="number" id="opdConsultationClaimChargebackAmount"
+                                            name="opd_consultation_claim_chargeback_amount" class="form-control"
+                                            placeholder="OPD Consultation Claim Charge Back Amount"
+                                            value="{{ $life_health->opd_consultation_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="opdConsultationMaxDay">Max Amount per Consultation:</label><br>
+                                        <input type="number" id="opdConsultationMaxDay" name="opd_consultation_max_day"
+                                            class="form-control" placeholder="OPD Consultation Max Day"
+                                            value="{{ $life_health->opd_consultation_max_day ?? '' }}"><br>
+
+                                        <label for="opdConsultationClaimWaitingDate">Waiting period or effective
+                                            date:</label><br>
+                                        <input type="number" id="opdConsultationClaimWaitingDate"
+                                            name="opd_consultation_claim_waiting_date" class="form-control"
+                                            placeholder="OPD Consultation Max Day Claim (waiting period or effective date)"
+                                            value="{{ $life_health->opd_consultation_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="opdConsultationClaimDelayDate">Difference between two
+                                            claims:</label><br>
+                                        <input type="number" id="opdConsultationClaimDelayDate"
+                                            name="opd_consultation_claim_delay_date" class="form-control"
+                                            placeholder="OPD Consultation Claim (delay period )"
+                                            value="{{ $life_health->opd_consultation_claim_delay_date ?? '' }}"><br>
+
+
+
+                                        <hr>
+
+
+                                        {{-- ----------------------------End OPD Consultation ----------------------------------------------- --}}
+                                        {{-- ----------------------------OPD Test ----------------------------------------------- --}}
+
+                                        {{-- <label for="opdTestClaimAmount">OPD Test Claim Amount:</label>
+                                        <input type="number" id="opdTestClaimAmount" name="opd_test_claim_amount"
+                                            class="form-control" placeholder="OPD Treatment Claim Amount:"
+                                            value="{{ $life_health->opd_test_claim_amount ?? '' }}"><br>
+
+                                        <label for="opdTestClaimChargebackAmount">OPD Test Claim Charge Back
+                                            Amount:</label><br>
+                                        <input type="number" id="opdTestClaimChargebackAmount"
+                                            name="opd_test_claim_chargeback_amount" class="form-control"
+                                            placeholder="OPD Treatment Claim Charge Back Amount"
+                                            value="{{ $life_health->opd_test_claim_chargeback_amount ?? '' }}"><br> --}}
+
+                                        {{-- <label for="opdTestMaxDay">OPD Test Max Day:</label><br>
+                                        <input type="number" id="opdTestMaxDay" name="opd_treatment_max_day"
+                                            class="form-control" placeholder="OPD Treatment Max Day"
+                                            value="{{ $life_health->opd_treatment_max_day ?? '' }}"><br> --}}
+
+                                        {{-- <label for="opdTestClaimWaitingDate">OPD Test Claim (waiting period or effective
+                                            date):</label><br>
+                                        <input type="number" id="opdTestClaimWaitingDate"
+                                            name="opd_test_claim_waiting_date" class="form-control"
+                                            placeholder="OPD Treatment Claim (waiting period or effective date)"
+                                            value="{{ $life_health->opd_test_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="opdTestClaimDelayDate">OPD Test Claim (delay period):</label><br>
+                                        <input type="number" id="opdTestClaimDelayDate" name="opd_test_claim_delay_date"
+                                            class="form-control" placeholder="OPD Treatment Claim (delay period)"
+                                            value="{{ $life_health->opd_test_claim_delay_date ?? '' }}"><br> --}}
+
+                                        {{-- <label for="opdTestClaimCoolingDate">OPD Test Claim (cooling period):</label><br>
+                                        <input type="number" id="opdTestClaimCoolingDate"
+                                            name="opd_test_claim_cooling_date" class="form-control"
+                                            placeholder="OPD Treatment Claim (cooling period)"
+                                            value="{{ $life_health->opd_test_claim_cooling_date ?? '' }}"><br> --}}
+
+                                        {{-- ---------------------Opd Test fields add -------------------------  --}}
+
+                                        {{-- <label for="opdTestClaimAmount">Total Lab Test Claim Amount:</label>
+                                        <input type="number" id="opdTestClaimAmount" name="opd_test_claim_amount"
+                                            class="form-control" placeholder="OPD Treatment Claim Amount:"
+                                            value="{{ $life_health->opd_test_claim_amount ?? '' }}"><br> --}}
+
+                                        <label for="opdTestClaimMaxAmount">Maximum Amount per Instance:</label>
+                                        <input type="number" id="opdTestClaimMaxAmount"
+                                            name="opd_test_max_amount_per_instance" class="form-control"
+                                            placeholder="OPD Treatment Max Amount per Instance:"
+                                            value="{{ $life_health->opd_test_claim_amount ?? '' }}"><br>
+
+                                        <label for="opdTestClaimChargebackAmount">Test Charge Back Amount:</label><br>
+                                        <input type="number" id="opdTestClaimChargebackAmount"
+                                            name="opd_test_claim_chargeback_amount" class="form-control"
+                                            placeholder="OPD Treatment Claim Charge Back Amount"
+                                            value="{{ $life_health->opd_test_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="opdTestClaimWaitingDate">Waiting period or effective date:</label><br>
+                                        <input type="number" id="opdTestClaimWaitingDate"
+                                            name="opd_test_claim_waiting_date" class="form-control"
+                                            placeholder="OPD Treatment Claim (waiting period or effective date)"
+                                            value="{{ $life_health->opd_test_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="opdTestClaimDelayDate">Difference between two claims:</label><br>
+                                        <input type="number" id="opdTestClaimDelayDate" name="opd_test_claim_delay_date"
+                                            class="form-control"
+                                            placeholder="OPD Lab Test Claim difference between two claims"
+                                            value="{{ $life_health->opd_test_claim_delay_date ?? '' }}"><br>
+
+
+                                        {{-- ---------------------End Opd test fields add -------------------------  --}}
+                                        <hr>
+
+
+                                    </div>
+
+                                    {{-- -----------------------end OPD Test------------------------------- --}}
+
+
+
+                                    {{-- ----------------------- OPD Medicine------------------------------- --}}
+                                    <div class="col">
+
+                                        <label for="opdMedicinesClaimAmount">Total Medicine Amount:</label>
+                                        <input type="number" id="opdMedicinesClaimAmount"
+                                            name="opd_medicines_claim_amount" class="form-control"
+                                            placeholder="OPD Consultation Claim Amount:"
+                                            value="{{ $life_health->opd_medicines_claim_amount ?? '' }}"><br>
+
+                                        <label for="opdMedicinePrescriptionAmount">Max Amount per Prescription:</label><br>
+                                        <input type="number" id="opdMedicinePrescriptionAmount"
+                                            name="opd_medicine_presription_amount" class="form-control"
+                                            placeholder="OPD Consultation Max Day"
+                                            value="{{ $life_health->opd_medicine_presription_amount ?? '' }}"><br>
+
+                                        <label for="opdMedicinesClaimChargebackAmount">Charge Back Amount:</label><br>
+                                        <input type="number" id="opdMedicinesClaimChargebackAmount"
+                                            name="opd_medicines_claim_chargeback_amount" class="form-control"
+                                            placeholder="OPD Consultation Claim Charge Back Amount"
+                                            value="{{ $life_health->opd_medicines_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="opdMedicinesClaimWaitingDate">Waiting period or effective
+                                            date:</label><br>
+                                        <input type="number" id="opdMedicinesClaimWaitingDate"
+                                            name="opd_medicines_claim_waiting_date" class="form-control"
+                                            placeholder="OPD Consultation Max Day Claim (waiting period or effective date)"
+                                            value="{{ $life_health->opd_medicines_claim_waiting_date ?? '' }}"><br>
+
+                                        <hr>
+                                        <label for="opdOtherClaimAmount">Other Amount:</label>
+                                        <input type="number" id="opdOtherClaimAmount" name="opd_other_claim_amount"
+                                            class="form-control" placeholder="OPD Consultation Claim Amount:"
+                                            value="{{ $life_health->opd_other_claim_amount ?? '' }}"><br>
+
+                                        <label for="opdClaimChargebackAmount">Charge Back Amount:</label><br>
+                                        <input type="number" id="opdClaimChargebackAmount"
+                                            name="opd_claim_chargeback_amount" class="form-control"
+                                            placeholder="OPD Consultation Claim Charge Back Amount"
+                                            value="{{ $life_health->opd_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="opdClaimWaitingDate">Waiting period or effective date:</label><br>
+                                        <input type="number" id="opdClaimWaitingDate" name="opd_claim_waiting_date"
+                                            class="form-control"
+                                            placeholder="OPD Consultation Max Day Claim (waiting period or effective date)"
+                                            value="{{ $life_health->opd_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="opdClaimDelayDate">Difference between two claims:</label><br>
+                                        <input type="number" id="opdClaimDelayDate" name="opd_claim_delay_date"
+                                            class="form-control" placeholder="OPD Consultation Claim (delay period )"
+                                            value="{{ $life_health->opd_claim_delay_date ?? '' }}"><br>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="opdExclusion">Exclusions</label>
+                                            <textarea class="form-control" rows="3" name="opd_exclusion" nothing>{{ $life_health->opd_exclusion }}</textarea>
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="opdClaimProcessDoc">Document For Claim
+                                                Process</label>
+                                            <textarea type="text" class="form-control" rows="3" name="opd_medicines_claim_process_doc" nothing>{{ $life_health->opd_medicines_claim_process_doc }}</textarea>
+                                        </div>
+
+
+
+                                    </div>
+                                    {{-- -----------------------end OPD Medicine------------------------------- --}}
+
+
+                                    <div class="col">
+                                        {{-- --------------------------Dental Consultation--------------------- --}}
+
+
+
+
+                                        <label for="dentalConsultationClaimAmount">Dental Coverage Claim
+                                            Amount:</label>
+                                        <input type="number" id="dentalConsultationClaimAmount"
+                                            name="dental_consultation_claim_amount" class="form-control"
+                                            placeholder="Dental Consultation Claim Amount:"
+                                            value="{{ $life_health->dental_consultation_claim_amount ?? '' }}"><br>
+
+
+
+                                        {{-- ------------------------------ Add dental fields ------------------------------- --}}
+
+                                        <div class="col">
+                                            <label class="form-label"
+                                                for="dentalTemporaryPermanentFillingAmount">Temporary & Permanent
+                                                Fillings:</label>
+                                            <input type="number" name="dental_temporary_permanent_filling_amount"
+                                                id="dentalTemporaryPermanentFillingAmount" class="form-control-input"
+                                                placeholder="Ex: 15000"
+                                                value="{{ $life_health->dental_temporary_permanent_filling_amount ?? '' }}">
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label" for="dentalRoutineSurgicalExtractionAmount">Routine
+                                                & Surgical Extraction:</label>
+                                            <input type="number" name="dental_routine_surgical_extraction_amount"
+                                                id="dentalRoutineSurgicalExtractionAmount" class="form-control-input"
+                                                placeholder="Ex: 15000"
+                                                value="{{ $life_health->dental_routine_surgical_extraction_amount ?? '' }}">
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label"
+                                                for="dentalConsultationClaimAmount">Consultation:</label>
+                                            <input type="number" name="dental_consultation_claim_amount"
+                                                id="dentalConsultationClaimAmount" class="form-control-input"
+                                                placeholder="Ex: 15000"
+                                                value="{{ $life_health->dental_consultation_claim_amount ?? '' }}">
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label" for="dentalMedicationAmount">Medication:</label>
+                                            <input type="number" name="dental_medication_amount"
+                                                id="dentalMedicationAmount" class="form-control-input"
+                                                placeholder="Ex: 15000"
+                                                value="{{ $life_health->dental_medication_amount ?? '' }}">
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label" for="dentalXrayAmount">X-rays:</label>
+                                            <input type="number" name="dental_xray_amount" id="dentalXrayAmount"
+                                                class="form-control-input" placeholder="Ex: 15000"
+                                                value="{{ $life_health->dental_xray_amount ?? '' }}">
+                                            <div data-mdb-input-init class="form-outline"></div>
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label" for="dentalRootCanalAmount">Root Canal
+                                                Treatment:</label>
+                                            <input type="number" name="dental_root_canal_amount"
+                                                id="dentalRootCanalAmount" class="form-control-input"
+                                                placeholder="Ex: 15000"
+                                                value="{{ $life_health->dental_root_canal_amount ?? '' }}">
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label" for="dentalScalingAmount">Scaling/Whitening:</label>
+                                            <input type="number" name="dental_scaling_amount" id="dentalScalingAmount"
+                                                class="form-control-input" placeholder="Ex: 15000"
+                                                value="{{ $life_health->dental_scaling_amount ?? '' }}">
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label" for="dentalOthersAmount">Others:</label>
+                                            <input type="number" name="dental_others_amount" id="dentalOthersAmount"
+                                                class="form-control-input" placeholder="Ex: 15000"
+                                                value="{{ $life_health->dental_others_amount ?? '' }}">
+                                        </div>
+                                        <label for="naturalDeathAmount">Charge Back Amount:</label><br>
+                                        <input type="number" id="naturalDeathAmount"
+                                            name="dental_claim_chargeback_amount" class="form-control"
+                                            placeholder="Dental Consultation Claim Charge Back Amount"
+                                            value="{{ $life_health->dental_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">Waiting period or effective date:</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="dental_claim_waiting_date"
+                                            class="form-control"
+                                            placeholder="Dental Consultation (waiting period or effective date)"
+                                            value="{{ $life_health->dental_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="naturalDeathAmount">Difference between two claims:</label><br>
+                                        <input type="number" id="naturalDeathAmount" name="dental_claim_delay_date"
+                                            class="form-control"
+                                            placeholder="Dental Consultation difference between two claims"
+                                            value="{{ $life_health->dental_claim_delay_date ?? '' }}"><br>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="dentalExclusion">Exclusions</label>
+                                            <textarea class="form-control" rows="3" placeholder="Exclusions" name="dental_exclusion" nothing>{{ $life_health->dental_exclusion }}</textarea>
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="dentalClaimProcessDoc">Claim Document
+                                                Required</label>
+                                            <textarea class="form-control" rows="3" placeholder="Claim Process" name="dental_claim_process_doc" nothing>{{ $life_health->dental_claim_process_doc }}</textarea>
+                                        </div>
+
+
+                                        {{-- ------------------------------ Add dental fields ------------------------------- --}}
+
+
+
+                                        <hr>
+
+                                        {{-- --------------------------End Dental Consultation--------------------- --}}
+
+
+
+                                        {{-- --------------------------Dental Test--------------------- --}}
+                                        {{-- <label for="dentalTestClaimAmount">Dental Treatment Amount:</label>
+                                        <input type="number" id="dentalTestClaimAmount"
+                                            name="dental_treatment_claim_amount" class="form-control"
+                                            placeholder="Dental Treatment Claim Amount:"
+                                            value="{{ $life_health->dental_treatment_claim_amount ?? '' }}"><br>
+
+                                        <label for="dentalTestClaimChargebackAmount">Dental Treatment Charge Back
+                                            Amount:</label><br>
+                                        <input type="number" id="dentalTestClaimChargebackAmount"
+                                            name="dental_treatment_claim_chargeback_amount" class="form-control"
+                                            placeholder="Dental Treatment Claim Charge Back Amount"
+                                            value="{{ $life_health->dental_treatment_claim_chargeback_amount ?? '' }}"><br>
+
+
+
+                                        <label for="dentalTestClaimWaitingDate">Dental Treatment (waiting period or
+                                            effective date):</label><br>
+                                        <input type="number" id="dentalTestClaimWaitingDate"
+                                            name="dental_treatment_claim_waiting_date" class="form-control"
+                                            placeholder="Dental Treatment Claim (waiting period or effective date)"
+                                            value="{{ $life_health->dental_treatment_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="dentalTestClaimDelayDate">Dental Treatment (delay period):</label><br>
+                                        <input type="number" id="dentalTestClaimDelayDate"
+                                            name="dental_treatment_claim_delay_date" class="form-control"
+                                            placeholder="Dental Treatment Claim (delay period)"
+                                            value="{{ $life_health->dental_treatment_claim_delay_date ?? '' }}"><br> --}}
+
+                                        {{-- <label for="dentalTestClaimCoolingDate">Dental Treatment  (cooling
+                                            period):</label><br>
+                                        <input type="number" id="dentalTestClaimCoolingDate"
+                                            name="dental_treatment_claim_cooling_date" class="form-control"
+                                            placeholder="Dental Treatment Claim (cooling period)"
+                                            value="{{ $life_health->dental_treatment_claim_cooling_date ?? '' }}"><br> --}}
+
+                                        <hr>
+                                        {{-- --------------------------End Dental Test--------------------- --}}
+
+                                    </div>
+
+
+                                    <div class="col">
+                                        {{-- --------------------------Eye Add fileds --------------------- --}}
+
+                                        <label for="eyeCoverageAmount">Eye Coverage Amount:</label>
+                                        <input type="number" id="eyeCoverageAmount" name="eye_coverage_amount"
+                                            class="form-control" placeholder="Eye Coverage Amount"
+                                            value="{{ $life_health->eye_coverage_amount ?? '' }}"><br>
+
+                                        <div class="row mb-4">
+                                            <div class="col">
+                                                <label for="eyeOpticalAmount">Eye Optical Amount:</label>
+                                                <input type="number" id="eyeOpticalAmount"
+                                                    name="eye_optiocal_claim_amount" class="form-control-input"
+                                                    placeholder="Eye Optical Amount:"
+                                                    value="{{ $life_health->eye_optiocal_claim_amount ?? '' }}"><br>
+                                            </div>
+
+                                            <div class="col">
+                                                <label for="eyeVisionTestAmount">Eye Vision tests for errors of
+                                                    refraction:</label>
+                                                <input type="number" id="eyeVisionTestAmount"
+                                                    name="eye_vision_test_claim_amount" class="form-control-input"
+                                                    placeholder="Eye Vision Test Amount:"
+                                                    value="{{ $life_health->eye_vision_test_claim_amount ?? '' }}"><br>
+                                            </div>
+
+                                            <div class="col">
+                                                <label for="eyeConsultationAmount">Consultation:</label>
+                                                <input type="number" id="eyeConsultationAmount"
+                                                    name="eye_consultation_claim_amount" class="form-control-input"
+                                                    placeholder="Eye Consultation Amount:"
+                                                    value="{{ $life_health->eye_consultation_claim_amount ?? '' }}"><br>
+                                            </div>
+                                            <div class="col">
+                                                <label for="eyeMedicationAmount">Medication:</label>
+                                                <input type="number" id="eyeMedicationAmount"
+                                                    name="eye_medication_claim_amount" class="form-control-input"
+                                                    placeholder="Medication:"
+                                                    value="{{ $life_health->eye_medication_claim_amount ?? '' }}"><br>
+                                            </div>
+                                            <div class="col">
+                                                <label for="eyeLensAmount">Lens:</label>
+                                                <input type="number" id="eyeLensAmount" name="eye_lens_claim_amount"
+                                                    class="form-control-input" placeholder="Lens:"
+                                                    value="{{ $life_health->eye_lens_claim_amount ?? '' }}"><br>
+                                            </div>
+                                            <div class="col">
+                                                <label for="eyeFramesAmount">Frames:</label>
+                                                <input type="number" id="eyeFramesAmount" name="eye_frame_claim_amount"
+                                                    class="form-control-input" placeholder="Frames:"
+                                                    value="{{ $life_health->eye_frame_claim_amount ?? '' }}"><br>
+                                            </div>
+                                            <div class="col">
+                                                <label for="eyeOthersAmount">Others:</label>
+                                                <input type="number" id="eyeOthersAmount" name="eye_others_claim_amount"
+                                                    class="form-control-input" placeholder="Others:"
+                                                    value="{{ $life_health->eye_others_claim_amount ?? '' }}"><br>
+                                            </div>
+                                        </div>
+
+                                        <label for="eyeMaxConsultationAmount">Maximum Amount Per Consultation:</label>
+                                        <input type="number" id="eyeMaxConsultationAmount"
+                                            name="eye_max_consultation_claim_amount" class="form-control"
+                                            placeholder="Eye Consultation Claim Amount:"
+                                            value="{{ $life_health->eye_max_consultation_claim_amount ?? '' }}"><br>
+
+                                        <label for="eyeClaimChargebackAmount">Charge Back Amount:</label><br>
+                                        <input type="number" id="eyeClaimChargebackAmount"
+                                            name="eye_claim_chargeback_amount" class="form-control"
+                                            placeholder="Eye Consultation Claim Charge Back Amount"
+                                            value="{{ $life_health->eye_claim_chargeback_amount ?? '' }}"><br>
+
+                                        <label for="eyeClaimWaitingDate">Waiting period or effective date:</label><br>
+                                        <input type="number" id="eyeClaimWaitingDate" name="eye_claim_waiting_date"
+                                            class="form-control"
+                                            placeholder="Eye Consultation Max Day Claim (waiting period or effective date)"
+                                            value="{{ $life_health->eye_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="eyeClaimDelayDate">Difference between two claims:</label><br>
+                                        <input type="number" id="eyeClaimDelayDate" name="eye_claim_delay_date"
+                                            class="form-control" placeholder="Eye Consultation Claim (delay period )"
+                                            value="{{ $life_health->eye_claim_delay_date ?? '' }}"><br>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="eyeExclusion">Exclusions</label>
+                                            <textarea class="form-control" rows="3"name="eye_exclusion" nothing>{{ $life_health->eye_exclusion }}</textarea>
+                                        </div>
+
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="eyeClaimProcessDoc">Claim Document
+                                                Required</label>
+                                            <textarea class="form-control" rows="3" name="eye_claim_process_doc" nothing>{{ $life_health->eye_claim_process_doc }}</textarea>
+                                        </div>
+
+
+                                        {{-- --------------------------Eye Add fileds --------------------- --}}
+
+
+
+
+                                        {{-- <label for="eyeConsultationClaimAmount">Eye Consultation Claim Amount:</label>
+                                        <input type="number" id="eyeConsultationClaimAmount"
+                                            name="eye_consultation_claim_amount" class="form-control"
+                                            placeholder="Eye Consultation Claim Amount:"
+                                            value="{{ $life_health->eye_consultation_claim_amount ?? '' }}"><br>
+
+                                        <label for="eyeConsultationClaimChargebackAmount">Eye Consultation Claim Charge
+                                            Back Amount:</label><br>
+                                        <input type="number" id="eyeConsultationClaimChargebackAmount"
+                                            name="eye_consultation_claim_chargeback_amount" class="form-control"
+                                            placeholder="Eye Consultation Claim Charge Back Amount"
+                                            value="{{ $life_health->eye_consultation_claim_chargeback_amount ?? '' }}"><br> --}}
+
+                                        {{-- <label for="eyeConsultationMaxDay">Eye Consultation Max Day:</label><br>
+                                        <input type="number" id="eyeConsultationMaxDay" name="eye_consultation_max_day"
+                                            class="form-control" placeholder="Eye Consultation Max Day"
+                                            value="{{ $life_health->eye_consultation_max_day ?? '' }}"><br> --}}
+
+                                        {{-- <label for="eyeConsultationClaimWaitingDate">Eye Consultation Claim (waiting period
+                                            or effective date):</label><br>
+                                        <input type="number" id="eyeConsultationClaimWaitingDate"
+                                            name="eye_consultation_claim_waiting_date" class="form-control"
+                                            placeholder="Eye Consultation Claim (waiting period or effective date)"
+                                            value="{{ $life_health->eye_consultation_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="eyeConsultationClaimDelayDate">Eye Consultation Claim (delay
+                                            period):</label><br>
+                                        <input type="number" id="eyeConsultationClaimDelayDate"
+                                            name="eye_consultation_claim_delay_date" class="form-control"
+                                            placeholder="Eye Consultation Claim (delay period)"
+                                            value="{{ $life_health->eye_consultation_claim_delay_date ?? '' }}"><br> --}}
+
+                                        {{-- <label for="eyeConsultationClaimCoolingDate">Eye Consultation Claim (cooling
+                                            period):</label><br>
+                                        <input type="number" id="eyeConsultationClaimCoolingDate"
+                                            name="eye_consultation_claim_cooling_date" class="form-control"
+                                            placeholder="Eye Consultation Claim (cooling period)"
+                                            value="{{ $life_health->eye_consultation_claim_cooling_date ?? '' }}"><br> --}}
+
+                                        {{-- -------------------------- Eye Fields Add --------------------- --}}
+
+                                        {{-- -------------------------- End Eye Fields Add --------------------- --}}
+
+                                        {{-- <hr> --}}
+
+
+
+                                        {{-- --------------------------End Eye Consultation--------------------- --}}
+
+
+
+                                        {{-- --------------------------Eye Treatment---------------------------- --}}
+                                        {{-- <label for="eyeTestClaimAmount">Eye Treatment Claim Amount:</label>
+                                        <input type="number" id="eyeTestClaimAmount" name="eye_treatment_claim_amount"
+                                            class="form-control" placeholder="Eye Treatment Claim Amount:"
+                                            value="{{ $life_health->eye_treatment_claim_amount ?? '' }}"><br>
+
+                                        <label for="eyeTestClaimChargebackAmount">Eye Treatment Claim Charge Back
+                                            Amount:</label><br>
+                                        <input type="number" id="eyeTestClaimChargebackAmount"
+                                            name="eye_treatment_claim_chargeback_amount" class="form-control"
+                                            placeholder="Eye Treatment Claim Charge Back Amount"
+                                            value="{{ $life_health->eye_treatment_claim_chargeback_amount ?? '' }}"><br> --}}
+
+                                        {{-- <label for="eyeTestMaxDay">Eye Treatment Max Day:</label><br>
+                                        <input type="number" id="eyeTestMaxDay" name="eye_treatment_max_day"
+                                            class="form-control" placeholder="Eye Treatment Max Day"
+                                            value="{{ $life_health->eye_treatment_max_day ?? '' }}"><br> --}}
+                                        {{--
+                                        <label for="eyeTestClaimWaitingDate">Eye Treatment Claim (waiting period or
+                                            effective
+                                            date):</label><br>
+                                        <input type="number" id="eyeTestClaimWaitingDate"
+                                            name="eye_treatment_claim_waiting_date" class="form-control"
+                                            placeholder="Eye Treatment Claim (waiting period or effective date)"
+                                            value="{{ $life_health->eye_treatment_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="eyeTestClaimDelayDate">Eye Treatment Claim (delay period):</label><br>
+                                        <input type="number" id="eyeTestClaimDelayDate"
+                                            name="eye_treatment_claim_delay_date" class="form-control"
+                                            placeholder="Eye Test Claim (delay period)"
+                                            value="{{ $life_health->eye_treatment_claim_delay_date ?? '' }}"><br> --}}
+
+                                        {{-- <label for="eyeTestClaimCoolingDate">Eye Treatment Claim (cooling period):</label><br>
+                                        <input type="number" id="eyeTestClaimCoolingDate"
+                                            name="eye_treatment_claim_cooling_date" class="form-control"
+                                            placeholder="Eye Treatment Claim (cooling period)"
+                                            value="{{ $life_health->eye_treatment_claim_cooling_date ?? '' }}"><br> --}}
+
+                                        {{-- <hr> --}}
+
+                                        {{-- --------------------------End Eye Treatment---------------------------- --}}
+
+                                        {{-- -------------------------- Eye Frame---------------------------- --}}
+                                        {{-- <label for="eyeTestClaimAmount">Eye Frame Claim Amount:</label>
+                                        <input type="number" id="eyeTestClaimAmount" name="eye_frame_claim_amount"
+                                            class="form-control" placeholder="Eye Frame Claim Amount:"
+                                            value="{{ $life_health->eye_frame_claim_amount ?? '' }}"><br>
+
+                                        <label for="eyeTestClaimChargebackAmount">Eye Frame Claim Charge Back
+                                            Amount:</label><br>
+                                        <input type="number" id="eyeTestClaimChargebackAmount"
+                                            name="eye_frame_claim_chargeback_amount" class="form-control"
+                                            placeholder="Eye Frame Claim Charge Back Amount"
+                                            value="{{ $life_health->eye_frame_claim_chargeback_amount ?? '' }}"><br> --}}
+                                        {{--
+
+                                        <label for="eyeTestClaimWaitingDate">Eye Frame Claim (waiting period or effective
+                                            date):</label><br>
+                                        <input type="number" id="eyeTestClaimWaitingDate"
+                                            name="eye_frame_claim_waiting_date" class="form-control"
+                                            placeholder="Eye Frame Claim (waiting period or effective date)"
+                                            value="{{ $life_health->eye_frame_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="eyeTestClaimDelayDate">Eye Frame Claim (delay period):</label><br>
+                                        <input type="number" id="eyeTestClaimDelayDate"
+                                            name="eye_frame_claim_delay_date" class="form-control"
+                                            placeholder="Eye Frame Claim (delay period)"
+                                            value="{{ $life_health->eye_frame_claim_delay_date ?? '' }}"><br> --}}
+
+
+
+                                        <hr>
+
+                                        {{-- --------------------------End Eye Treatment---------------------------- --}}
+                                        {{-- -------------------------- Maternity Add Fields ----------------------- --}}
+
+                                        <div class="border border-dark rounded m-2 p-3">
+                                            <div class="row mb-4">
+                                                <div class="col">
+                                                    <label for="maternityCoverageAmount">Total Maternity Coverage
+                                                        Amount:</label>
+                                                    <input type="number" id="maternityCoverageAmount"
+                                                        name="maternity_coverage_amount" class="form-control-input"
+                                                        placeholder="Maternity Coverage Amount"
+                                                        value="{{ $life_health->maternity_coverage_amount }}"><br>
+                                                </div>
+                                                <div class="col">
+                                                    <label for="maternityUterinePregnancy">Uterine Pregnancy:</label>
+                                                    <input type="number" id="maternityUterinePregnancy"
+                                                        name="maternity_uterine_preganancy_amount"
+                                                        class="form-control-input"
+                                                        placeholder="Caesarean Delivery / Ectopic / Uterine Pregnancy"
+                                                        value="{{ $life_health->maternity_uterine_preganancy_amount }}"><br>
+                                                </div>
+                                                <div class="col">
+                                                    <label for="maternityNormalDelivery">Normal Delivery:</label>
+                                                    <input type="number" id="maternityNormalDelivery"
+                                                        name="maternity_normal_delivery_amount" class="form-control-input"
+                                                        placeholder="Normal Delivery"
+                                                        value="{{ $life_health->maternity_normal_delivery_amount }}"><br>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col">
+                                                    <label for="maternityAbortionMiscarriage">Legal Abortion or
+                                                        Miscarriage:</label>
+                                                    <input type="number" id="maternityAbortionMiscarriage"
+                                                        name="maternity_legal_abortion_miscarriage_amount"
+                                                        class="form-control-input"
+                                                        placeholder="Legal Abortion or Miscarriage"
+                                                        value="{{ $life_health->maternity_legal_abortion_miscarriage_amount }}"><br>
+                                                </div>
+                                                <div class="col">
+                                                    <label for="maternityOthers">Others:</label>
+                                                    <input type="number" id="maternityOthers"
+                                                        name="maternity_others_amount" class="form-control-input"
+                                                        placeholder="Other"
+                                                        value="{{ $life_health->maternity_others_amount }}"><br>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col">
+                                                    <label for="maternityPrePostHospitalization">Maternity Pre and Post
+                                                        Hospitalization Expenses:</label>
+                                                    <input type="number" id="maternityPrePostHospitalization"
+                                                        name="maternity_pre_post_hospitalization_amount"
+                                                        class="form-control-input"
+                                                        placeholder="Maternity Pre and Post Hospitalization Coverage Amount"
+                                                        value="{{ $life_health->maternity_pre_post_hospitalization_amount }}"><br>
+                                                </div>
+                                                <div class="col">
+                                                    <label for="maternityPrePostNatal">Maternity Pre and Post Natal
+                                                        Coverages:</label>
+                                                    <input type="number" id="maternityPrePostNatal"
+                                                        name="maternity_pre_post_natal_amount" class="form-control-input"
+                                                        placeholder="Pre and Post Natal Coverages"
+                                                        value="{{ $life_health->maternity_pre_post_natal_amount }}"><br>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col">
+                                                    <label for="maternityBabyCoverage">Maternity Coverages for new-born
+                                                        Baby:</label>
+                                                    <input type="number" id="maternityBabyCoverage"
+                                                        name="maternity_baby_amount" class="form-control-input"
+                                                        placeholder="Coverages for new-born Baby"
+                                                        value="{{ $life_health->maternity_baby_amount }}"><br>
+                                                </div>
+                                                <div class="col">
+                                                    <label for="maternityVaccination">Maternity Vaccination
+                                                        Coverage:</label><br>
+                                                    <input type="number" id="maternityVaccination"
+                                                        name="maternity_vaccination_amount" class="form-control-input"
+                                                        placeholder="Vaccination Coverage"
+                                                        value="{{ $life_health->maternity_vaccination_amount ?? '' }}"><br>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col">
+                                                    <label for="maternityMinAge">Maternity Minimum Age:</label><br>
+                                                    <input type="number" id="maternityMinAge" name="maternity_min_age"
+                                                        class="form-control" placeholder="Maternity Minimum Age"
+                                                        value="{{ $life_health->maternity_min_age }}"><br>
+                                                </div>
+                                                <div class="col">
+                                                    <label for="maternityMaxAge">Maternity Maximum Age:</label><br>
+                                                    <input type="number" id="maternityMaxAge" name="maternity_max_age"
+                                                        class="form-control" placeholder="Maternity Maximum Age"
+                                                        value="{{ $life_health->maternity_max_age }}"><br>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col">
+
+                                                    <label for="naturalDeathAmount">Charge Back Amount:
+                                                        :</label><br>
+                                                    <input type="number" id="naturalDeathAmount"
+                                                        name="maternity_chargeback_amount" class="form-control"
+                                                        placeholder="Charge Back Amount"
+                                                        value="{{ $life_health->maternity_chargeback_amount }}"><br>
+                                                </div>
+
+                                                <div class="col">
+                                                    <label for="maternityClaimWaitingDate">Waiting period or effective
+                                                        date:</label><br>
+                                                    <input type="number" id="maternityClaimWaitingDate"
+                                                        name="maternity_claim_waiting_date" class="form-control"
+                                                        placeholder="Maternity (waiting period or effective date)"
+                                                        value="{{ $life_health->maternity_claim_waiting_date }}"><br>
+                                                </div>
+                                                <div class="col">
+                                                    <label for="maternityClaimDelayDate">Difference between two
+                                                        claims:</label><br>
+                                                    <input type="number" id="maternityClaimDelayDate"
+                                                        name="maternity_claim_delay_date" class="form-control"
+                                                        placeholder="Maternity difference between two claims"
+                                                        value="{{ $life_health->maternity_claim_delay_date }}"><br>
+                                                </div>
+                                            </div>
+                                            <label class="form-label" for="maternityClaimExclusion">Exclusions</label>
+                                            <textarea class="form-control" rows="3" name="maternity_claim_exclusion" nothing>{{ $life_health->maternity_claim_exclusion }}</textarea>
+                                            <label class="form-label" for="maternityClaimProcessDoc">Document Required
+                                                for Claim Process</label>
+                                            <textarea class="form-control" rows="3" name="maternity_claim_process_doc" nothing>{{ $life_health->maternity_claim_process_doc }}</textarea>
+                                        </div>
+
+                                        <hr>
+
+
+
+
+                                        {{-- -------------------------- Ambulance----------------------- --}}
+                                        <label for="eyeTestClaimAmount">Ambulance Amount:</label>
+                                        <input type="number" id="eyeTestClaimAmount" name="ambulance_claim_amount"
+                                            class="form-control" placeholder="Ambulance  Amount:"
+                                            value="{{ $life_health->ambulance_claim_amount ?? '' }}"><br>
+
+                                        <label for="eyeTestClaimChargebackAmount">Ambulance Charge Back
+                                            Amount:</label><br>
+                                        <input type="number" id="eyeTestClaimChargebackAmount"
+                                            name="ambulance_claim_chargeback_amount" class="form-control"
+                                            placeholder="Ambulance  Charge Back Amount"
+                                            value="{{ $life_health->ambulance_claim_chargeback_amount ?? '' }}"><br>
+
+
+                                        <label for="eyeTestClaimWaitingDate">Ambulance (waiting period or effective
+                                            date):</label><br>
+                                        <input type="number" id="eyeTestClaimWaitingDate"
+                                            name="ambulance_claim_waiting_date" class="form-control"
+                                            placeholder="Ambulance  (waiting period or effective date)"
+                                            value="{{ $life_health->ambulance_claim_waiting_date ?? '' }}"><br>
+
+                                        <label for="eyeTestClaimDelayDate">Ambulance (delay period):</label><br>
+                                        <input type="number" id="eyeTestClaimDelayDate"
+                                            name="ambulance_claim_delay_date" class="form-control"
+                                            placeholder="Ambulance  (delay period)"
+                                            value="{{ $life_health->ambulance_claim_delay_date ?? '' }}"><br>
+
+
+
+                                        <hr>
+
+                                        {{-- --------------------------End Eye Treatment---------------------------- --}}
+
+
+
+                                    </div>
+
+
+                                </div>
+
+
+
+                                <script>
+                                    function showHospitalInputFields(selectElement) {
+                                        var selectedValue = selectElement.value;
+                                        var inputFieldsDiv = document.getElementById("Hospital_inputFields");
+
+                                        if (selectedValue === "hospitalCoverage") {
+                                            inputFieldsDiv.style.display = "block";
+                                        } else {
+                                            inputFieldsDiv.style.display = "none";
+                                        }
+                                    }
+                                </script>
+                            </div>
+
+                            {{-- -------------------------------End Hospital Coverage -------------------------------------------------------- --}}
+
+
+
+                            <!-- Hospital and Telimedicine Card input -->
+                            <div class="form-row mb-4">
+                                <div class="col">
+                                    <!-- Hospital  Card -->
+                                    <input type="number" name="hospital_card_fee"
+                                        value="{{ $life_health->hospital_card_fee }}" class="form-control"
+                                        placeholder="Hospital Card Amount">
+                                    <label class="form-label" for="form1Example2">Hospital Card Amount </label>
+                                </div>
+                                <div class="col">
+                                    <!--  telimedicine  Amount -->
+
+
+                                    @if (isset($teliMedicineFeeValues) && !empty($teliMedicineFeeValues[0] && $teliMedicineFree == 'nothing'))
+                                        @php
+                                            $data = json_decode($teliMedicineFeeValues[0], true);
+                                        @endphp
+
+                                        @foreach ($data as $fieldName => $fieldValue)
+                                            <input type="number" name="{{ $fieldName }}"
+                                                value="{{ $fieldValue }}">
+                                            {{ $fieldName }}: {{ $fieldValue }}<br />
+                                        @endforeach
+                                        <label for="teliMedicineCardAmount">Teli-Medicine Card Amount</label>
+                                    @else
+                                        <input type="number" placeholder="No value find for teli medicine card"
+                                            class="form-control" disabled>
+                                        {{-- <br /> --}}
+                                    @endif
+
+                                    @if ($teliMedicineFree == 'free')
+                                        <label for="teliMedicineCardAmount">Teli-Medicine Card Amount:</label>
+                                        <select name="teli_medi_fee" id="teliMedicineCardAmount"
+                                            onchange="showOptionsTeli()">
+                                            <option value="free">Free Amount</option>
+                                            <option value="paid">Paid</option>
+                                        </select>
+                                        <div id="optionsContainer"></div>
+
+                                        <script>
+                                            function showOptionsTeli() {
+                                                var amountType = document.getElementById("teliMedicineCardAmount").value;
+                                                var optionsContainer = document.getElementById("optionsContainer");
+                                                optionsContainer.innerHTML = "";
+
+                                                if (amountType === "paid") {
+                                                    for (var i = 1; i <= 9; i++) {
+                                                        var label = document.createElement("label");
+                                                        label.htmlFor = "teli_medi_fee_" + i;
+                                                        // label.appendChild(document.createTextNode("Teli_medicine_amount_" + i));
+                                                        // label.appendChild(document.createTextNode(i +" "));
+
+                                                        var selectOption = document.createElement("select");
+                                                        selectOption.name = "column_number_" + i;
+                                                        selectOption.innerHTML = "<option value='" + i + "'>" + i + "</option>";
+
+                                                        var inputField = document.createElement("input");
+                                                        inputField.type = "number";
+                                                        inputField.name = "teli_medi_fee_" + i;
+                                                        inputField.placeholder = "Amount for " + i;
+
+                                                        optionsContainer.appendChild(label);
+                                                        // optionsContainer.appendChild(selectOption);
+                                                        optionsContainer.appendChild(inputField);
+                                                        optionsContainer.appendChild(document.createElement("br"));
+                                                    }
+
+                                                    // Add unlimited option
+                                                    var labelUnlimited = document.createElement("label");
+                                                    labelUnlimited.htmlFor = "unlimited";
+                                                    labelUnlimited.appendChild(document.createTextNode("Unlimited"));
+
+                                                    var inputFieldUnlimited = document.createElement("input");
+                                                    inputFieldUnlimited.type = "checkbox";
+                                                    inputFieldUnlimited.name = "unlimited";
+                                                    inputFieldUnlimited.value = "unlimited";
+                                                    inputFieldUnlimited.id = "unlimited";
+
+                                                    optionsContainer.appendChild(labelUnlimited);
+                                                    optionsContainer.appendChild(inputFieldUnlimited);
+
+                                                    // Add input field for Teli_medicine_price
+                                                    var labelTeliMedicinePrice = document.createElement("label");
+                                                    labelTeliMedicinePrice.htmlFor = "teli_medi_fee_unlimited";
+                                                    // labelTeliMedicinePrice.appendChild(document.createTextNode("Teli Medicine Price:"));
+
+                                                    var inputFieldTeliMedicinePrice = document.createElement("input");
+                                                    inputFieldTeliMedicinePrice.type = "number";
+                                                    inputFieldTeliMedicinePrice.name = "teli_medi_fee_unlimited"; // variable for unlimited
+                                                    inputFieldTeliMedicinePrice.placeholder = "Enter Teli Medicine Price";
+
+                                                    optionsContainer.appendChild(labelTeliMedicinePrice);
+                                                    optionsContainer.appendChild(inputFieldTeliMedicinePrice);
+                                                }
+                                            }
+                                        </script>
+                                    @endif
+                                    {{-- -------------------------------------------------------- --}}
+                                    {{-- @php
+                                    dd($teliMedicineFeeValues);
+                                    @endphp --}}
+
+
+
+                                    {{-- @if (isset($teliMedicineFeeValues))
+
+
+
+                                        @foreach ($teliMedicineFeeValues as $key => $jsonString)
+                                            @php
+                                                $data = json_decode($jsonString, true);
+                                            @endphp
+
+                                            @foreach ($data as $fieldName => $fieldValue)
+                                                <input type="number" name="{{ $fieldName }}"
+                                                    value="{{ $fieldValue }}">
+                                                {{ $fieldName }}: {{ $fieldValue }}<br />
+                                            @endforeach
+                                        @endforeach
+
+                                    @endif --}}
+
+
+
+
+                                    {{-- @php
+                                           dd($teliMedicineFeeValues);
+
+                                    @endphp --}}
+
+
+
+                                    {{-- @foreach ($teliMedicineFeeValues as $key => $value)
+                                        <input type="number" name="$teli_medicine_fee_{{ $key + 1 }}"
+                                            value="{{ $value }}">
+                                         echo $key+1." ".$value."<br/>";
+                                    @endforeach --}}
+
+                                    {{-- @php
+
+                                    dd($teliMedicineFeeValues);
+
+                                    @endphp --}}
+
+
+
+
+
+
+
+
+
+                                    <!-- Telimedi service -->
+
+
+                                    <!--  telimedicine  Amount -->
+                                    {{-- <input type="number" name="teli_medicine_fee"
+                                        value="{{ $life_health->teli_medicine_fee }}" nothing class="form-control"
+                                        placeholder="Teli-Medicine Card Amount">
+                                        <label class="form-label" for="form1Example2">Teli-Medicine Card Amount</label> --}}
+                                        {{-- -------------------------------------------------------- --}}
+                                        {{-- code for edit the combo_pkg , personName: --}}
+                                        @php
+                                            // dd($life_health);
+                                        @endphp
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="comboPackageCheckbox" name="combo_pkg">
+                                            <label class="form-check-label" for="comboPackageCheckbox">
+                                                Combo Packages
+                                            </label>
+                                        </div>
+
+                                        <div id="totalPersonsDiv" class="d-none mt-3">
+                                            <div class="form-group">
+                                                <label for="totalPersons">Total number of persons:</label>
+                                                <input type="number" class="form-control" id="totalPersons" min="1" max="10" name="combo_person">
+                                            </div>
+                                            <button type="button" class="btn btn-primary" id="generateFieldsButton">Generate Fields</button>
+                                        </div>
+
+                                        <div id="namesContainer" class="mt-3"></div>
+
+                                        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+                                        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+                                        <script>
+                                            $(document).ready(function() {
+                                                // Function to pre-fill the form fields
+                                                function prefillFields() {
+                                                    let combo_pkg = true; // Assuming 'combo_pkg' should be checked
+                                                    let combo_person = 2; // Assuming 'combo_person' should be set to 2
+                                                    let personNames = ["Husband", "Wife"]; // Assuming 'personName' should contain these values
+
+                                                    // Set the checkbox status
+                                                    $('#comboPackageCheckbox').prop('checked', combo_pkg);
+
+                                                    // Set the total persons value
+                                                    $('#totalPersons').val(combo_person);
+
+                                                    // Generate person name fields
+                                                    $('#namesContainer').html('');
+                                                    for (let i = 0; i < personNames.length; i++) {
+                                                        let nameField = `<div class="form-group">
+                                                                            <label for="personName${i}">Person ${i + 1} Name:</label>
+                                                                            <input type="text" class="form-control" name="personName[]" id="personName${i}" placeholder="Person ${i + 1} Name" value="${personNames[i]}">
+                                                                         </div>`;
+                                                        $('#namesContainer').append(nameField);
+                                                    }
+                                                }
+
+                                                // Call the prefillFields function on document ready
+                                                prefillFields();
+
+                                                // Handle events as before
+                                                $('#comboPackageCheckbox').change(function() {
+                                                    if ($(this).is(':checked')) {
+                                                        $('#totalPersonsDiv').removeClass('d-none');
+                                                    } else {
+                                                        $('#totalPersonsDiv').addClass('d-none');
+                                                        $('#namesContainer').html('');
+                                                    }
+                                                });
+
+                                                $('#generateFieldsButton').click(function() {
+                                                    let numberOfPersons = parseInt($('#totalPersons').val());
+                                                    $('#namesContainer').html('');
+
+                                                    for (let i = 0; i < numberOfPersons; i++) {
+                                                        let nameField = `<div class="form-group">
+                                                                            <label for="personName${i}">Person ${i + 1} Name:</label>
+                                                                            <input type="text" class="form-control" name="personName[]" id="personName${i}" placeholder="Person ${i + 1} Name">
+                                                                         </div>`;
+                                                        $('#namesContainer').append(nameField);
+                                                    }
+                                                });
+
+                                                // Function to update the variable $life with all package content
+                                                function updateLife() {
+                                                    let combo_pkg = $('#comboPackageCheckbox').is(':checked') ? 1 : 0;
+                                                    let combo_person = $('#totalPersons').val();
+                                                    let personNames = [];
+                                                    $('input[name="personName[]"]').each(function() {
+                                                        personNames.push($(this).val());
+                                                    });
+
+                                                    let $life = {
+                                                        combo_pkg: combo_pkg,
+                                                        combo_person: combo_person,
+                                                        personNames: personNames
+                                                    };
+
+                                                    // Debugging: print $life to console
+                                                    console.log($life);
+
+                                                    // Here you can also send $life to the server via AJAX if needed
+                                                    // $.post('/your-server-endpoint', $life, function(response) {
+                                                    //     console.log(response);
+                                                    // });
+                                                }
+
+                                                // Call updateLife function whenever there's a change
+                                                $('#comboPackageCheckbox, #totalPersons, input[name="personName[]"]').change(updateLife);
+                                            });
+                                        </script>
+
+
+                                        {{-- -------------------------------------------------------- --}}
+                                </div>
+
+                            </div>
+
+                            {{-- Discount   --}}
+
+                            <!-- Duration input -->
+                            <div class="form-row mb-4">
+                                <div data-mdb-input-init class="col form-outline mb-4">
+                                    <input type="text" name="brand_name" id="form1Example2" class="form-control"
+                                        value="{{ $life_health->brand_name }}" nothing placeholder="Brand Name" />
+                                    <label class="form-label" for="form1Example2">Brand Name for Package
+                                        Privileges</label>
+                                </div>
+                                <div data-mdb-input-init class="col form-outline mb-4">
+                                    <input type="text" name="provider_name" id="form1Example2" class="form-control"
+                                        value="{{ $life_health->provider_name }}" nothing placeholder="Provider Name" />
+                                    <label class="form-label" for="form1Example2">Provider ID</label>
+                                </div>
+
+                                <div data-mdb-input-init class="col form-outline mb-4">
+                                    <input type="number" name="child_dealer_id" id="form1Example2"
+                                        class="form-control" value="{{ $life_health->child_dealer_id }}" nothing
+                                        placeholder="ChildDealer Id" />
+                                    <label class="form-label" for="form1Example2">Privileger Id [Child Dealer]</label>
+                                </div>
+                            </div>
+
+                            <div class="form-row mb-4">
+                                <div data-mdb-input-init class="form-outline mb-4 col">
+                                    <input type="text" name="pkg_type" id="form1Example2" class=" form-control"
+                                    value="{{ $life_health->pkg_type }}" nothing
+                                    placeholder="Package Type" />
+                                    <label class="form-label" for="form1Example2">Package Type</label>
+                                </div>
+                                <div data-mdb-input-init class="form-outline mb-4 col">
+                                    <input type="number" name="discount" id="form1Example2" class=" form-control"
+                                    value="{{ $life_health->discount }}" nothing
+                                    placeholder="Package Discount __%" />
+                                    <label class="form-label" for="form1Example2">Package Discount</label>
+                                </div>
+                                <div data-mdb-input-init class="form-outline mb-4 col">
+                                    <input type="number" name="vat" id="form1Example2" class=" form-control"
+                                        value="{{ $life_health->vat }}" nothing placeholder="Package Vat __%" />
+                                    <label class="form-label" for="form1Example2">Package Vat</label>
+                                </div>
+                                <div data-mdb-input-init class="form-outline mb-4 col">
+                                    <input type="number" name="package_cooling_period" id="form1Example2"
+                                        class="form-control" value="{{ $life_health->package_cooling_period }}" nothing
+                                        placeholder="Package Cooling Period (Day)" />
+                                    <label class="form-label" for="form1Example2">Package Cooling Period</label>
+                                </div>
+                            </div>
+
+                            {{-- =============================new working fileds=================================== --}}
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <div class="form-row mb-4">
+                                    <div data-mdb-input-init class="col form-outline mb-4">
+                                        <input type="text" name="parent_commission" id="form1Example2"
+                                            class="form-control" value="{{ $life_health->parent_commission }}" nothing
+                                            placeholder="Parent Dealer Commission __%" />
+                                        <label class="form-label" for="form1Example2">Parent Dealer Commission
+                                        </label>
+                                    </div>
+
+
+
+
+                                    {{-- <div data-mdb-input-init class="col form-outline mb-4">
+                                        <input type="number" name="parent_dealer_id" id="form1Example2" class="form-control"
+                                            value="{{ old('parent_dealer_id') }}" nothing placeholder="Parent Dealer Id" />
+                                        <label class="form-label" for="form1Example2">Select Parent Dealer</label>
+                                    </div> --}}
+
+
+                                    {{-- ================================================================================= --}}
+
+
+
+
+                                    <div data-mdb-input-init class="col form-outline mb-4">
+                                        <input type="text" name="parent_dealer_id" id="form1Example2"
+                                            class="form-control" value="{{ $life_health->parent_dealer_id }}" nothing
+                                            placeholder="Parent Dealer ID" />
+                                        <label class="form-label" for="form1Example2">Parent Dealer ID
+                                        </label>
+
+
+
+                                        {{-- @if ($life_health->parent_dealer_id !== null && $life_health->parent_dealer_id->isNotEmpty()) --}}
+                                        {{-- @if ($life_health->parent_dealer_id)
+
+                                            <select name="parent_dealer_id" class="form-select form-control " required>
+
+                                                @foreach ($life_health->parent_dealer_id as $parent_dealers)
+                                                    <option value="{{ $parent_dealers }}">
+                                                        {{ $parent_dealers }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <label class="form-label mb-4" for="form3Example3"> Parent Dealer ID
+                                            </label>
+                                        @else
+                                            <label class="form-label text-danger" for="form3Example3">[Parent Dealer not
+                                                Found]</label>
+
+                                        @endif --}}
+                                    </div>
+
+                                    {{-- ================================================================================= --}}
+                                </div>
+
+                            </div>
+                            {{-- ===================================== Digit : partner, insurance company =================================== --}}
+                            <div class="form-row mb-4">
+                                <div data-mdb-input-init class="col-md-4 form-outline mb-4">
+                                    <input type="text" name="partner_code" id="form1Example2" class="form-control"
+                                        value="{{ $life_health->partner_code }}" nothing placeholder="Partner Code" />
+                                    <label class="form-label" for="form1Example2">Partner Code</label>
+                                </div>
+                                <div data-mdb-input-init class="col-md-4 form-outline mb-4">
+                                    <input type="text" name="insurance_company_code" id="form1Example2" class="form-control"
+                                        value="{{ $life_health->insurance_company_code}}" nothing placeholder="Insurance Company Code" />
+                                    <label class="form-label" for="form1Example2">Insurance Company Code</label>
+                                </div>
+                                <div data-mdb-input-init class="col-md-4 form-outline mb-4">
+                                    <input type="text" name="b2b_b2c_code" id="form1Example2" class="form-control"
+                                        value="{{ $life_health->b2b_b2c_code }}" nothing placeholder="B to B or C (type single latter)" />
+                                    <label class="form-label" for="form1Example2">B2B / B2C Code</label>
+                                </div>
+                            </div>
+                            {{-- ===================================== Digit : partner, insurance company =================================== --}}
+                            <div class="form-row mb-4">
+                                {{-- <div class="col">
+                                    <label class="form-label" for="form1Example2">Package Cooling Period</label>
+                                    <input type="number" name="package_cooling_period" id="form1Example2"
+                                    class="form-control" value="{{ old('discount') }}" nothing
+                                    placeholder="Package Cooling Period (Day)" />
+                                </div> --}}
+                                <div class="col">
+                                    <label for="naturalDeathAmount"> waiting period or effective date
+                                        :</label><br>
+                                    <input type="number" id="naturalDeathAmount" name="waiting_period"
+                                        class="form-control" value="{{ $life_health->waiting_period }}"
+                                        placeholder="(waiting period or effective date) "><br>
+                                </div>
+
+                                <div class="col">
+
+                                    <label for="naturalDeathAmount">difference between two claims
+                                        :</label><br>
+                                    <input type="number" id="naturalDeathAmount" name="difference_between_two_claims"
+                                        class="form-control" value="{{ $life_health->difference_between_two_claims }}"
+                                        placeholder="Difference between two claims"><br>
+
+
+                                </div>
+
+                            </div>
+
+
+
+
+                            <label class="form-label" for="form1Example2">
+                                Exclusions</label>
+                            <textarea class="form-control" value="{{ $life_health->exclusion }}" rows="3" placeholder=" Exclusions"
+                                name="exclusion" nothing>{{ $life_health->exclusion }}</textarea>
+
+                            <label class="form-label" for="form1Example2"> Document Required for Claim
+                                Process</label>
+                            <textarea class="form-control" value="{{ $life_health->document_claim_process }}" rows="3"
+                                placeholder="Claim Process" name="document_claim_process" nothing>{{ $life_health->document_claim_process }}</textarea>
+                            {{-- =============================new working fileds=================================== --}}
+                            <!-- Submit button -->
+                            <button data-mdb-ripple-init type="submit" class="btn btn-primary btn-block my-3">Update Package</button>
+                        </form>
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+        </div>
+    </section>
+-----------------------
+update controller : 
+-----------------------
+ public function update(Request $request, $id)
+    {
+
+
+
+        // dd($request->all());
+
+        // $request->validate([
+        //     'Pname' => 'required',
+        // ]);
+
+        $life_health = LifeAndHealth::findOrFail($id);
+
+        $oldImage = 'images/packages/' . $life_health->image;
+        $imageName = $life_health->image;
+
+        if ($image = $request->file('image')) {
+            if (file_exists($oldImage)) {
+                File::delete($oldImage);
+            }
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move('images/packages', $imageName);
+        }
+
+
+        // code for teli_medicine_card----------------------------------
+
+        // Constructing the teli_medicine_fee value
+        $teliMedicineFee = [];
+
+        // Loop through teli_medi_fee_1 to teli_medi_fee_9
+        for ($i = 1; $i <= 9; $i++) {
+            if ($request->has("teli_medi_fee_$i")) {
+                $teliMedicineFee["teli_medi_fee_$i"] = $request->input("teli_medi_fee_$i");
+            }
+        }
+
+
+        // dd($request->input('unlimited'));
+        // Add the unlimited value if present
+        if ($request->has('unlimited')) {
+            $teliMedicineFee['unlimited'] = $request->input('unlimited');
+        }
+
+        // Serialize the teliMedicineFee array into JSON format
+        $jsonTeliMedicineFee = json_encode($teliMedicineFee);
+
+        // Assign the serialized JSON data to the teli_medicine_fee column
+        $life_health->teli_medi_fee = $jsonTeliMedicineFee;
+
+        // code for teli_medicine_card----------------------------------
+
+        //if teli_medi is free then show : =>
+        // --------------------------------------
+        if ($request->teli_medi_fee == "free") {
+            $jsonTeliMedicineFee = 'free';
+        }
+
+
+
+
+        $life_health->hospital_card_fee = $request->hospital_card_fee;
+
+        //for combo pkg : ---------------------------------
+        if ($request->has('personName')) {
+            $personName = json_encode($request->personName);
+        }
+
+
+
+
+        $life_health->update([
+            'category_id' => $request->category_id,
+            'Pname' => $request->Pname,
+            'image' => $imageName,
+            'benefit' => $request->benefit,
+            'feature' => $request->feature,
+            'claim_process' => $request->claim_process,
+            'duration' => $request->duration,
+            'price' => $request->price,
+            'discount' => $request->discount,
+            'yearly_fee' => $request->yearly_fee,
+            'half_yearly_fee' => $request->half_yearly_fee,
+            'quarterly_fee' => $request->quarterly_fee,
+            'monthly_fee' => $request->monthly_fee,
+            'life_coverage_amount' => $request->life_coverage_amount,
+            'natural_death_amount' => $request->natural_death_amount,
+            'natural_death_claim_chargeback_amount' => $request->natural_death_claim_chargeback_amount,
+            'natural_death_claim_waiting_date' => $request->natural_death_claim_waiting_date,
+            'natural_death_claim_delay_date' => $request->natural_death_claim_delay_date,
+            'natural_death_claim_cooling_date' => $request->natural_death_claim_cooling_date,
+            'natural_death_exclusion' => $request->natural_death_exclusion,
+            'natural_death_claim_process' => $request->natural_death_claim_process,
+
+            'accidental_death_amount' => $request->accidental_death_amount,
+            'accidental_death_claim_chargeback_amount' => $request->accidental_death_claim_chargeback_amount,
+            'accidental_death_claim_waiting_date' => $request->accidental_death_claim_waiting_date,
+            'accidental_death_claim_delay_date' => $request->accidental_death_claim_delay_date,
+            'accidental_death_claim_cooling_date' => $request->accidental_death_claim_cooling_date,
+            'accidental_death_exclusion' => $request->accidental_death_exclusion,
+            'accidental_death_claim_process_doc' => $request->accidental_death_claim_process_doc,
+
+            'major_diseases_amount' => $request->major_diseases_amount,
+            'major_diseases_claim_chargeback_amount' => $request->major_diseases_claim_chargeback_amount,
+            'major_diseases_claim_waiting_date' => $request->major_diseases_claim_waiting_date,
+            'major_diseases_exclusion' => $request->major_diseases_exclusion,
+            'major_diseases_claim_process_doc' => $request->major_diseases_claim_process_doc,
+
+            'ppd_claim_coverage_amount' => $request->ppd_claim_coverage_amount,
+            'ppd_claim_chargeback_amount' => $request->ppd_claim_chargeback_amount,
+            'ppd_claim_waiting_date' => $request->ppd_claim_waiting_date,
+            'ppd_exclusion' => $request->ppd_exclusion,
+            'ppd_claim_process_doc' => $request->ppd_claim_process_doc,
+
+            'ptd_amount' => $request->ptd_amount,
+            'ptd_claim_chargeback_amount' => $request->ptd_claim_chargeback_amount,
+            'ptd_claim_waiting_date' => $request->ptd_claim_waiting_date,
+            'ptd_exclusion' => $request->ptd_exclusion,
+            'ptd_claim_process_doc' => $request->ptd_claim_process_doc,
+
+
+            'critical_illness_coverage_amount' => $request->critical_illness_coverage_amount,
+            'critical_illness_claim_chargeback_amount' => $request->critical_illness_claim_chargeback_amount,
+            'critical_illness_claim_waiting_date' => $request->critical_illness_claim_waiting_date,
+            'critical_illness_exclusion' => $request->critical_illness_exclusion,
+            'critical_illness_claim_process_doc' => $request->critical_illness_claim_process_doc,
+
+
+
+            'hospital_coverage_amount' => $request->hospital_coverage_amount,
+
+            'ipd_coverage_amount' => $request->ipd_coverage_amount,
+            'ipd_accommodation_claim_amount' => $request->ipd_accommodation_claim_amount,
+            'ipd_accommodation_claim_chargeback_amount' => $request->ipd_accommodation_claim_chargeback_amount,
+            'ipd_accommodation_max_day' => $request->ipd_accommodation_max_day,
+            'ipd_accommodation_claim_waiting_date' => $request->ipd_accommodation_claim_waiting_date,
+            'ipd_accommodation_claim_delay_date' => $request->ipd_accommodation_claim_delay_date,
+            'ipd_accommodation_claim_cooling_date' => $request->ipd_accommodation_claim_cooling_date,
+            'ipd_accommodation_exclusion' => $request->ipd_accommodation_exclusion,
+            'ipd_accommodation_claim_process_doc' => $request->ipd_accommodation_claim_process_doc,
+
+
+            'ipd_treatment_claim_amount' => $request->ipd_treatment_claim_amount,
+            'ipd_treatment_claim_chargeback_amount' => $request->ipd_treatment_claim_chargeback_amount,
+            'ipd_treatment_max_day' => $request->ipd_treatment_max_day,
+            'ipd_treatment_claim_waiting_date' => $request->ipd_treatment_claim_waiting_date,
+            'ipd_treatment_claim_delay_date' => $request->ipd_treatment_claim_delay_date,
+            'ipd_treatment_claim_cooling_date' => $request->ipd_treatment_claim_cooling_date,
+
+
+
+            'ipd_accommodation_max_amount' => $request->ipd_accommodation_max_amount,
+            'ipd_accommodation_max_ccu_icu' => $request->ipd_accommodation_max_ccu_icu,
+            'ipd_treatment_consultant_amount' => $request->ipd_treatment_consultant_amount,
+            'ipd_treatment_routen_investigation_amount' => $request->ipd_treatment_routen_investigation_amount,
+            'ipd_treatment_medicine_amount' => $request->ipd_treatment_medicine_amount,
+            'ipd_treatment_surgical_amount' => $request->ipd_treatment_surgical_amount,
+            'ipd_treatment_ancillary_amount' => $request->ipd_treatment_ancillary_amount,
+            'ipd_treatment_others_amount' => $request->ipd_treatment_others_amount,
+            'ipd_treatment_exclusion' => $request->ipd_treatment_exclusion,
+            'ipd_treatment_claim_process_doc' => $request->ipd_treatment_claim_process_doc,
+
+
+
+
+
+            'opd_coverage_amount' => $request->opd_coverage_amount,
+            'opd_consultation_claim_amount' => $request->opd_consultation_claim_amount,
+            'opd_consultation_claim_chargeback_amount' => $request->opd_consultation_claim_chargeback_amount,
+            'opd_consultation_max_day' => $request->opd_consultation_max_day,
+            'opd_consultation_claim_waiting_date' => $request->opd_consultation_claim_waiting_date,
+            'opd_consultation_claim_delay_date' => $request->opd_consultation_claim_delay_date,
+            'opd_consultation_claim_cooling_date' => $request->opd_consultation_claim_cooling_date,
+            'opd_test_claim_amount' => $request->opd_test_claim_amount,
+            'opd_test_claim_chargeback_amount' => $request->opd_test_claim_chargeback_amount,
+            'opd_treatment_max_day' => $request->opd_treatment_max_day,
+            'opd_test_claim_waiting_date' => $request->opd_test_claim_waiting_date,
+            'opd_test_claim_delay_date' => $request->opd_test_claim_delay_date,
+            'opd_test_claim_cooling_date' => $request->opd_test_claim_cooling_date,
+            'opd_medicines_claim_amount' => $request->opd_medicines_claim_amount,
+            'opd_medicine_presription_amount' => $request->opd_medicine_presription_amount,
+            'opd_medicines_claim_chargeback_amount' => $request->opd_medicines_claim_chargeback_amount,
+            'opd_medicines_claim_waiting_date' => $request->opd_medicines_claim_waiting_date,
+            'opd_other_claim_amount' => $request->opd_other_claim_amount,
+            'opd_claim_chargeback_amount' => $request->opd_claim_chargeback_amount,
+            'opd_claim_waiting_date' => $request->opd_claim_waiting_date,
+            'opd_claim_delay_date' => $request->opd_claim_delay_date,
+            'opd_exclusion' => $request->opd_exclusion,
+            'opd_medicines_claim_process_doc' => $request->opd_medicines_claim_process_doc,
+
+
+
+
+
+            'dental_coverage_amount' => $request->dental_coverage_amount,
+            'dental_consultation_claim_amount' => $request->dental_consultation_claim_amount,
+            'dental_temporary_permanent_filling_amount' => $request->dental_temporary_permanent_filling_amount,
+            'dental_routine_surgical_extraction_amount' => $request->dental_routine_surgical_extraction_amount,
+            'dental_medication_amount' => $request->dental_medication_amount,
+            'dental_xray_amount' => $request->dental_xray_amount,
+            'dental_root_canal_amount' => $request->dental_root_canal_amount,
+            'dental_scaling_amount' => $request->dental_scaling_amount,
+            'dental_others_amount' => $request->dental_others_amount,
+            'dental_claim_chargeback_amount' => $request->dental_claim_chargeback_amount,
+            'dental_claim_waiting_date' => $request->dental_claim_waiting_date,
+            'dental_claim_delay_date' => $request->dental_claim_delay_date,
+            'dental_exclusion' => $request->dental_exclusion,
+
+            'dental_consultation_claim_chargeback_amount' => $request->dental_consultation_claim_chargeback_amount,
+            'dental_consultation_max_day' => $request->dental_consultation_max_day,
+            'dental_consultation_claim_waiting_date' => $request->dental_consultation_claim_waiting_date,
+            'dental_consultation_claim_delay_date' => $request->dental_consultation_claim_delay_date,
+            'dental_consultation_claim_cooling_date' => $request->dental_consultation_claim_cooling_date,
+            'dental_treatment_claim_amount' => $request->dental_treatment_claim_amount,
+            'dental_treatment_claim_chargeback_amount' => $request->dental_treatment_claim_chargeback_amount,
+            'dental_treatment_max_day' => $request->dental_treatment_max_day,
+            'dental_treatment_claim_waiting_date' => $request->dental_treatment_claim_waiting_date,
+            'dental_treatment_claim_delay_date' => $request->dental_treatment_claim_delay_date,
+            'dental_treatment_claim_cooling_date' => $request->dental_treatment_claim_cooling_date,
+
+
+
+            'eye_coverage_amount' => $request->eye_coverage_amount,
+            'eye_consultation_claim_amount' => $request->eye_consultation_claim_amount,
+            'eye_consultation_claim_chargeback_amount' => $request->eye_consultation_claim_chargeback_amount,
+            'eye_consultation_claim_waiting_date' => $request->eye_consultation_claim_waiting_date,
+            'eye_consultation_claim_delay_date' => $request->eye_consultation_claim_delay_date,
+            'eye_treatment_claim_amount' => $request->eye_treatment_claim_amount,
+            'eye_treatment_claim_chargeback_amount' => $request->eye_treatment_claim_chargeback_amount,
+            'eye_treatment_claim_waiting_date' => $request->eye_treatment_claim_waiting_date,
+            'eye_treatment_claim_delay_date' => $request->eye_treatment_claim_delay_date,
+            'eye_frame_claim_amount' => $request->eye_frame_claim_amount,
+            'eye_frame_claim_chargeback_amount' => $request->eye_frame_claim_chargeback_amount,
+            'eye_frame_claim_waiting_date' => $request->eye_frame_claim_waiting_date,
+            'eye_frame_claim_delay_date' => $request->eye_frame_claim_delay_date,
+            'eye_optiocal_claim_amount' => $request->eye_optiocal_claim_amount,
+            'eye_vision_test_claim_amount' => $request->eye_vision_test_claim_amount,
+            'eye_medication_claim_amount' => $request->eye_medication_claim_amount,
+            'eye_lens_claim_amount' => $request->eye_lens_claim_amount,
+            'eye_others_claim_amount' => $request->eye_others_claim_amount,
+            'eye_max_consultation_claim_amount' => $request->eye_max_consultation_claim_amount,
+            'eye_claim_chargeback_amount' => $request->eye_claim_chargeback_amount,
+            'eye_claim_waiting_date' => $request->eye_claim_waiting_date,
+            'eye_claim_delay_date' => $request->eye_claim_delay_date,
+            'eye_exclusion' => $request->eye_exclusion,
+            'eye_claim_process_doc' => $request->eye_claim_process_doc,
+
+
+
+
+
+            //Maternity add : ------------------------------
+            "maternity_claim_amount" => $request->maternity_claim_amount,
+            "maternity_coverage_amount" => $request->maternity_coverage_amount,
+            "maternity_uterine_preganancy_amount" => $request->maternity_uterine_preganancy_amount,
+            "maternity_normal_delivery_amount" => $request->maternity_normal_delivery_amount,
+            "maternity_legal_abortion_miscarriage_amount" => $request->maternity_legal_abortion_miscarriage_amount,
+            "maternity_others_amount" => $request->maternity_others_amount,
+
+
+            "maternity_pre_post_hospitalization_amount" => $request->maternity_pre_post_hospitalization_amount,
+            "maternity_pre_post_natal_amount" => $request->maternity_pre_post_natal_amount,
+            "maternity_baby_amount" => $request->maternity_baby_amount,
+            "maternity_vaccination_amount" => $request->maternity_vaccination_amount,
+            "maternity_min_age" => $request->maternity_min_age,
+            "maternity_max_age" => $request->maternity_max_age,
+            "maternity_claim_waiting_date" => $request->maternity_claim_waiting_date,
+            "maternity_claim_delay_date" => $request->maternity_claim_delay_date,
+            "maternity_chargeback_amount" => $request->maternity_chargeback_amount,
+            "maternity_claim_exclusion" => $request->maternity_claim_exclusion,
+            "maternity_claim_process_doc" => $request->maternity_claim_process_doc,
+            //End Maternity add : ------------------------------
+            'ambulance_claim_amount' => $request->ambulance_claim_amount,
+            'ambulance_claim_chargeback_amount' => $request->ambulance_claim_chargeback_amount,
+            'ambulance_claim_waiting_date' => $request->ambulance_claim_waiting_date,
+            'ambulance_claim_delay_date' => $request->ambulance_claim_delay_date,
+            'ambulance_claim_exclusion' => $request->ambulance_claim_exclusion,
+            'ambulance_claim_process_doc' => $request->ambulance_claim_process_doc,
+
+            'hospital_card_fee' => $request->hospital_card_fee,
+            'teli_medicine_fee' => $request->teli_medicine_fee,
+
+            'brand_name' => $request->brand_name,
+            'child_dealer_id' => $request->child_dealer_id,
+            // 'parent_dealer_id'=> $request->vat,
+            'discount' => $request->discount,
+            'vat' => $request->vat,
+            'package_cooling_period' => $request->package_cooling_period,
+            'teli_medicine_fee' => $jsonTeliMedicineFee,
+            //for the combo pkg: ------------------------------
+            'combo_pkg' => $request->combo_pkg,
+            'combo_person' => $request->combo_person,
+            'personName' => $personName,
+            //provider name -----------------------------------
+            'provider_name' => $request->provider_name,
+            //pkg type + promo code ---------------------------
+            'pkg_type' => $request->pkg_type,
+
+        ]);
+
+
+        return redirect()->to(route('admin.life_and_health_show'))->with('msg', 'Package Successfully Updated!');
     }
