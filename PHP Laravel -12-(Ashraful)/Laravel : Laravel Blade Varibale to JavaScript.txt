@@ -1,3 +1,51 @@
+To use a Laravel Blade variable within a `<script>` tag, you can pass the Blade variable directly into the JavaScript code by using the `{{ }}` Blade syntax to output the variable's value. Here's how you can do it:
+
+### Example:
+
+Assume you have a Blade variable `$name` that you want to assign to a JavaScript variable `name` inside a `<script>` tag.
+
+```blade
+@php
+    $name = 'John Doe';
+@endphp
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blade Variable in Script</title>
+</head>
+<body>
+    <h1>Hello, {{ $name }}!</h1>
+
+    <script>
+        // Assigning Blade variable to a JavaScript variable
+        let name = @json($name);
+
+        // Alternatively, you can use the following method:
+        // let name = "{{ $name }}";
+
+        console.log(name); // Output: John Doe
+    </script>
+</body>
+</html>
+```
+
+### Explanation:
+
+1. **Using `@json($name)`**:
+   - This method is preferred when dealing with more complex data, like arrays or objects, as it ensures the data is correctly formatted as JSON.
+   - `@json($name)` converts the Blade variable to a JSON-encoded string, which is then safely embedded in your JavaScript code.
+
+2. **Using `{{ $name }}`**:
+   - This method is simpler and works well for strings or simple scalar values.
+   - It directly outputs the Blade variable's value into the script.
+
+### Considerations:
+
+- If the variable contains quotes, spaces, or special characters, using `@json($name)` is safer as it escapes the content properly.
+- If you are using data from the database or user input, always consider using `@json()` to avoid potential security issues with improperly escaped output.
+
+================================================================== Real example for edit combo person ==================================
 @php
     // Assuming $life_health is available in the Blade view
     $comboPkg = $life_health->combo_pkg == 'on';
