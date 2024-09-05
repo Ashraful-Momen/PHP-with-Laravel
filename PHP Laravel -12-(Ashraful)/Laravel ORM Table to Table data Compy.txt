@@ -94,3 +94,36 @@
         // after all data copy to child_lf_order_table then delete all data form Policy data ....
 
         PolicyData::truncate();
+=================================================Optimize code for table to table Data copy ============================================
+// Retrieve the first record with the specified shuffle_key and select only the necessary columns
+$order_parent = OrderParent::where('shuffle_key', $response['pgw_shuffle_id'])
+    ->select(
+        'category_id',
+        'order_ref_id',
+        'shuffle_key',
+        'user_id',
+        'order_user_phone',
+        'order_user_address',
+        'bill',
+        'quantity',
+        'order_status',
+        'payment_status',
+        'payment_frequency',
+        'advance_payment',
+        'due_payment',
+        'total_payment',
+        'service_status',
+        'pgw_name',
+        'pgw_status',
+        'pgw_json'
+    )
+    ->first();
+
+// Convert the object to an array if a record is found
+if ($order_parent) {
+    $dataToInsertArray = $order_parent->toArray();
+
+    // Insert the data into 'life_and_health_payment_histories' table
+    $LifeAndHealthPaymentHistory = DB::table('life_and_health_payment_histories')->insert($dataToInsertArray);
+}
+
