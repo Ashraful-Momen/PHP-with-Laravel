@@ -1,5 +1,37 @@
 if ($request->file('life_and_health_csv')) {
 
+// ----------------------------- Convert file to array --------------------------------
+            // Convert the CSV file into an array
+            $data = array_map('str_getcsv', file($request->life_and_health_csv));
+
+            // Remove the header
+            $header = array_shift($data);
+
+            // Count occurrences of Order_SL_Number
+            $orderCounts = array_count_values(array_column($data, 0)); // Extract and count Order_SL_Number
+            dd($orderCounts);
+
+            // Initialize the result array for formatted output
+            $order_sl = [];
+
+            // Populate the result array with the format Order_SL_Number[n] => count
+            foreach ($orderCounts as $orderSL => $count) {
+                $order_sl[$orderSL] = $count;
+            }
+            // Populate the result array with the format Order_SL_Number[n] => count
+            // foreach ($orderCounts as $orderSL => $count) {
+            //     $order_sl["Order_SL_Number[$orderSL]"] = $count;
+            // }
+
+            // Display the formatted output
+            foreach ($order_sl as $key => $value) {
+                echo "$key => $value<br>";
+            }
+
+            // Output for debugging purposes (optional)
+            dd($orderCounts,$order_sl[6]);
+ //End the count of unique element of an array ---------------------------------------------------------------------------------------------------
+
 
             // ------------------------------------------------------
             #data upload by csv file : ------------------------------
@@ -53,35 +85,5 @@ if ($request->file('life_and_health_csv')) {
             // }
             // dd($data);
             //---------------------------------------------------------------------------------------------------
-            // ----------------------------- Convert file to array --------------------------------
-            $data = array_map('str_getcsv', file($request->life_and_health_csv));
-
-            // Separate the header and the rest of the data
-            $header = array_shift($data); // Removes the first row (header) and returns it
-
-            // Initialize an array to count occurrences of Order_SL_Number
-            $orderCounts = array_count_values(array_column($data, 0)); // Count occurrences of the first column (Order_SL_Number)
-
-
-            // Initialize an array to store reformatted data
-            $order_sl = [];
-
-            // Loop through the orderCounts to map them as order_sl[index] => count
-            foreach ($orderCounts as $key =>$count) {
-                $order_sl[$key] = $count; // Auto-increment index since we don't need manual counter
-            }
-
-            // // Display formatted output
-            // foreach ($order_sl as $index => $count) {
-            //     echo "Order_SL_Number[" . ($index + 1) . "] => $count<br>"; // Adjust for 1-based index
-            // }
-
-            dd($order_sl);
-
-            // Output the result (dd equivalent in Laravel)
-            dd($order_sl, $header, $data);
-
-            //---------------------------------------------------------------------------------------------------
-
-            dd($header, $data);
+           
             // order checker fn----------------------------------------------------------------------------------
