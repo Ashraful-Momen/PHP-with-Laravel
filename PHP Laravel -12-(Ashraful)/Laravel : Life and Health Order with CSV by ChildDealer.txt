@@ -1,0 +1,715 @@
+ public function life_and_health_order_process_with_csv(Request $request)
+    {
+
+        // dd($request->all());
+
+        //important params for creating order : -----------------------------
+
+        // get those data form life pkg : 'hospital_card_id','tele_medicine_id','insurance_type','sold_by','if user not created then create it'
+        //*** if child Dealer credit option allow . then payment_status will be credit and order_status will be complete, else payment_status and order_status will be pending */
+
+        //  'insurance_owner',
+        //  'promo_code',
+
+
+        //important params for creating order : -----------------------------
+
+        //
+        // child order data: ------------------------------------------------
+        //     [
+        //         "Order_SL_" => "1",
+        //         "pkg_id" => "1",
+        //         "o_name" => "ali2",
+        //         "o_DOB" => "2024-06-13",
+        //         "o_gender" => "male",
+        //         "o_id_type" => "1", //NID = 1, Passport = 2 , Birth Certificate = 3
+        //         "o_id_number" => "56565565",
+        //         "o_id_file" => "pexels-dianne-226424.jpg",
+        //         "o_phone" => "556565656565",
+        //         "o_email" => "ashraful@instasure.xyz",
+        //         "n_name" => "asdfasdf",
+        //         "n_DOB" => "2024-06-06",
+        //         "relation_with_nominee" => "asdfasdfasd",
+        //         "n_gender" => "male",
+        //         "n_id_type" => "1",
+        //         "n_id_number" => "233242323",
+        //         "n_id_file" => "pexels-valentin-s-589841.jpg",
+        //         "n_phone" => "23123123123123123",
+        //         "n_email" => "a@gmail.com",
+        //     ]
+        //
+        // end child order data: ------------------------------------------------
+
+
+        if ($request->file('life_and_health_csv')) {
+
+
+            // ------------------------------------------------------
+            #data upload by csv file : ------------------------------
+
+
+
+            // -------------------------------convert file to array--------------------------------
+            $data =  array_map('str_getcsv', file($request->life_and_health_csv));
+
+            $header = $data[0]; // 1st row for header
+
+            unset($data[0]); // 1st row for header removal
+
+            // -----------------------------------------------------------------------------
+
+            // ----------------------------- Convert file to array --------------------------------
+            // Convert the CSV file into an array
+            $data = array_map('str_getcsv', file($request->life_and_health_csv));
+
+            // Remove the header
+            $header = array_shift($data);
+
+            // Count occurrences of Order_SL_Number
+            $Order_SL_Number = array_count_values(array_column($data, 0)); // Extract and count Order_SL_Number
+            // dd($Order_SL_Number[5]);
+
+
+
+            // dd($header, $data);
+            //---------------------------------------------------------------------------------------------------
+
+            // order checker fn----------------------------------------------------------------------------------
+
+            // $previous_order = null; // Initialize previous_order outside the loop
+
+            // foreach ($data as $key => $child_order) {
+
+            //     $order_checker = $child_order[0]; // $child_order[0] holds the Order_SL value
+            //     $counter = $key;
+
+
+
+            //     // -------------------------------------------------------
+            //     if ($order_checker != $previous_order) {
+
+            //         #for order_ref: ------------------------------------------
+            //         $length = 7;
+            //         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            //         $order_ref_id = substr(str_shuffle($characters), 0, $length);
+            //     }
+
+
+
+
+
+
+            //     echo "Order checker : " . $order_checker . " ref_id : " . $order_ref_id . " | counter => " . $counter . "<br>"; // Output current order_checker value
+
+            //     if ($order_checker != $previous_order) { // Check if the current order is different from the previous order
+            //         $counter++;
+            //         echo "Access this block => Order_SL changed. Current order: " . $order_checker . " order_ref_id : " . $order_ref_id . " | counter => " . $counter . "<br>";
+            //     }
+
+
+            //     $previous_order = $order_checker; // Set previous_order to the current value for the next iteration
+            //     $order_checker != $previous_order ? $counter = $key + 1 : $counter;
+            // }
+
+            // end order checker fn----------------------------------------------------------------------------------
+
+
+            $previous_order = null; // Initialize previous_order outside the loop
+
+            foreach ($data as $key => $child_order) {
+
+                // dd($child_order);
+                $order_checker = $child_order[0]; // $child_order[0] holds the Order_SL value
+                $counter = $key;
+
+                //----------------------------------------Data Set ----------------------------------------------
+                // -------------------------------------------------------
+                if ($order_checker != $previous_order){
+
+                    #for order_ref: ------------------------------------------
+                    $length = 7;
+                    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    $order_ref_id = substr(str_shuffle($characters), 0, $length);
+                }
+
+                // -------------------------------------------------------
+                $totalInsurance = $count_total_order = $key + 1;
+                $sold_by = Auth::user()->id; //chldDealer_id
+                $pkg = LifeAndHealth::findorfail($child_order[1]); //have to handle exception
+                $coverage_amount = $pkg;
+                $category_id = $pkg->category_id;
+                $before_discount_pirce = $pkg->price;
+
+                $hospital_card_id = $pkg->hospital_card_pkg_id;
+                $hdc_package = HDCPackages::findOrFail($hospital_card_id);
+                $hdc_price = $hdc_package->physical_virtual_type == 'Physical' ? $hdc_package->price_physical : $hdc_package->price_virtual;
+                $tele_medicine_id = $pkg->tele_medi_pkg_id;
+                $tele_medicine_price = TeleMedicine::find($tele_medicine_id)->price;
+                $discount = $pkg->discount;
+                $with_discount_price = $before_discount_pirce * (1 - ($discount / 100));
+                $vat = $pkg->vat;
+                $with_vat_price = $with_discount_price * (1 + ($vat / 100));
+                $total_amount = $with_vat_price + $hdc_price + $tele_medicine_price; // have to fix further .
+                $pkg_type = $pkg->pkg_type;
+                $combo_pkg = $pkg->combo_pkg;
+                $combo_person = $pkg->combo_person;
+
+                // dd($combo_pkg);
+
+
+
+
+                // 3.----------------------------------------------------start check the commission amount : ---------------------------------------------
+                #commission amount :
+                #if sold_by exit then update the commission for sold_by users:
+                // ----------------------------------------------------------
+                if ($sold_by != null) {
+
+
+                    #remove the vat amount , then calculation percentage of commission :
+                    // ------------------------------------------------------------------------------
+                    // Assuming $cart_data->with_discount_price is the price after discount and excluding VAT
+
+                    // Assuming $all_order contains an instance of a model with a product_id attribute
+                    $product_id = $pkg->id;
+
+                    // Retrieve the LifeAndHealth model based on the product_id
+                    $life_and_health = $pkg;
+
+                    // Access the vat attribute if the LifeAndHealth model exists
+                    $vat_amount =  $life_and_health->vat ?? 0;
+
+                    // for total price calculation : Life pkg price , TeleMedi pkg price , hdc price
+
+                    $price_after_discount = $total_amount;
+
+                    $vat_percentage = $vat_amount; // Assuming 15% VAT
+
+
+                    // Calculate VAT amount
+                    $vat_amount = ($price_after_discount * $vat_percentage) / 100;
+
+                    // Calculate price after deducting VAT
+                    $price_without_vat = $price_after_discount - $vat_amount;
+
+
+
+                    // ------------------------------------------------------------------------------
+
+
+                    //find the child_dealer commission_row from dealer table ------------------------
+                    $user_row = Dealer::where('user_id', $sold_by)->first();
+
+
+
+                    #------------------------------child commission ---------------------------------
+                    $child_commission_amount = $user_row->ChildDelar_category_comission;
+                    $child_commission_arr = json_decode($child_commission_amount);
+
+
+                    //need the life_health_cat id and percentage also_________________________________
+                    foreach ($child_commission_arr as $cat_id => $commission) {
+                        echo $cat_id . "commission: " . $commission . "<br>";
+                        if ($cat_id == 8) { //category_id for life & health fix , that's why use this condition ....
+                            $child_commission_value = $commission;
+                        }
+                    }
+                    $child_commission = $price_without_vat * $child_commission_value / 100;
+
+
+
+
+
+
+                    #---------------------------End child commission ---------------------------------
+
+                    #------------------------------Parent commission ---------------------------------
+                    $partDealer_id = $user_row->parent_id;
+                    // dd($partDealer_id);
+
+                    $user_row = Dealer::find($partDealer_id);
+
+                    $parent_commission_amount = $user_row->parentDelar_category_comission ?? 0;
+                    $parent_commission_arr = json_decode($parent_commission_amount);
+
+                    //need the life_health_cat id  and percentage also________________________________
+                    foreach ($parent_commission_arr as $cat_id => $commission) {
+                        echo $cat_id . "commission: " . $commission . "<br>";
+                        if ($cat_id == 8) {
+                            $parent_commission_value = $commission;
+                        }
+                    }
+                    $parent_commission = $price_without_vat * $parent_commission_value / 100;
+                    #---------------------------End child commission ---------------------------------
+
+
+
+                    #---------------------------Provider amount -------------------------------------
+
+                    // #Find provider amount from all child orders : -----------------------------------------------------------
+
+
+
+
+                    $provider_amount = $pkg->provider_price  ?? 0;
+
+                    // end provider amount ----------------------------------------------------------------------------------
+
+                    #---------------------------End Provider amount ---------------------------------
+
+                    #---------------------------Admin Net amount -------------------------------------
+                    $admin_net_amount = ($total_amount) - ($child_commission + $parent_commission + $provider_amount);
+
+                    #---------------------------End Admin Net amount ---------------------------------
+
+                    // echo "child_commission_amount" . $child_commission;
+
+                    // echo "parent_commission_amount" . $parent_commission;
+
+                    // dd($child_commission, $parent_commission, $provider_amount, $admin_net_amount,$total_amount);
+
+
+
+
+
+                    //********End  add the commission part for child / parent / companty ..... */---------------------------
+                }
+                // 3.----------------------------------------------------end check the commission amount : -----------------------------------------------
+
+
+
+
+
+
+                // 1.-------------------------------------Start check the user exit or not :(Done) -----------------------------------------------
+                $owner_name = $child_order[2];
+                $owner_dob = $child_order[3];
+                $id_type = $child_order[5] ?? 'nid'; //ID Type: 1.Nid, 2. passport, 3. birth certificate
+                $id_number = $child_order[5]; //ID Type: 1.Nid, 2. passport, 3. birth certificate
+                // ---------------------------------------
+
+                $owner_gender = $child_order[4]; //gender.
+                $owner_phone = $child_order[7]; //owner number
+                $owner_email = $child_order[8]; //owner email
+                $owner_address = $child_order[9]; //owner address
+
+
+
+                $owner = User::where('phone', $owner_phone)->first();
+
+
+
+                // dd($header, $child_order);
+
+                //if owner not found then create new owner-----------------------------------------------
+                if (!$owner) {
+                    $user_type = "customer";
+                    $password = 123456;
+                    $user = new User();
+                    $user->name = $owner_name;
+                    $user->gender = $owner_gender;
+                    $user->dob = $owner_dob;
+                    $user->phone = $owner_phone;
+                    $user->email = $owner_email;
+                    $user->address = $owner_address;
+                    $user->user_type = $user_type;
+                    $user->id_type = $id_type;
+                    $user->nid = $id_number;
+                    $user->password = Hash::make($password);
+
+                    $user->save();
+                }
+
+                // ------------------------------------------
+                $insurance_owner = [
+                    "name" => $owner->name,
+                    "id" => $owner->id,
+                ];
+
+                $insurance_owner = json_encode($insurance_owner);
+                // ------------------------------------------
+                // 1.-------------------------------------End check the user exit or not : -----------------------------------------------
+
+                // 2.****check the order sl number (if sl no change the start new order-parent+child), the first chlild order of person will be owner: ------------------------------------------------
+
+
+
+
+
+
+                //-------------------------------------------------Insert order ------------------------------------------------------------------
+                #Find : 'product_id','hospital_card_id','tele_medicine_id','pkg_type','sold_by','combo_pkg','combo_person'
+                #calculate:bill,total_amount, admin_total_amount,insurance_provider_amount,child_commission_amount,parent_commission_amount
+                // dd("pkg_id : ".$chlild_order[1]);
+                // dd($pkg);
+                $sold_by = Auth::user()->id; //chldDealer_id
+                $pkg = LifeAndHealth::findorfail($child_order[1]);
+                $hospital_card_id = $pkg->hospital_card_pkg_id;
+                $tele_medicine_id = $pkg->tele_medi_pkg_id;
+
+                $pkg_type = $pkg->pkg_type;
+                $combo_pkg = $pkg->combo_pkg;
+                $combo_person = $pkg->combo_person;
+                // dd($hospital_card_id, $tele_medicine_id, $pkg_type, $combo_pkg, $combo_person,$insurance_owner);
+
+
+
+                $child_order = array_combine($header, $child_order);
+
+                // -------------------------------------------------------------------------- Policy ID-------------------------------------------------------------
+
+
+                // -------------------------------------
+
+                $length = 7;
+                $characters = '0123456789';
+                $randomString = substr(str_shuffle($characters), 0, $length);
+
+                // -------------------------------------------------------
+                #policy number = partner2digit(instasure) + insuranceCompnay2digit(Progati) +Category(LH = life&health)+ + b2b_b2c2digit + 24(year) + random_string 7digit
+
+                $life_health = $pkg;
+                $partnerCode = $life_health->partner_code;
+                $insuranceCode = $life_health->insurance_company_code;
+                $b2b_b2c = $life_health->b2b_b2c_code == "B" ? "1" : "0";
+                // dd($life_health, $partnerCode, $insuranceCode, $b2b_b2c);
+                //year only last 2 digit:
+                $fullYear = date('Y'); // This gives you the full year, e.g., 2024
+                $year = substr($fullYear, -2); // Get the last two digits // 2
+
+                $policy_id = $partnerCode . $insuranceCode . "08" . $b2b_b2c . $year  . $randomString;
+
+                // ---------------------------------------------------end Policy ID-------------------------------------------------------------
+
+
+
+
+                //-------------------------------------------------update : child_order -------------------------------------------------------------
+                //  dd($tele_medicine_id);
+
+                $child_order_done = LifeAndHealthChildOrder::create($child_order);
+                // dd($child_order_done);
+                // dd($owner->id,$sold_by,$insurance_owner,$hospital_card_id,$tele_medicine_id,$total_amount,$before_discount_pirce,$with_discount_price,$parent_commission,$child_commission,$provider_amount,$admin_net_amount,$vat,$discount);
+
+                $child_order_done->update([
+                    'order_parent_id' => $order_ref_id,
+                    'customer_id' => $owner->id,
+                    'sold_by' => Auth::user()->id,
+                    'insurance_owner' => $order_checker != $previous_order?$insurance_owner:null,
+                    'hospital_card_id' => $hospital_card_id,
+                    'hospital_card_fee' => $hdc_price,
+                    'tele_medicine_id' => $tele_medicine_id,
+                    'teli_medicine_fee' => $tele_medicine_price,
+                    'price' => $pkg->price,
+                    'total_payment' => $total_amount,
+                    'before_discount_price' => $before_discount_pirce,
+                    'after_discount_price' => $with_discount_price,
+                    'parent_commission_amount' => $parent_commission,
+                    'child_commission_amount' => $child_commission,
+                    'insurance_provider_amount' => $provider_amount,
+                    'admin_total_amount' => $admin_net_amount,
+                    'vat' => $vat,
+                    'discount' => $discount ?? 0,
+                    'Pname' => $pkg->Pname, // pkg name
+                    'image' => $pkg->image, // pkg image
+                    'duration' => $pkg->duration, // pkg duration
+                    'total_payment' => $total_amount, // total payment
+                    'form_status' => 1,
+
+                    // ------------------------update policy Details --------------------------------------------------------
+
+                    "policy_id" => $policy_id,
+                    "policy_start_date" => now()->format('Y-m-d'),
+                    "policy_end_date" => now()->addYear($pkg->duration)->subDay()->format('Y-m-d'),
+
+                    //------------------------- update the coverage amount --------------------------------------------------
+                    // Coverage amounts from life_health_pkg_admin_table
+                    "life_coverage_amount" => $coverage_amount->life_coverage_amount,
+                    "natural_death_amount" => $coverage_amount->natural_death_amount,
+                    "accidental_death_amount" => $coverage_amount->accidental_death_amount,
+                    "major_diseases_amount" => $coverage_amount->major_diseases_amount,
+                    "ppd_claim_coverage_amount" => $coverage_amount->ppd_claim_coverage_amount,
+                    "ptd_amount" => $coverage_amount->ptd_amount,
+                    "critical_illness_coverage_amount" => $coverage_amount->critical_illness_coverage_amount,
+                    "ipd_coverage_amount" => $coverage_amount->ipd_coverage_amount,
+                    "ipd_accommodation_claim_amount" => $coverage_amount->ipd_accommodation_claim_amount,
+                    "ipd_accommodation_claim_chargeback_amount" => $coverage_amount->ipd_accommodation_claim_chargeback_amount,
+                    "ipd_accommodation_max_amount" => $coverage_amount->ipd_accommodation_max_amount,
+                    "ipd_accommodation_max_day" => $coverage_amount->ipd_accommodation_max_day,
+                    "ipd_accommodation_max_ccu_icu" => $coverage_amount->ipd_accommodation_max_ccu_icu,
+                    "ipd_treatment_claim_amount" => $coverage_amount->ipd_treatment_claim_amount,
+                    "ipd_treatment_consultant_amount" => $coverage_amount->ipd_treatment_consultant_amount,
+                    "ipd_treatment_routen_investigation_amount" => $coverage_amount->ipd_treatment_routen_investigation_amount,
+                    "ipd_treatment_routen_investigation_chargeback_amount" => $coverage_amount->ipd_treatment_routen_investigation_chargeback_amount,
+                    "ipd_treatment_routen_investigation_max_amount" => $coverage_amount->ipd_treatment_routen_investigation_max_amount,
+                    "ipd_treatment_routen_investigation_max_day" => $coverage_amount->ipd_treatment_routen_investigation_max_day,
+                    "ipd_treatment_medical_surgery_amount" => $coverage_amount->ipd_treatment_medical_surgery_amount,
+                    "ipd_treatment_medical_surgery_chargeback_amount" => $coverage_amount->ipd_treatment_medical_surgery_chargeback_amount,
+                    "ipd_treatment_medical_surgery_max_amount" => $coverage_amount->ipd_treatment_medical_surgery_max_amount,
+                    "ipd_treatment_medical_surgery_max_day" => $coverage_amount->ipd_treatment_medical_surgery_max_day,
+                    "ipd_post_op_treatment_amount" => $coverage_amount->ipd_post_op_treatment_amount,
+                    "ipd_post_op_treatment_chargeback_amount" => $coverage_amount->ipd_post_op_treatment_chargeback_amount,
+                    "ipd_post_op_treatment_max_amount" => $coverage_amount->ipd_post_op_treatment_max_amount,
+                    "ipd_post_op_treatment_max_day" => $coverage_amount->ipd_post_op_treatment_max_day,
+                    "opd_treatment_coverage_amount" => $coverage_amount->opd_treatment_coverage_amount,
+                    "opd_treatment_max_limit_amount" => $coverage_amount->opd_treatment_max_limit_amount,
+                    "opd_treatment_max_amount" => $coverage_amount->opd_treatment_max_amount,
+                    "opd_treatment_max_day" => $coverage_amount->opd_treatment_max_day,
+                    "opd_treatment_max_ccu_icu" => $coverage_amount->opd_treatment_max_ccu_icu,
+                    "opd_consultant_claim_amount" => $coverage_amount->opd_consultant_claim_amount,
+                    "opd_consultant_max_amount" => $coverage_amount->opd_consultant_max_amount,
+                    "opd_consultant_max_day" => $coverage_amount->opd_consultant_max_day,
+                    "opd_routine_investigation_amount" => $coverage_amount->opd_routine_investigation_amount,
+                    "opd_routine_investigation_max_amount" => $coverage_amount->opd_routine_investigation_max_amount,
+                    "opd_routine_investigation_max_day" => $coverage_amount->opd_routine_investigation_max_day,
+                    "opd_medical_surgery_amount" => $coverage_amount->opd_medical_surgery_amount,
+                    "opd_medical_surgery_max_amount" => $coverage_amount->opd_medical_surgery_max_amount,
+                    "opd_medical_surgery_max_day" => $coverage_amount->opd_medical_surgery_max_day,
+                    "opd_post_op_treatment_amount" => $coverage_amount->opd_post_op_treatment_amount,
+                    "opd_post_op_treatment_max_amount" => $coverage_amount->opd_post_op_treatment_max_amount,
+                    "opd_post_op_treatment_max_day" => $coverage_amount->opd_post_op_treatment_max_day,
+
+
+
+                ]);
+                //  dd($tele_medicine_id,$child_order_done->tele_medicine_id);
+
+
+                // --------------------------------------------------update the coverage amount table (have to work)---------------------------------
+
+                // dd($child_order_done);
+                $childOrderCoverageList = LifeAndHealthCoverage::create($child_order);
+
+                $childOrderCoverageList->update([
+                    'order_parent_id' => $order_ref_id,
+                    'customer_id' => $owner->id,
+                    'sold_by' => Auth::user()->id,
+                    'insurance_owner' => $order_checker != $previous_order?$insurance_owner:null,
+                    'hospital_card_id' => $hospital_card_id,
+                    'hospital_card_fee' => $hdc_price,
+                    'tele_medicine_id' => $tele_medicine_id,
+                    'teli_medicine_fee' => $tele_medicine_price,
+                    'price' => $pkg->price,
+                    'total_payment' => $total_amount,
+                    'before_discount_price' => $before_discount_pirce,
+                    'after_discount_price' => $with_discount_price,
+                    'parent_commission_amount' => $parent_commission,
+                    'child_commission_amount' => $child_commission,
+                    'insurance_provider_amount' => $provider_amount,
+                    'admin_total_amount' => $admin_net_amount,
+                    'vat' => $vat,
+                    'discount' => $discount ?? 0,
+                    'Pname' => $pkg->Pname, // pkg name
+                    'image' => $pkg->image, // pkg image
+                    'duration' => $pkg->duration, // pkg duration
+                    'total_payment' => $total_amount, // total payment
+                    'form_status' => 1,
+
+                    // ------------------------update policy Details --------------------------------------------------------
+
+                    "policy_id" => $policy_id,
+                    "policy_start_date" => now()->format('Y-m-d'),
+                    "policy_end_date" => now()->addYear($pkg->duration)->subDay()->format('Y-m-d'),
+                ]);
+                // --------------------------------------------------if order check is different then update order parent , hdc card , tele_mecine_id -------------------------------------------------------------
+
+                if ($order_checker != $previous_order) { // Check if the current order is different from the previous order
+
+                    // echo "Access this block => Order_SL changed. Current order: " . $order_checker . "<br>";
+
+                    // ------------------------------------------------update parent_order  -------------------------------------------------------------
+
+
+                    // echo "order serial number " . $Order_SL_Number[$counter+1]. " total amount : " . $total_amount . "combo pkg : " . $combo_pkg .  "<br>";
+                    // dd($combo_pkg === 'on' ? $total_amount * $Order_SL_Number[$counter+1] : $total_amount );
+                    // dd($total_amount, $Order_SL_Number[$counter+1],$counter);
+
+
+                    $order_parent = OrderParent::create([
+                        'category_id' => $category_id,
+                        'product_id' => $pkg->id,
+                        'order_ref_id' => $order_ref_id,
+                        'user_id' => $owner->id,
+                        'sold_by' => Auth::user()->id,
+                        'order_user_phone' => $owner_phone,
+                        'order_user_address' => $owner_address,
+                        // 'bill' => $total_amount,
+                        'bill' => $combo_pkg != 'on' ? $total_amount * $Order_SL_Number[$counter] : $total_amount , // combo pkg price fix
+                        'quantity' => $totalInsurance,
+                        'payment_frequency' => $payment_frequency ?? 0,
+                        'hospital_card_id' => $hospital_card_id ?? 0, //have to fix here: get the correct card by the card_id not user $cart->get() have to use first() method.
+                        'tele_medicine_id' => $tele_medicine_id ?? 0, //have to fix here: get the correct card by the card_id not user $cart->get() have to use first() method.
+                        'vat' => $vat,
+                        'life_combo_pkg' => $combo_pkg,
+                        'order_status' => 'Complete',
+                        'payment_status' => 'Complete',
+                        'pgw_status' => 'Complete',
+                        'pgw_name' => 'Credit',
+                    ]);
+                    // dd($category_id, $pkg->id, $randomString, $owner->id, $owner->phone, $owner->address, $total_amount, $totalInsurance, $payment_frequency ?? 0, $hospitalCardId ?? 0, $vat, $combo_pkg);
+
+                    //--------------------------------------------------generate telemedicine order with api:---------------------------------------------
+                    //--------------------------------------------------generate hdc order with api:-------------------------------------------------
+                    //-----------------------------------APi: hdc order & generate hdc card-----------------------------
+
+                    #only hdc owner can get the hdc card if  single order => 'free_hdc_id'is empty .
+                    // dd("Here order", $existingOrder);
+
+                    //*** */ API: HDC order & generate HDC card | have to fix here if hdc_pkg free then update this fileds.
+                    // don't delete this code :// if (empty($existingOrder->free_hdc_id && !empty($existingOrder->insurance_owner) && !empty($existingOrder->hospital_card_id)))
+                    // if (empty( !empty($existingOrder->insurance_owner) && !empty($existingOrder->hospital_card_id)))
+
+
+                    // dd($child_order_done->insurance_owner, $child_order_done->tele_medicine_id);
+
+
+
+                    // -------------------------------------
+                    if (empty($child_order_done->free_hdc_id) && !empty($child_order_done->insurance_owner) && !empty($child_order_done->hospital_card_id)) {
+
+
+                        // dd("api section", $existingOrder);
+
+                        $hdc_pkg_id = $child_order_done->hospital_card_id;
+
+                        $requestData['package_id'] = $hdc_pkg_id;
+
+                        // Create HDC order for owner only with API and handle JSON response
+                        $hdc_api_order_response = app()->call(
+                            [HDCCustomerController::class, 'hdc_place_order'],
+                            ['request' => new \Illuminate\Http\Request($requestData)]
+                        );
+
+                        // dd("api section", $hdc_api_order_response);
+
+                        // Decode the JSON response
+                        $hdc_api_order_response_array = $hdc_api_order_response->getData(true);
+
+                        // dd("hdc order complete ",$hdc_api_order_response_array); //this line is ok
+
+                        $order_parent_id = $hdc_api_order_response_array['Order Parent']['id'] ?? null;
+
+
+
+                        if ($order_parent_id !== null) {
+                            OrderParent::where('id', $order_parent_id)->update(['life_combo_pkg' => "Life combo package"]);
+                        }
+
+                        // dd("update combo pkg in order parent ",$order_parent_id);
+
+
+
+                        // Accessing the 'id' under 'Order Parent '
+                        $hdc_order_id = $hdc_api_order_response_array['HDC Order']['id'] ?? null;
+
+                        // dd($hdc_order_id); // Check the value of $order_parent_id
+
+
+
+
+
+                        if ($hdc_order_id != null) {
+                            // Create an instance of HDCCustomerController
+                            $hdcController = app()->make(HDCCustomerController::class);
+
+                            // Call the non-static method 'card_generate' on the instance
+                            // $hdc_api_generated_card = $hdcController->card_generate(['id' => $order_parent_id]);
+                            $hdc_api_generated_card = $hdcController->card_generate(new \Illuminate\Http\Request(['id' => $hdc_order_id]));
+
+                            // Check the generated card response
+                            // dd($hdc_api_generated_card);
+
+                            // Decode the JSON response
+                            $hdc_api_generated_card_array = $hdc_api_generated_card->getData(true);
+
+                            // dd($hdc_api_generated_card_array['data']['id']);
+
+                            #now update the single order 'free_hdc_id' with the generated card id:
+                            $child_order_done->free_hdc_card_id = $hdc_api_generated_card_array['data']['id'];
+                            $child_order_done->save();
+                            // Handle the JSON response and return the web page or perform further actions
+                        }
+                    }
+
+
+                    // dd("hdc card generated", $existingOrder);
+
+
+                    //--------------------------------------------------End generate hdc order with api:---------------------------------------------
+
+
+                    //------------------------------------Api : Tele Medicine Order----------------------------------------------------------------------
+                    // dd(!empty($existingOrder->insurance_owner) && !empty($existingOrder->tele_medicine_id));
+
+                    if (!empty($child_order_done->insurance_owner) && !empty($child_order_done->tele_medicine_id)) {
+
+
+                        // dd("api section", $existingOrder);
+
+
+                        $requestData['pkg_id'] = $child_order_done->tele_medicine_id;
+                        $requestData['order_user_phone'] = (string) $owner_phone;  // Ensure it's a string
+                        $requestData['order_user_address'] = $owner_address;
+
+                        // Check if promo_code_hidden is required, and add it to the request data
+                        $requestData['promo_code_hidden'] = $existingOrder->promo_code_hidden ?? 'N/A';
+
+                        // Create HDC order for owner only with API and handle JSON response
+                        $tele_api_order_response = app()->call(
+                            [TeleMedicineCustomerController::class, 'api_tele_medicine_order_make'],
+                            ['request' => new \Illuminate\Http\Request($requestData)]
+                        );
+
+                        // Debug the API response
+                        // dd("api section", $tele_api_order_response);
+
+                        // Decode the JSON response
+                        $tele_api_order_response_array = $tele_api_order_response->getData(true);
+
+                        // dd("Tele Medicine order complete ",$tele_api_order_response_array['Order']['id'],$all_order); //this line is ok
+
+                        $order_parent_id = $tele_api_order_response_array['Order']['id'] ?? null;
+
+
+                        //***need to update 2 thing 1. life combo pkg 2. order product / pkg  id in Tele Medicine Order and order_ref_id:
+                        if ($order_parent_id !== null) {
+                            $tele = TeleMedicineOrder::where('id', $order_parent_id)->update(['life_combo_pkg' => "Life combo package", 'product_id' => $child_order_done->tele_medicine_id, 'order_ref_id' => $child_order_done->order_parent_id]);
+                        }
+
+                        // dd("update combo pkg in order parent ",$tele??'');
+
+
+
+
+
+
+
+
+
+                    }
+                    //------------------------------------End Api : Tele Medicine Order------------------------------------------------------------------
+
+
+                }
+
+                $previous_order = $order_checker; // Set previous_order to the current value for the next iteration
+
+
+
+
+            }
+
+
+
+
+            // dd($owner_phone); // have to fix the length.
+
+
+
+            // return "user already created";
+            // return redirect()->route('childDealer.hr_employee_list')->with('success', 'Employee Created Successfully');
+            // ------------------------------------------------------
+        }
+
+        dd("Success");
+    }
