@@ -16,3 +16,42 @@ class RouteController extends Controller
         return redirect()->back()->with('success', 'Controller created successfully.');
     }
 }
+
+
+=============================================== run artisan command for queue active ==================================================
+
+
+
+  Route::get('/hdc-notification-email', function () {
+
+        //send the email : ---------------------------------------------
+
+        $user = Auth::user();
+        $user = User::findOrFail($user->id);
+        $name = "Mohammad Ali";
+        $hdcCard = "123698547896325";
+
+        Artisan::call('queue:work', [
+            '--once' => true
+        ]);
+
+        $user->notify(new HospitalCardEmailNotification($name, $hdcCard));
+
+
+
+
+        //end the email : ---------------------------------------------
+
+
+        //send the sms : ---------------------------------------------
+
+        // $user = Auth::user();
+
+        // $user = User::findOrFail($user->id);
+
+        // UserInfo::smsApi('8801859385787', "Test SMS");
+
+        //end the sms : ---------------------------------------------
+
+        return "Email sent Successfully!";
+    })->name('hdc_notification');
