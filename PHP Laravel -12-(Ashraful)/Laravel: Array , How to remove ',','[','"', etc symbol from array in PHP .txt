@@ -1,0 +1,29 @@
+ if($combo_pkg === 'on' )
+                // if($combo_pkg === 'on' && $combo_person > 1)
+                {
+                    for ($i = 1; $i <= $combo_person; $i++) {
+
+                        // dd($personName); // output => "owner","wife","son"
+                        // dd($personName[0]); // output => "
+                        // dd($personName[1]); // output => o
+                        // dd($personName[2]); // output => w
+                        // .........
+                        //but need $personName[1] = owner
+                        // $personName[2] = wife
+                        // $personName[3] = son
+
+                        $personNameArray = explode(',', $personName);
+
+
+                        for ($i = 1; $i <= $combo_person; $i++) {
+                            if (isset($personNameArray[$i - 1])) {  // Adjust for 0-based array indexing
+                                // Remove unwanted characters like [ and ] and then trim spaces and quotes
+                                $cleanName = str_replace(['[', ']', '"'], '', $personNameArray[$i - 1]);
+                                echo trim($cleanName);  // Output the cleaned name clean the white space
+                            } else {
+                                // dd("Index $i does not exist in the array.");
+                                // dd("Index $i does not exist in the array.");
+                            }
+                        }
+
+}
