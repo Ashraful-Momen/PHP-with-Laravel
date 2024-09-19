@@ -1,7 +1,0 @@
-                                                            <p class="text-dark">
-                                                                {!!  \Illuminate\Support\Str::limit($life_health->feature, 150) !!}
-                                                                @if (strlen($life_health->feature) > 150)
-                                                                    <a
-                                                                    href="{{ route('life-insurance-pkg-details', $life_health->id) }}"> id="read-more">...More</a>
-                                                                @endif
-                                                            </p>

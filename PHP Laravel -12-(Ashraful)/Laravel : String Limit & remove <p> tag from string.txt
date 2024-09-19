@@ -1,0 +1,9 @@
+                                                      <div class="col text-start">
+                                                            <p class="text-dark">
+                                                                {{ \Illuminate\Support\Str::limit(strip_tags($life_health->feature), 150) }}
+                                                            </p>
+                                                            @if (strlen(strip_tags($life_health->feature)) > 150)
+                                                                <a href="{{ route('life-insurance-pkg-details', $life_health->id) }}" id="read-more">...More</a>
+                                                            @endif
+                                                            
+                                                        </div>
