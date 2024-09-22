@@ -22,6 +22,8 @@ class User extends Authenticatable
 use App\Notifiaction\HospitalCardEmailNotification;
 $user->notify(new HospitalCardEmailNotification($varibale_others)); 
 
+or user facade =>  Notification::send($user, new HospitalCardEmailNotification($name, $hdcCard));
+
 
 
 -------------------------------
