@@ -7,12 +7,21 @@
 
 #send notification in 2 way : 
 -----------------------------
-1. method: 
+1.Add Notifiable to the User Model because we use $user by default email sent from user->email form DB
+-----------------------------
+class User extends Authenticatable
+{
+    use Notifiable;
+................
+................
+}
+
+
+2. method: 
 ----------
 use App\Notifiaction\HospitalCardEmailNotification;
 $user->notify(new HospitalCardEmailNotification($varibale_others)); 
 
-2. Facade: 
 
 
 -------------------------------
