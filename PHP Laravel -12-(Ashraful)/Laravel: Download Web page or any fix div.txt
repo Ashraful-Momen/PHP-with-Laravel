@@ -1,0 +1,28 @@
+<div class="card mb-3" id="cardToDownload">
+    <img src="{{ asset($card->card_image) }}" class="card-img-top" alt="Wild Landscape" />
+    <div class="card-body">
+        <h5 class="card-title text-capitalize">{{ $hdc_package->card_category }}</h5>
+        <p class="card-text">
+            {{ $hdc_package->description }}
+        </p>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        // Select the div element to be converted to PDF
+        var element = document.getElementById('cardToDownload');
+
+        // Options for pdf generation
+        var opt = {
+            margin: 1,
+            filename: 'card-details.pdf', // Set the name of the downloaded PDF
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        // Generate the PDF and download it automatically
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
