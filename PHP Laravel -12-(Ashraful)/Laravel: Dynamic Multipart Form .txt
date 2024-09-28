@@ -1,0 +1,88 @@
+@foreach ($cart as $i => $cartItem)
+    @php
+        $life_combo_pkg = App\Model\LifeAndHealth::find($cartItem->product_id);
+        $life_pkg_personName = json_decode($life_combo_pkg->personName, true);
+        $totalFormSteps = count($life_pkg_personName); // Total number of form steps
+        $cart_id = $cartItem->id;
+    @endphp
+
+    @if ($life_combo_pkg->combo_pkg == 'on')
+        <form id="multiStepForm_{{ $i }}" method="POST" action="{{ route('insert_cart_data') }}">
+            @csrf
+
+            <input class="form-control" type="number" name="cart_id" hidden value="{{ $cart_id }}" required>
+            <input class="form-control" type="text" name="form_status" hidden value="1" required>
+            <input type="text" name="insurance_owner" hidden value="{{ json_encode(['name' => Auth::user()->name, 'user_id' => Auth::user()->id]) }}">
+
+            <!-- Step Loop -->
+            @for ($step = 0; $step < $totalFormSteps; $step++)
+                <div class="step {{ $step == 0 ? 'active' : '' }} shadow-lg p-4" id="step{{ $step }}">
+                    <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="{{ ($step + 1) * (100 / $totalFormSteps) }}" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{ ($step + 1) * (100 / $totalFormSteps) }}%"></div>
+                    </div>
+                    <br>
+                    <h2 class="text-center">Step {{ $step + 1 }}: {{ $step == 0 ? 'Insurance Owner Info' : 'Insurance Nominee Info' }} </h2>
+                    <hr>
+
+                    <!-- Example Form Inputs for Each Step -->
+                    <div class="form-group">
+                        <!-- Dynamic form fields based on the step -->
+                        Step {{ $step + 1 }} Content
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="btn-group w-100" role="group">
+                        @if ($step > 0)
+                            <button type="button" class="btn text-white prev-step col rounded-pill p-1 btn-sm w-25" style="background-color:#002e5b">Previous</button>
+                        @endif
+
+                        @if ($step == $totalFormSteps - 1)
+                            <button type="submit" class="btn rounded-pill text-white w-25 p-1 ms-2 btn-sm" style="background-color:#002e5b">Submit</button>
+                        @else
+                            <button type="button" class="btn rounded-pill text-white next-step w-25 p-1 ms-2 btn-sm" style="background-color:#002e5b">Next</button>
+                        @endif
+                    </div>
+                </div>
+            @endfor
+        </form>
+    @endif
+@endforeach
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        var totalSteps = {{ $totalFormSteps }}; // Dynamic total steps
+        
+        $(".next-step").click(function() {
+            var form = $(this).closest('form');
+            var currentStep = form.find('.step.active');
+            var nextStep = currentStep.next('.step');
+
+            if (nextStep.length) {
+                currentStep.removeClass('active');
+                nextStep.addClass('active');
+                // Update progress bar
+                var progress = (nextStep.index() / totalSteps) * 100;
+                form.find(".progress-bar").css("width", progress + "%");
+            }
+        });
+
+        $(".prev-step").click(function() {
+            var form = $(this).closest('form');
+            var currentStep = form.find('.step.active');
+            var prevStep = currentStep.prev('.step');
+
+            if (prevStep.length) {
+                currentStep.removeClass('active');
+                prevStep.addClass('active');
+                // Update progress bar
+                var progress = (prevStep.index() / totalSteps) * 100;
+                form.find(".progress-bar").css("width", progress + "%");
+            }
+        });
+    });
+</script>
