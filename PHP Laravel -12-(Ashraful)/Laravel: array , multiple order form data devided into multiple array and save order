@@ -1,0 +1,464 @@
+dynamic form => 
+-------------------
+
+{{-- ============================ Form for update user profile ================================ --}}
+                                            <form action="{{ route('update_customer_order_info') }}" method="POST">
+                                                @csrf
+                                                {{-- @method('PUT') <!-- This is for updating --> --}}
+
+                                                <input type="text" name="order_parent_id"
+                                                    value="{{ $c->order_parent_id }}" hidden>
+                                                <input type="number" name="product_id" value="{{ $c->product_id }}"
+                                                    hidden>
+
+                                                    @foreach ($order as $step => $c)
+                                                    <input type="id" name="id_{{ $step }}" value="{{ $c->id }}" hidden>
+                                                    <!-- Single item -->
+                                                    <div class="row">
+                                                        <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
+                                                            <!-- Image -->
+                                                            <div class="bg-image hover-overlay hover-zoom ripple rounded" data-mdb-ripple-color="light">
+                                                                <img src="{{ asset('images/packages/' . $c->image) }}" alt="Image not Found" class="w-100" />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
+                                                            <!-- Data -->
+                                                            <p><strong>{{ $c->Pname }}</strong></p>
+
+                                                            <!-- Form Inputs -->
+                                                            <div class="mb-4">
+                                                                <label for="o_name_{{ $step }}">Insurance Owner Name:</label>
+                                                                <input type="text" name="o_name_{{ $step }}" value="{{ $c->o_name }}" class="form-control">
+                                                            </div>
+                                                            <div class="d-flex justify-content-center mb-4">
+                                                                <label class="form-label ms-2">Gender:</label>
+                                                                <div class="col form-check form-check-inline">
+                                                                    <input type="radio" name="o_gender_{{ $step }}" value="male" id="maleRadio_{{ $step }}" class="form-check-input">
+                                                                    <label class="form-check-label" for="maleRadio_{{ $step }}">Male</label>
+                                                                </div>
+                                                                <div class="col form-check form-check-inline">
+                                                                    <input type="radio" name="o_gender_{{ $step }}" value="female" id="femaleRadio_{{ $step }}" class="form-check-input">
+                                                                    <label class="form-check-label" for="femaleRadio_{{ $step }}">Female</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <label for="o_phone_{{ $step }}">Insurance Owner Mobile:</label>
+                                                                <input type="text" name="o_phone_{{ $step }}" value="{{ $c->o_phone }}" class="form-control">
+                                                            </div>
+                                                            <div class="mb-4">
+                                                                <label for="o_email_{{ $step }}">Insurance Owner Email:</label>
+                                                                <input type="text" name="o_email_{{ $step }}" value="{{ $c->o_email }}" class="form-control">
+                                                            </div>
+                                                            <div class="mb-4">
+                                                                <label for="o_DOB_{{ $step }}">Insurance Owner Date of Birth:</label>
+                                                                <input type="text" name="o_DOB_{{ $step }}" value="{{ $c->o_DOB }}" class="form-control">
+                                                            </div>
+                                                            <div class="mb-4">
+                                                                <label class="form-label" for="o_id_type_{{ $step }}">Identification Type</label>
+                                                                <select name="o_id_type_{{ $step }}" class="form-select form-control" aria-label="Default select example">
+                                                                    <option value="0" selected disabled>Select Identification:</option>
+                                                                    <option value="1">NID</option>
+                                                                    <option value="2">Passport</option>
+                                                                    <option value="3">Birth Certificate</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-4">
+                                                                <label for="o_id_number_{{ $step }}">Insurance Owner NID:</label>
+                                                                <input type="text" name="o_id_number_{{ $step }}" value="{{ $c->o_id_number }}" class="form-control">
+                                                            </div>
+
+                                                            {{-- ========================= Nominee Part ========================== --}}
+                                                            <div class="mb-4">
+                                                                <label for="n_name_{{ $step }}">Insurance Nominee Name:</label>
+                                                                <input type="text" name="n_name_{{ $step }}" value="{{ $c->n_name }}" class="form-control">
+                                                            </div>
+
+                                                            <div class="d-flex justify-content-center mb-4">
+                                                                <label class="form-label ms-2">Nominee Gender:</label>
+                                                                <div class="col form-check form-check-inline">
+                                                                    <input type="radio" name="n_gender_{{ $step }}" value="male" id="nomineeMaleRadio_{{ $step }}" class="form-check-input" {{ $c->n_gender == 'male' ? 'checked' : '' }}>
+                                                                    <label class="form-check-label" for="nomineeMaleRadio_{{ $step }}">Male</label>
+                                                                </div>
+                                                                <div class="col form-check form-check-inline">
+                                                                    <input type="radio" name="n_gender_{{ $step }}" value="female" id="nomineeFemaleRadio_{{ $step }}" class="form-check-input" {{ $c->n_gender == 'female' ? 'checked' : '' }}>
+                                                                    <label class="form-check-label" for="nomineeFemaleRadio_{{ $step }}">Female</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <label for="n_phone_{{ $step }}">Nominee Mobile:</label>
+                                                                <input type="text" name="n_phone_{{ $step }}" value="{{ $c->n_phone }}" class="form-control">
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <label for="n_email_{{ $step }}">Nominee Email:</label>
+                                                                <input type="text" name="n_email_{{ $step }}" value="{{ $c->n_email }}" class="form-control">
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <label for="n_DOB_{{ $step }}">Nominee Date of Birth:</label>
+                                                                <input type="text" name="n_DOB_{{ $step }}" value="{{ $c->n_DOB }}" class="form-control">
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <label class="form-label" for="n_id_type_{{ $step }}">Nominee Identification Type</label>
+                                                                <select name="n_id_type_{{ $step }}" class="form-select form-control" aria-label="Default select example">
+                                                                    <option value="0" selected disabled>Select Identification:</option>
+                                                                    <option value="1" {{ $c->n_id_type == 1 ? 'selected' : '' }}>NID</option>
+                                                                    <option value="2" {{ $c->n_id_type == 2 ? 'selected' : '' }}>Passport</option>
+                                                                    <option value="3" {{ $c->n_id_type == 3 ? 'selected' : '' }}>Birth Certificate</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <label for="n_id_number_{{ $step }}">Nominee Identification Number:</label>
+                                                                <input type="text" name="n_id_number_{{ $step }}" value="{{ $c->n_id_number }}" class="form-control">
+                                                            </div>
+                                                            {{-- ========================= Nominee Part ========================== --}}
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+
+
+
+                                                <button type="submit" class="btn btn-primary mt-3">Update
+                                                    Order</button>
+                                            </form>
+
+                                            <hr class="mt-4">
+
+
+                                            {{-- ============================ End Form for update user profile ============================ --}}
+
+
+
+=====================================
+request dd($reqeust) => 
+====================================
+  +request: Symfony\Component\HttpFoundation\InputBag {#45 ▼
+    #parameters: array:47 [▼
+      "_token" => "0nFoWqiLn6wzENXBhBWaDtPL5s6LT17Zwk6FsZxZ"
+      "order_parent_id" => "drKqfDMbyC"
+      "product_id" => "50"
+      "id_0" => "221"
+      "o_name_0" => "Hector Stein"
+      "o_phone_0" => "985"
+      "o_email_0" => "johepanony@mailinator.com"
+      "o_DOB_0" => "1975-11-07"
+      "o_id_number_0" => "133"
+      "n_name_0" => null
+      "n_phone_0" => null
+      "n_email_0" => null
+      "n_DOB_0" => null
+      "n_id_number_0" => null
+      "id_1" => "222"
+      "o_name_1" => "Leo Chaney"
+      "o_phone_1" => "804"
+      "o_email_1" => "lateqi@mailinator.com"
+      "o_DOB_1" => "1976-04-06"
+      "o_id_number_1" => "244"
+      "n_name_1" => null
+      "n_phone_1" => null
+      "n_email_1" => null
+      "n_DOB_1" => null
+      "n_id_number_1" => null
+      "id_2" => "223"
+      "o_name_2" => "Leigh Ferguson"
+      "o_phone_2" => "141"
+      "o_email_2" => "rybefytewi@mailinator.com"
+      "o_DOB_2" => "1977-12-18"
+      "o_id_number_2" => "686"
+      "n_name_2" => null
+      "n_phone_2" => null
+      "n_email_2" => null
+      "n_DOB_2" => null
+      "n_id_number_2" => null
+      "id_3" => "224"
+      "o_name_3" => "Mara Harvey"
+      "o_phone_3" => "370"
+      "o_email_3" => "vycysisy@mailinator.com"
+      "o_DOB_3" => "1999-02-28"
+      "o_id_number_3" => "186"
+      "n_name_3" => null
+      "n_phone_3" => null
+      "n_email_3" => null
+      "n_DOB_3" => null
+      "n_id_number_3" => null
+    ]
+  }
+
+================================================save those data as multiple order =================================================
+
+public function insert_dynamic_form_data(Request $request)
+    {
+
+
+        $data = $request->all();
+        // dd('Hello',$data);
+         // --------------------------------------------------------------------------------
+         //----------------------data insert part-------------------------------------------
+
+
+        //data insert part to DB ------------------------------------------------------
+
+        $cart_data = Cart::find($request->cart_id);
+
+        //coverage amount from life_pkg_admin_table : _________________________________
+        $coverage_amount = LifeAndHealth::find($cart_data->product_id);
+
+
+        // dd($cart_data,$cart_data->tele_medicine_id);
+
+
+        $payment_frequency = $cart_data->pluck('payment_frequency');
+
+        //************************************ */
+        // echo $payment_frequency = $cart->pluck('payment_frequency')."<br>";  => need to save the payment frequency to the life_child_order , and order parent table .
+
+        $paymentFrequencies = $cart_data->pluck('payment_frequency')->toArray();
+        $payment_frequency = !empty($paymentFrequencies) ? (int) $paymentFrequencies[0] : null; // convert array data to the int .
+         // --------------------------------------------------------------------------------
+        // Initialize arrays for each type of data
+        $names = [];
+        $dob = [];
+        $genders = [];
+        $idTypes = [];
+        $idNumbers = [];
+        $idFiles = [];
+        $phones = [];
+        $emails = [];
+
+        // Loop through the data
+        foreach ($data as $key => $value) {
+            // Check for keys with the 'o_' prefix
+            if (strpos($key, 'o_name_') === 0) {
+                $names[] = $value;
+            } elseif (strpos($key, 'o_DOB_') === 0) {
+                $dob[] = $value;
+            } elseif (strpos($key, 'o_gender_') === 0) {
+                $genders[] = $value;
+            } elseif (strpos($key, 'o_id_type_') === 0) {
+                $idTypes[] = $value;
+            } elseif (strpos($key, 'o_id_number_') === 0) {
+                $idNumbers[] = $value;
+            } elseif (strpos($key, 'o_id_file_') === 0) {
+                $idFiles[] = $value;
+            } elseif (strpos($key, 'o_phone_') === 0) {
+                $phones[] = $value;
+            } elseif (strpos($key, 'o_email_') === 0) {
+                $emails[] = $value;
+            }
+        }
+
+        // dd(count($names));
+
+        for ($i = 0; $i < count($names); $i++) {
+            // echo $names[$i] . ' ' . $dob[$i] . ' ' . $genders[$i] . ' ' . $idTypes[$i] . ' ' . $idNumbers[$i] . ' ' . $idFiles[$i] . ' ' . $phones[$i] . ' ' . $emails[$i] . '<br>';
+
+            $policyData1 = PolicyData::create([
+
+                //--------------data From cart_id---------------------------
+                // 'order_parent_id' => $cart_data('order_parent_id'),
+                'cart_id' => $request->cart_id,
+                'product_id' => $cart_data->product_id,
+                'customer_id' => $cart_data->customer_id,
+                'Pname' => $cart_data->Pname,
+                'image' => $cart_data->image,
+                'duration' => $cart_data->duration,
+                'discount' => $cart_data->discount,
+                'price' => $cart_data->price,
+                'hospital_card_id' => $cart_data->hospital_card_id,
+                'tele_medicine_id' => $cart_data->tele_medicine_id,
+                'hospital_card_fee' => $cart_data->hospital_card_fee,
+                'teli_medicine_fee' => $cart_data->teli_medicine_fee,
+                'before_discount_price' => $cart_data->before_discount_price,
+                'after_discount_price' => $cart_data->with_discount_price,
+                'payment_frequency' => $payment_frequency,
+                'promo_code' => $cart_data->promo_code, // promo code --------------------------------
+
+                //------------- data From ----------------------------------
+                // 'order_parent_id' => $randomString,
+                'form_status' => $request->form_status??0,
+                'o_name' => $names[$i],
+                'o_gender' => $genders[$i],
+                'o_phone' => $phones[$i],
+                'o_email' => $emails[$i],
+                'o_DOB' => $dob[$i],
+                'o_id_type' => $idTypes[$i],
+                'o_id_number' => $idNumbers[$i],
+                'o_id_file' => $idFiles[$i],
+                'relation_with_nominee' => $request->relation_with_nominee??null,
+                'n_name' => $request->input('n_name'),
+                'n_gender' => $request->input('n_gender'),
+                'n_phone' => $request->input('n_phone'),
+                'n_email' => $request->input('n_email'),
+                'n_DOB' => $request->input('n_DOB'),
+                'n_id_type' => $request->input('n_id_type'),
+                'n_id_number' => $request->input('n_id_number'),
+                'n_id_file' => $request->input('n_id_file'),
+                'vat' => $cart_data->vat,
+                'insurance_owner' => $i == 0 ? $request->insurance_owner : null,
+                // //---------------- coverage amount : form life_health_pkg_admin_table -------------------
+                //---------------- coverage amount -------------------
+                "life_coverage_amount" => $coverage_amount->life_coverage_amount,
+                "natural_death_amount" => $coverage_amount->natural_death_amount,
+                "accidental_death_amount" => $coverage_amount->accidental_death_amount,
+                "major_diseases_amount" => $coverage_amount->major_diseases_amount,
+                "ppd_claim_coverage_amount" => $coverage_amount->ppd_claim_coverage_amount,
+                "ptd_amount" => $coverage_amount->ptd_amount,
+                "critical_illness_coverage_amount" => $coverage_amount->critical_illness_coverage_amount,
+                "ipd_coverage_amount" => $coverage_amount->ipd_coverage_amount,
+                "ipd_accommodation_claim_amount" => $coverage_amount->ipd_accommodation_claim_amount,
+                "ipd_accommodation_claim_chargeback_amount" => $coverage_amount->ipd_accommodation_claim_chargeback_amount,
+                "ipd_accommodation_max_amount" => $coverage_amount->ipd_accommodation_max_amount,
+                "ipd_accommodation_max_day" => $coverage_amount->ipd_accommodation_max_day,
+                "ipd_accommodation_max_ccu_icu" => $coverage_amount->ipd_accommodation_max_ccu_icu,
+                "ipd_treatment_claim_amount" => $coverage_amount->ipd_treatment_claim_amount,
+                "ipd_treatment_consultant_amount" => $coverage_amount->ipd_treatment_consultant_amount,
+                "ipd_treatment_routen_investigation_amount" => $coverage_amount->ipd_treatment_routen_investigation_amount,
+                "ipd_treatment_medicine_amount" => $coverage_amount->ipd_treatment_medicine_amount,
+                "ipd_treatment_surgical_amount" => $coverage_amount->ipd_treatment_surgical_amount,
+                "ipd_treatment_ancillary_amount" => $coverage_amount->ipd_treatment_ancillary_amount,
+                "ipd_treatment_others_amount" => $coverage_amount->ipd_treatment_others_amount,
+                "opd_coverage_amount" => $coverage_amount->opd_coverage_amount,
+                "opd_consultation_claim_amount" => $coverage_amount->opd_consultation_claim_amount,
+                "opd_test_claim_amount" => $coverage_amount->opd_test_claim_amount,
+                "opd_medicines_claim_amount" => $coverage_amount->opd_medicines_claim_amount,
+                "opd_medicine_presription_amount" => $coverage_amount->opd_medicine_presription_amount,
+                "dental_coverage_claim_amount" => $coverage_amount->dental_coverage_claim_amount,
+                "dental_consultation_claim_amount" => $coverage_amount->dental_consultation_claim_amount,
+                "dental_temporary_permanent_filling_amount" => $coverage_amount->dental_temporary_permanent_filling_amount,
+                "dental_routine_surgical_extraction_amount" => $coverage_amount->dental_routine_surgical_extraction_amount,
+                "dental_medication_amount" => $coverage_amount->dental_medication_amount,
+                "dental_xray_amount" => $coverage_amount->dental_xray_amount,
+                "dental_root_canal_amount" => $coverage_amount->dental_root_canal_amount,
+                "dental_scaling_amount" => $coverage_amount->dental_scaling_amount,
+                "dental_others_amount" => $coverage_amount->dental_others_amount,
+                "eye_coverage_amount" => $coverage_amount->eye_coverage_amount,
+                "eye_optiocal_claim_amount" => $coverage_amount->eye_optiocal_claim_amount,
+                "eye_vision_test_claim_amount" => $coverage_amount->eye_vision_test_claim_amount,
+                "eye_consultation_claim_amount" => $coverage_amount->eye_consultation_claim_amount,
+                "eye_medication_claim_amount" => $coverage_amount->eye_medication_claim_amount,
+                "eye_lens_claim_amount" => $coverage_amount->eye_lens_claim_amount,
+                "eye_frame_claim_amount" => $coverage_amount->eye_frame_claim_amount,
+                "eye_others_claim_amount" => $coverage_amount->eye_others_claim_amount,
+                "maternity_coverage_amount" => $coverage_amount->maternity_coverage_amount,
+                "maternity_uterine_preganancy_amount" => $coverage_amount->maternity_uterine_preganancy_amount,
+                "maternity_normal_delivery_amount" => $coverage_amount->maternity_normal_delivery_amount,
+                "maternity_legal_abortion_miscarriage_amount" => $coverage_amount->maternity_legal_abortion_miscarriage_amount,
+                "maternity_others_amount" => $coverage_amount->maternity_others_amount,
+                "maternity_pre_post_hospitalization_amount" => $coverage_amount->maternity_pre_post_hospitalization_amount,
+                "maternity_pre_post_natal_amount" => $coverage_amount->maternity_pre_post_natal_amount,
+                "maternity_baby_amount" => $coverage_amount->maternity_baby_amount,
+                "maternity_vaccination_amount" => $coverage_amount->maternity_vaccination_amount,
+                "ambulance_claim_amount" => $coverage_amount->ambulance_claim_amount,
+
+                // //coverage amount : form life_health_pkg_admin_table
+
+                // "life_coverage_amount"=>$coverage_amount->life_coverage_amount,
+                // "natural_death_amount"=>$coverage_amount->natural_death_amount,
+                // "accidental_death_amount",
+                // "major_diseases_amount",
+                // "ppd_claim_coverage_amount",
+                // "ptd_claim_chargeback_amount",
+                // "critical_illness_coverage_amount",
+
+                // "ipd_coverage_amount",
+                // "ipd_accommodation_claim_amount",
+                // "ipd_accommodation_claim_chargeback_amount",
+                // "ipd_accommodation_max_amount",
+                // "ipd_accommodation_max_day",
+                // "ipd_accommodation_max_ccu_icu",
+
+                // "ipd_treatment_claim_amount",
+                // "ipd_treatment_consultant_amount",
+                // "ipd_treatment_routen_investigation_amount",
+                // "ipd_treatment_medicine_amount",
+                // "ipd_treatment_surgical_amount",
+                // "ipd_treatment_ancillary_amount",
+                // "ipd_treatment_others_amount",
+
+                // "opd_coverage_amount",
+                // "opd_consultation_claim_amount",
+                // "opd_test_claim_amount",
+                // "opd_medicines_claim_amount",
+                // "opd_medicine_presription_amount",
+
+                // "dental_coverage_claim_amount",
+                // "dental_consultation_claim_amount",
+                // "dental_temporary_permanent_filling_amount",
+                // "dental_routine_surgical_extraction_amount",
+                // "dental_medication_amount",
+                // "dental_xray_amount",
+                // "dental_root_canal_amount",
+                // "dental_scaling_amount",
+                // "dental_others_amount",
+
+
+                // "eye_coverage_amount",
+                // "eye_optiocal_claim_amount",
+                // "eye_vision_test_claim_amount",
+                // "eye_consultation_claim_amount",
+                // "eye_medication_claim_amount",
+                // "eye_lens_claim_amount",
+                // "eye_frame_claim_amount",
+                // "eye_others_claim_amount",
+
+
+                // "maternity_coverage_amount",
+                // "maternity_uterine_preganancy_amount",
+                // "maternity_normal_delivery_amount",
+                // "maternity_legal_abortion_miscarriage_amount",
+                // "maternity_others_amount",
+                // "maternity_pre_post_hospitalization_amount",
+                // "maternity_pre_post_natal_amount",
+                // "maternity_baby_amount",
+                // "maternity_vaccination_amount",
+
+                // "ambulance_claim_amount",
+
+            ]);
+        }
+
+
+        return cart_all::make_order( $request);
+
+
+
+
+
+        // Debugging output to verify
+        dd([
+            'cart_id' => $data['cart_id'],
+            'form_status' => $data['form_status'],
+            'insurance_owner' => $data['insurance_owner'],
+            'names' => $names,
+            'dob' => $dob,
+            'genders' => $genders,
+            'idTypes' => $idTypes,
+            'idNumbers' => $idNumbers,
+            'idFiles' => $idFiles,
+            'phones' => $phones,
+            'emails' => $emails,
+        ]);
+
+
+
+
+
+
+
+        // --------------------------------------------------------------------------------
+        $cleanedData = [];
+        foreach ($data as $key => $value) {
+            // Remove the trailing numbers (_0, _1, etc.) from keys starting with 'o_'
+            $newKey = preg_replace('/_(\d+)$/', '', $key); //**** */ Remove _0, _1, etc. form o_name_1 to o_name
+            $cleanedData[$newKey][] = $value;
+        }
+
+        // Example output for 'o_name' would now include all values without _0, _1, etc.
+        dd($cleanedData);
+        // --------------------------------------------------------------------------------
+    }
