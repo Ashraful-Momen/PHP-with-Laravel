@@ -1,0 +1,55 @@
+To achieve the behavior where the button only appears when the checkbox is checked, you can use JavaScript or jQuery to dynamically show or hide the "Proceed to Checkout" button based on the checkbox state.
+
+Here’s how you can modify the HTML and use jQuery to implement this:
+
+### HTML Structure
+
+```html
+<div class="text-center">
+    <b> 
+        "All the information you provided has been confirmed as accurate. Check Here =>
+        <input type="checkbox" id="confirmationCheckbox" class="btn btn-primary"
+            {{ $all_order->confirm_form_submit_by_user == 'ok' ? 'checked' : '' }}>
+        " 
+    </b>
+    <br>
+</div>
+
+<!-- Initially hide the Proceed to Checkout button -->
+<div id="checkoutButtonContainer" style="display: none;">
+    <button type="submit" class="btn btn-danger btn-sm btn-block form-control border-0 w-100">
+        Proceed to Checkout Page
+    </button>
+</div>
+```
+
+### jQuery Script to Show the Button
+
+```html
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Check if the checkbox is already checked on page load
+    if ($('#confirmationCheckbox').is(':checked')) {
+        $('#checkoutButtonContainer').show(); // Show the button if checkbox is already checked
+    }
+
+    // Event listener for checkbox change
+    $('#confirmationCheckbox').change(function() {
+        if ($(this).is(':checked')) {
+            $('#checkoutButtonContainer').show(); // Show button when checkbox is checked
+        } else {
+            $('#checkoutButtonContainer').hide(); // Hide button when checkbox is unchecked
+        }
+    });
+});
+</script>
+```
+
+### Explanation
+
+1. **Checkbox Initialization**: On page load, the script checks whether the checkbox is already checked (`{{ $all_order->confirm_form_submit_by_user == 'ok' ? 'checked' : '' }}`). If it is, the button is shown.
+2. **Event Listener**: The `change` event is attached to the checkbox. When the checkbox is checked, the button will be displayed. If the checkbox is unchecked, the button will be hidden.
+3. **Hidden by Default**: The button is initially hidden using `style="display: none;"`. This ensures that it is not visible until the checkbox is checked.
+
+This script will make sure the "Proceed to Checkout" button only appears after the user confirms the information by checking the checkbox.
