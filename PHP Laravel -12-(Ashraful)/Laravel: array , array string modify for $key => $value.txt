@@ -1,0 +1,64 @@
+ #parameters: array:47 [▼
+      "_token" => "0nFoWqiLn6wzENXBhBWaDtPL5s6LT17Zwk6FsZxZ"
+      "order_parent_id" => "drKqfDMbyC"
+      "product_id" => "50"
+      "id_0" => "221"
+      "o_name_0" => "Hector Stein"
+      "o_phone_0" => "985"
+      "o_email_0" => "johepanony@mailinator.com"
+      "o_DOB_0" => "1975-11-07"
+      "o_id_number_0" => "133"
+      "n_name_0" => null
+      "n_phone_0" => null
+      "n_email_0" => null
+      "n_DOB_0" => null
+      "n_id_number_0" => null
+      "id_1" => "222"
+      "o_name_1" => "Leo Chaney"
+      "o_phone_1" => "804"
+      "o_email_1" => "lateqi@mailinator.com"
+      "o_DOB_1" => "1976-04-06"
+      "o_id_number_1" => "244"
+      "n_name_1" => null
+      "n_phone_1" => null
+      "n_email_1" => null
+      "n_DOB_1" => null
+      "n_id_number_1" => null
+      "id_2" => "223"
+      "o_name_2" => "Leigh Ferguson"
+      "o_phone_2" => "141"
+      "o_email_2" => "rybefytewi@mailinator.com"
+      "o_DOB_2" => "1977-12-18"
+      "o_id_number_2" => "686"
+      "n_name_2" => null
+      "n_phone_2" => null
+      "n_email_2" => null
+      "n_DOB_2" => null
+      "n_id_number_2" => null
+      "id_3" => "224"
+      "o_name_3" => "Mara Harvey"
+      "o_phone_3" => "370"
+      "o_email_3" => "vycysisy@mailinator.com"
+      "o_DOB_3" => "1999-02-28"
+      "o_id_number_3" => "186"
+      "n_name_3" => null
+      "n_phone_3" => null
+      "n_email_3" => null
+      "n_DOB_3" => null
+      "n_id_number_3" => null
+    ]
+  }
+
+$data = $reqeust->all();
+
+// --------------------------------------------------------------------------------
+        $cleanedData = [];
+        foreach ($data as $key => $value) {
+            // Remove the trailing numbers (_0, _1, etc.) from keys starting with 'o_'
+            $newKey = preg_replace('/_(\d+)$/', '', $key); //**** */ Remove _0, _1, etc. form o_name_1 to o_name
+            $cleanedData[$newKey][] = $value;
+        }
+
+        // Example output for 'o_name' would now include all values without _0, _1, etc.
+        dd($cleanedData);
+        // --------------------------------------------------------------------------------
