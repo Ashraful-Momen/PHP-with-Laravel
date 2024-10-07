@@ -97,7 +97,8 @@ Route::get('/tele/deregister/check',function(){
 =========================================================================================================================================
 
 
-
+#this function decrypt the encoded data : 
+------------------------------------------
 
 function customer_deregister(Request $request)
 {
