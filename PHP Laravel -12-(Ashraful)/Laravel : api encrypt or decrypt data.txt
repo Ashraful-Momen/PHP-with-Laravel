@@ -1,0 +1,160 @@
+
+Route::get('/tele/deregister/check',function(){
+        // Data to encrypt
+        $data = [
+            "clientId" => "WwDUYRNavkwlwTXeV6ReSONPc0W5MjJETTNsX1fp4dZnpgzyDyE16",
+            "users" => [
+                [
+                    "customer_phone" =>'01859385787',
+                    "date" => '2024-07-12',
+
+                ]
+            ],
+
+        ];
+
+
+
+
+        //,"expiredDate" => "2025-09-09"
+
+
+        // Convert data to JSON
+        $jsonData = json_encode($data);
+
+        // Encryption key and IV
+        $key = '2nshhul9d7lzdak1efy0gjdjwc3hzdns'; // 32 bytes for AES-256
+        $iv = 'z3w5ihuok1amrdns'; // 16 bytes IV
+
+        // Encrypt the data
+        $encryptedData = openssl_encrypt($jsonData, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+
+        // Encode encrypted data to base64
+        $encryptedDataBase64 = base64_encode($encryptedData);
+
+        //echo "Encrypted Data: " . $encryptedDataBase64 . "\n";
+
+
+
+        // API URL
+        $apiUrl = '127.0.0.1:8000/api/tele_medicine/deregister';
+
+        // Prepare the data to send
+        $requestData = [
+            'clientId' => '66d7e1de9ca06c103c761f68',
+            'encryptedData' => $encryptedDataBase64
+        ];
+
+        // Initialize cURL
+        $ch = curl_init($apiUrl);
+
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($requestData));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: */*',
+            'Content-Type: application/json'
+        ]);
+
+        // Execute the request and get the response
+        $response = curl_exec($ch);
+
+        // Check for errors
+        // if (curl_errno($ch)) {
+        //     echo 'cURL error: ' . curl_error($ch);
+        // } else {
+        //     echo 'Response: ' . $response;
+        // }
+
+        // dd($response);
+
+
+
+
+
+        // Decode the response
+        $decodedResponse = json_decode($response, true);
+
+        return $decodedResponse;
+
+
+
+
+
+        // Log::info("Tele Medicine owner create in Zaynax Panel", ["Tele Medicie response from main api function" => $decodedResponse]);
+
+
+        // Close cURL
+        curl_close($ch);
+
+        // return response()->json([
+        //     $decodedResponse
+        // ]);
+    });
+
+
+=========================================================================================================================================
+
+
+
+
+function customer_deregister(Request $request)
+{
+    // Check if the encryptedData field is present
+    if (!$request->has('encryptedData')) {
+        return response()->json(['status' => false, 'message' => 'No encrypted data provided']);
+    }
+
+    // Encryption key and IV (should match those used for encryption)
+    $key = '2nshhul9d7lzdak1efy0gjdjwc3hzdns'; // 32-byte key for AES-256
+    $iv = 'z3w5ihuok1amrdns'; // 16-byte IV
+
+    // Get the base64-encoded encrypted data
+    $encryptedDataBase64 = $request->encryptedData;
+
+    // Decode the base64-encoded encrypted data
+    $encryptedData = base64_decode($encryptedDataBase64);
+
+    // Decrypt the data using AES-256-CBC
+    $decryptedData = openssl_decrypt($encryptedData, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+
+    // Convert the decrypted data from JSON back to an array
+    $data = json_decode($decryptedData, true);
+
+    // Ensure the decrypted data is valid
+    if (!$data) {
+        return response()->json(['status' => false, 'message' => 'Failed to decrypt data']);
+    }
+
+    // Now you have access to the decrypted data
+    $clientId = $data['clientId'] ?? null;
+    $users = $data['users'] ?? [];
+
+    // Proceed with your validation and business logic using the decrypted data
+    $validator = Validator::make($data, [
+        'users.*.customer_phone' => 'required|',
+        'clientId' => 'required|string',
+        'users.*.date' => 'required|date',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['status' => false, 'message' => $validator->errors()->first()]);
+    }
+
+    // Process the customer deregistration logic
+    $user = TeleMedicineOrder::where('order_user_phone', $data['users'][0]['customer_phone'])->first();
+
+    if (empty($user) || $clientId != 'WwDUYRNavkwlwTXeV6ReSONPc0W5MjJETTNsX1fp4dZnpgzyDyE16') {
+        return response()->json(['status' => false, 'message' => 'No customer belongs to this phone number, please add new customer']);
+    } else {
+        TeleMedicineDeregister::create([
+            'customer_phone' => $data['users'][0]['customer_phone'],
+            'expiry_date' => $data['users'][0]['date'],
+            'clientId' => $clientId,
+            'json_response' => json_encode($data),
+        ]);
+
+        return response()->json(['status' => true, 'message' => 'Customer deregistered successfully', "phone" => $data['users'][0]['customer_phone']]);
+    }
+}
