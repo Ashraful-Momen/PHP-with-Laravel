@@ -1,4 +1,7 @@
 
+#send request to api endpoint with encrypt data: 
+-----------------------------------------------------
+
 Route::get('/tele/deregister/check',function(){
         // Data to encrypt
         $data = [
