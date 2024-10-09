@@ -1,0 +1,113 @@
+To implement dark mode, light mode, and auto mode (based on system preferences) in a Bootstrap-based project, you can use Bootstrap's built-in support for themes along with some custom JavaScript. Here's a step-by-step guide:
+
+### 1. Set up Bootstrap
+
+First, ensure you have Bootstrap integrated into your project. You can use the CDN or download it locally:
+
+```html
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+```
+
+### 2. HTML Structure for Theme Switcher
+
+Create buttons or a switcher for light, dark, and auto modes:
+
+```html
+<div class="d-flex justify-content-center mt-4">
+    <button id="lightMode" class="btn btn-light me-2">Light Mode</button>
+    <button id="darkMode" class="btn btn-dark me-2">Dark Mode</button>
+    <button id="autoMode" class="btn btn-secondary">Auto Mode</button>
+</div>
+```
+
+### 3. JavaScript for Theme Switching
+
+You need JavaScript to handle switching between light, dark, and auto modes. Use `localStorage` to remember the user's choice and apply the appropriate theme based on system settings if in auto mode.
+
+```html
+<script>
+    // Apply the saved theme or detect system preference
+    function applyTheme(theme) {
+        if (theme === "dark") {
+            document.documentElement.setAttribute("data-bs-theme", "dark");
+        } else if (theme === "light") {
+            document.documentElement.setAttribute("data-bs-theme", "light");
+        } else {
+            // Auto mode, match system preference
+            const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.setAttribute("data-bs-theme", prefersDarkScheme ? "dark" : "light");
+        }
+    }
+
+    // Save the user's theme preference
+    function setTheme(theme) {
+        localStorage.setItem("theme", theme);
+        applyTheme(theme);
+    }
+
+    // Set initial theme on page load
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme") || "auto";
+        applyTheme(savedTheme);
+
+        // Set up button event listeners
+        document.getElementById("lightMode").addEventListener("click", function () {
+            setTheme("light");
+        });
+        document.getElementById("darkMode").addEventListener("click", function () {
+            setTheme("dark");
+        });
+        document.getElementById("autoMode").addEventListener("click", function () {
+            setTheme("auto");
+        });
+    });
+
+    // Listen for system theme changes in auto mode
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+        const savedTheme = localStorage.getItem("theme") || "auto";
+        if (savedTheme === "auto") {
+            applyTheme("auto");
+        }
+    });
+</script>
+```
+
+### 4. Bootstrap 5 Theme Integration
+
+In Bootstrap 5.3+, you can use the `data-bs-theme` attribute to toggle between themes:
+
+- `light`: Default theme.
+- `dark`: Dark mode.
+
+Set this attribute on the `html` or `body` element. For example:
+
+```html
+<html data-bs-theme="light">
+```
+
+The `applyTheme()` function handles dynamically updating this attribute based on the selected mode.
+
+### 5. Optional: Custom Styles (if needed)
+
+You can further customize your styles based on the theme:
+
+```css
+[data-bs-theme="dark"] {
+    background-color: #121212;
+    color: white;
+}
+
+[data-bs-theme="light"] {
+    background-color: white;
+    color: black;
+}
+```
+
+### Result:
+
+- **Light Mode**: When you click "Light Mode," the page switches to a light theme.
+- **Dark Mode**: When you click "Dark Mode," the page switches to a dark theme.
+- **Auto Mode**: This mode respects the user's system preferences (light/dark) and automatically switches when the system changes its theme.
+
+This provides a full-featured theme switcher using Bootstrap and JavaScript!
