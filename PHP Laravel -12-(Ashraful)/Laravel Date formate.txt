@@ -12,3 +12,14 @@ $order_child->expire_date = now()->addYears(2)->format('Y-m-d');
 #if getting formate() member function error => 
 
  {{ (new DateTime($hdc_card->send_date))->format('d-F-Y h:i A') }}
+
+=========================================================
+                                          <div class="col">
+                                            <div data-mdb-input-init class="form-outline">
+                                                <input type="date" name="o_DOB" id="form3Example1"
+                                                       value="{{ Auth::check() && Auth::user()->dob ? (new \DateTime(Auth::user()->dob))->format('Y-m-d') : '' }}"
+                                                       placeholder="{{ Auth::check() && Auth::user()->dob ? (new \DateTime(Auth::user()->dob))->format('d-F-Y') : 'N/A' }}"
+                                                       class="form-control">
+                                                <label class="form-label" for="form3Example1">Date of Birth</label>
+                                            </div>
+                                        </div>
