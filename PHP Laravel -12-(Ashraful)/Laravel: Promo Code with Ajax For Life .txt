@@ -1,0 +1,763 @@
+view: 
+--------------
+@extends('frontend.layouts.app')
+@section('title', 'Dashboard')
+@push('css')
+    <style>
+        .package-title {
+            font-family: "Roboto";
+            font-weight: 400;
+        }
+
+        .package-desc {
+            font-family: 'Roboto';
+            font-size: 16px;
+            color: #000;
+            letter-spacing: 1px;
+            line-height: 30px;
+        }
+
+        .single-pricing-box .pricing-header.bg2 {
+            background-image: url(https://t4.ftcdn.net/jpg/01/19/11/55/360_F_119115529_mEnw3lGpLdlDkfLgRcVSbFRuVl6sMDty.jpg);
+        }
+
+        .ptb-100 {
+            padding-top: 25px;
+            padding-bottom: 100px;
+        }
+
+        .single-pricing-box {
+            padding-bottom: 19px;
+        }
+
+        .single-pricing-box .pricing-header {
+            background-color: #002e5b;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            padding-top: 25px;
+            padding-bottom: 25px;
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        @media only screen and (max-width: 767px) {
+            .page-title-area {
+                height: -14%;
+                padding-top: 214px;
+                padding-bottom: 32px;
+            }
+        }
+
+        .src-image {
+            display: none;
+        }
+
+        .card2 {
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+            padding: 0;
+            color: #fff;
+
+        }
+
+        .card2 .header-bg {
+            /* This stretches the canvas across the entire hero unit */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            border-bottom: 1px #FFF solid;
+            /* This positions the canvas under the text */
+            z-index: 1;
+        }
+
+        .card2 .avatar {
+            position: relative;
+            z-index: 100;
+        }
+
+        .card2 .avatar img {
+            width: 100px;
+            height: 100px;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            border: 5px solid rgba(0, 0, 30, 0.8);
+        }
+
+        #hoverMe {
+            border-bottom: 1px dashed #e5e5e5;
+            text-align: left;
+            padding: 13px 20px 11px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #002e5b;
+
+        }
+
+        #hoverMe:hover {
+            border-left: 3px solid #002e5b;
+            background-color: #ebebeb;
+            color: #002e5b;
+
+        }
+
+        .text-white a {
+            color: #fff !important;
+        }
+
+
+        @media (max-width: 767px) {
+            .sticky-bottom {
+                width: 100%;
+                position: -webkit-sticky;
+                position: sticky;
+                bottom: 0;
+            }
+        }
+
+        /* ------------------------------------------ cart table sytel --------------------------------------------- */
+    </style>
+
+    {{-- promo code container height -- --}}
+    <style>
+        .fixed-height {
+            height: 250px;
+            /* Set the desired fixed height */
+            margin-bottom: 10px;
+
+        }
+
+        .inner-content {
+            height: 100%;
+            /* margin: 10px 10px 10px 10px; */
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            /* Ensures content stays spaced properly */
+        }
+
+        .selected-div {
+            background-color: #DBDDE0;
+        }
+    </style>
+    {{-- promo code container height -- --}}
+@endpush
+@section('content')
+
+
+    <!-- Start Page Title Area -->
+    <div
+        class="page-title-area page-title-bg1 d-lg-block d-none {{ Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') || Session::has('RobiMicrosite') ? ' d-lg-block d-none' : '' }} wow animate__zoomIn">
+        <div class="d-table">
+            <div class="d-table-cell">
+                <div class="container ">
+                    <div class="page-title-content">
+                        <h2>Dashboard</h2>
+                        <ul>
+                            <li><a href="{{ url('/') }}">Home</a></li>
+                            <li>Dashboard - Insurance Cart </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Page Title Area -->
+
+    <!-- Start Pricing Area -->
+    <section class="pricing-area ptb-20 pb-70">
+        <div class="container">
+            <div class="row">
+
+                <div
+                    class="col-lg-3 col-md-2 col-sm-2  {{ Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') || Session::has('RobiMicrosite') ? ' d-lg-block d-none' : '' }}">
+                    @include('frontend.partials.customer_dashboard_sidebar')
+                </div>
+                {{-- Insurance Details  --}}
+                <div class="col-lg-9 col-md-12 col-sm-12 {{ Session::has('nagadMicrosite') ? ' mt-sm-5 ' : '' }}">
+                    {{-- cart table ------------------------ --}}
+                    <section class="h-100 gradient-custom ">
+                        <div class="container pb-5">
+                            <div class="row d-flex justify-content-center mb-4">
+                                @if (Session::has('msg'))
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        <strong>{{ session('msg') }}</strong>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                                        </button>
+                                    </div>
+                                @endif
+
+                                <div class="col-md-8 col-sm-12 wow animate__zoomIn">
+                                    <div class="card mb-4 shadow-lg">
+                                        <div class="card-header py-3">
+                                            <h5 class="mb-0 text-center">Cart Items</h5>
+                                        </div>
+                                        <div class="card-body">
+
+                                            @if (isset($cart) && count($cart) > 0)
+
+
+
+                                                @foreach ($cart as $c)
+                                                    @php
+
+                                                        //if life pkg has combo pkg then show off the ++/-- btn :
+                                                        $life_pkg = App\Model\LifeAndHealth::find($c->product_id);
+                                                        $combo = $life_pkg->combo_pkg;
+
+                                                        // dd($combo);
+
+                                                        // dd($c);
+
+                                                    @endphp
+                                                    <!-- Single item -->
+                                                    <div class="row d-flex align-items-center">
+
+                                                        <div class="col-lg-8 col-md-6 mb-4 mb-lg-0 wow px-4 ">
+
+                                                          
+                                                            <!-- Data -->
+                                                            <img src="{{ asset('images/packages/' . $c->image) }}"
+                                                                alt="Image not Found" class="w-50"
+                                                                style="margin-left: -20px; padding-bottom: 5px;" />
+                                                            <br>
+                                                            <b class="">{{ $c->Pname }}</b>
+
+                                                            {{-- <p class="package-desc"> --}}
+                                                            <p class="">
+                                                                @if ($c->discount > 0)
+                                                                    Discount: {{ $c->discount }}% <br>
+                                                                @endif
+                                                                Price: {{ $c->price }}Tk <br>
+                                                                Hospital Card : {{ $c->hospital_card_fee }} Tk. <br>
+                                                                Tele-Medicine Fee : {{ $c->teli_medicine_fee }} Tk. <br>
+                                                                {{-- Installment: {{ $c->payment_frequency }} <br> --}}
+                                                                @if ($c->vat)
+                                                                    <!-- Calculating VAT as amount -->
+                                                                    Vat:
+                                                                    {{ ($c->price + $c->hospital_card_fee + $c->teli_medicine_fee) * ($c->vat / 100) * $c->quantity }}
+                                                                    Tk. <br>
+                                                                @endif
+                                                                {{-- @if ($c->vat)
+                                                                    Vat: {{ $c->vat }} %<br>
+                                                                @endif --}}
+                                                                Total Price : {{ $c->with_discount_price }}Tk. <br>
+                                                                Policy Duration: {{ $c->duration }} Years.
+                                                            </p>
+
+                                                            <div class="mb-4 d-flex align-items-center gap-2">
+                                                                <form action="{{ route('delete_cart_item', $c->id) }}"
+                                                                    method="post">
+
+                                                                    @csrf
+
+
+                                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                                        data-mdb-toggle="tooltip" title="Remove item">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+
+                                                                </form>
+                                                                @if ($totalInsurance > 0)
+                                                                    <a
+                                                                        href="{{ route('life_and_health_one_page_form_fill_up') }}">
+                                                                        <button type="button"
+                                                                            class="default-btn btn-primary btn-lg btn-block">
+                                                                            Go to Next (Policy Form) <span></span>
+                                                                        </button>
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+
+
+                                                            <!-- Data -->
+                                                        </div>
+
+                                                        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0 ">
+
+                                                            <!-- Quantity -->
+                                                            <div class="d-flex mb-4" style="max-width: 300px">
+
+                                                                <form action="{{ route('decrease_cart_item', $c->id) }}"
+                                                                    method="post">
+
+                                                                    @csrf
+
+                                                                    <input id="form1" min="1" name="quantity"
+                                                                        value="1" type="number" class="form-control"
+                                                                        hidden />
+
+                                                                    @if ($combo == 'on')
+                                                                        <button class="btn btn-primary px-3 me-2"
+                                                                            type="submit"
+                                                                            onclick="this.parentNode.querySelector('input[type=number]').stepDown()"
+                                                                            disabled>
+                                                                            <i class="fas fa-minus"></i>
+                                                                        </button>
+                                                                    @else
+                                                                        <button class="btn btn-primary px-3 me-2"
+                                                                            type="submit"
+                                                                            onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                                            <i class="fas fa-minus"></i>
+                                                                        </button>
+                                                                    @endif
+
+
+                                                                </form>
+
+                                                                <div class="form-outline">
+                                                                    <input id="form1" min="1" name="quantity"
+                                                                        value={{ $c->quantity }} type="number"
+                                                                        class="form-control text-center" disabled />
+                                                                    <label class="form-label" for="form1">package
+                                                                        Quantity</label>
+                                                                </div>
+
+                                                                {{-- increase cart item  --}}
+                                                                <form action="{{ route('increase_cart_item', $c->id) }}"
+                                                                    method="post">
+
+                                                                    @csrf
+
+                                                                    <input id="form1" min="1" name="quantity"
+                                                                        value="" type="number" class="form-control"
+                                                                        hidden />
+
+                                                                    @if ($combo == 'on')
+                                                                        <button class="btn btn-primary px-3 ms-2"
+                                                                            type="submit"
+                                                                            onclick="this.parentNode.querySelector('input[type=number]').stepUp()"
+                                                                            disabled>
+                                                                            <i class="fas fa-plus"></i>
+                                                                        </button>
+                                                                    @else
+                                                                        <button class="btn btn-primary px-3 ms-2"
+                                                                            type="submit"
+                                                                            onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                                            <i class="fas fa-plus"></i>
+                                                                        </button>
+                                                                    @endif
+
+
+
+
+                                                                </form>
+                                                                {{-- End increase cart item  --}}
+
+
+                                                            </div>
+
+
+                                                            <!-- Quantity -->
+
+                                                            <!-- Price -->
+                                                            <p class="text-start text-md-center">
+                                                                <strong>{{ $c->with_discount_price }} TK</strong>
+                                                            </p>
+                                                            <!-- Price -->
+                                                        </div>
+                                                    </div>
+                                                    <!-- Single item -->
+                                                @endforeach
+                                            @else
+                                                <p class="my-2">Your cart is empty.</p>
+                                            @endif
+
+
+
+
+
+                                            {{-- Don't delete this code  --}}
+                                            <!-- @if ($totalInsurance > 0)
+    <a href="{{ route('life_and_health_one_page_form_fill_up') }}">
+                                                                                                <button type="button" class="default-btn btn-primary btn-lg btn-block">
+                                                                                                    Go to Next (Policy Form) <span></span>
+                                                                                                </button>
+                                                                                            </a>
+    @endif -->
+                                            {{-- Don't delete this code  --}}
+
+
+
+                                            <hr class="my-4" />
+
+
+
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-md-4 wow animate__zoomIn ">
+                                    <div class="card mb-4 shadow-lg">
+                                        <div class="card-header py-3">
+                                            <h5 class="mb-0">Summary</h5>
+                                        </div>
+                                        @if (isset($cart) && count($cart) > 0)
+                                            <div class="card-body">
+                                                <ul class="list-group list-group-flush">
+                                                    <li
+                                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
+                                                        Insurance Quantity
+                                                        <span>{{ $totalInsurance }}</span>
+                                                    </li>
+                                                    @php
+                                                        $payment_frequency = $cart->first()->payment_frequency;
+                                                    @endphp
+
+                                                    <li
+                                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
+                                                        Insurance Price
+                                                        <span class="total-amount">{{ $totalPrice * $payment_frequency }}
+                                                            TK</span>
+                                                    </li>
+                                                    <li
+                                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0 ">
+                                                        Hot Deals <span class="badge bg-secondary promo_code_name"> </span>
+                                                        <span class="text-success promo_discount_amount">  </span>
+                                                    </li>
+
+                                                    <li
+                                                        class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
+                                                        <div>
+                                                            <strong>Total amount</strong>
+                                                            <strong>
+                                                                <p class="mb-0">(including VAT)</p>
+                                                            </strong>
+                                                        </div>
+
+                                                        <span><strong>{{ $totalPrice * $payment_frequency }}
+                                                                TK</strong></span>
+                                                    </li>
+
+
+
+                                                    <!-- Other items... -->
+                                                </ul>
+                                            </div>
+                                        @else
+                                            <p class="text-center my-2">Your cart is empty.</p>
+                                        @endif
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+
+                            {{-- ----------------------------- Promo Code Section ---------------------------------- --}}
+                            <div class="row d-flex justify-content-center mb-4 ">
+
+
+                                <div class="col-md-8 col-sm-12 wow animate__zoomIn">
+                                    <div class="card mb-4 shadow-lg">
+                                        <div class="card-header py-3">
+                                            <h5 class="mb-0 text-center">Hot Deals</h5>
+                                        </div>
+
+
+                                        {{-- promo code loop list  --}}
+                                        <div class="card-body ">
+
+                                            <div class="row">
+                                                @foreach ($promoCodes as $p)
+                                                    <div class="col-md-6 fixed-height">
+                                                        <div class="col border inner-content selectable-div"
+                                                            onclick="selectDiv(this, '{{ $p->promo_name }}', '{{ $p->discount }}')">
+                                                            <div class="col p-2 my-1">
+                                                                <div class="d-flex justify-content-between">
+                                                                    <i class="fa fa-gift fs-5" aria-hidden="true">
+                                                                        <b class="fs-5">{{ $p->promo_name }}</b>
+                                                                    </i>
+                                                                    <input class="form-check-input" type="radio"
+                                                                        name="flexRadioDefault" id="flexRadioDefault1"
+                                                                        value="{{ $p->id }}">
+                                                                </div>
+                                                                <div class="my-2">
+                                                                    <p>{{ $p->promo_description }}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <small>Offer Details</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+
+                                                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+                                                <script>
+                                                    function selectDiv(element, promoName, discountValue) {
+                                                        // Remove 'selected-div' class from all selectable divs
+                                                        document.querySelectorAll('.selectable-div').forEach(function(div) {
+                                                            div.classList.remove('selected-div');
+                                                            div.querySelector('input[type="radio"]').checked = false; // Uncheck all radio buttons
+                                                        });
+
+                                                        // Add 'selected-div' class to the clicked div
+                                                        element.classList.add('selected-div');
+                                                        element.querySelector('input[type="radio"]').checked = true;
+
+                                                        // Make AJAX call to update cart with promo code
+                                                        applyPromoCode(promoName, discountValue);
+
+                                                        // console.log(promoName, discountValue);
+                                                    }
+
+                                                    function applyPromoCode(promoName, discountValue) {
+                                                        $.ajax({
+                                                            url: "{{ route('apply-promo-code-life') }}",
+                                                            type: 'POST',
+                                                            data: {
+                                                                promo_name: promoName,
+                                                                discount_value: discountValue,
+                                                            },
+                                                            headers: {
+                                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Ensure CSRF token is included
+                                                            },
+                                                            success: function(response) {
+
+                                                                console.log(response);
+                                                                if (response.success) {
+                                                                    document.querySelector('.total-amount').innerText = response.new_total_price + ' TK';
+                                                                    document.querySelector('.promo_code_name').innerText = response.promo_code + '';
+                                                                    document.querySelector('.promo_discount_amount').innerText = response.discount + '%';
+                                                                } else {
+                                                                    alert(response.message);
+                                                                }
+                                                            },
+                                                            error: function(xhr, status, error) {
+                                                                console.error("Error occurred: ", xhr.responseText);
+                                                                alert('An error occurred. Please try again.');
+                                                            }
+                                                        });
+                                                    }
+                                                </script>
+
+                                            </div>
+
+
+
+
+
+
+
+
+                                            {{-- -------------------------------------- --}}
+                                            {{-- Apply cupon code input filed  --}}
+                                            <hr>
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <b>Coupon Code</b>
+                                                    <div class="col d-flex justify-content-between">
+                                                        <input type="text" class="form-control m-1"
+                                                            placeholder="Enter coupon code">
+                                                        <button class="btn btn-primary m-1">Apply</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {{-- reward : gpstart and lotto brand code --}}
+                                            <div class="row">
+                                                <div class="col-md-12 ">
+                                                    <b>Reward</b>
+                                                    <hr>
+                                                    <div class="col d-flex justify-content-between">
+                                                        {{-- ------------------------------- --}}
+                                                        <div class="col-md-6 " style="height: 300px;">
+                                                            <div class="col border inner-content m-1">
+                                                                <div class="col p-2 my-3">
+                                                                    <div class="">
+                                                                        <img class="img-fluid"
+                                                                            style="height: 50px; width: 100px"
+                                                                            src="data:image/png;base64,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"
+                                                                            alt="">
+                                                                        <br>
+                                                                        <b class="fs-6">Special Deal for GP STAR</b>
+
+                                                                    </div>
+                                                                    <div class="">
+                                                                        <p>Enter your Grameenphone number to check what deal
+                                                                            is available for this product.</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <small>Terms & Conditions </small>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between my-4">
+                                                                        <input type="text" class="form-control m-1"
+                                                                            placeholder="Enter Grameenphone number">
+                                                                        <button
+                                                                            class="btn btn-sm btn-primary m-1">Apply</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 " style="height: 300px;">
+                                                            <div class="col border inner-content m-1">
+                                                                <div class="col p-2 my-3">
+                                                                    <div class="">
+                                                                        <img class="img-fluid"
+                                                                            style="height: 50px; width: 100px"
+                                                                            src="data:image/jpeg;base64,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"
+                                                                            alt="">
+                                                                        <br>
+                                                                        <b class="fs-6">Special Deal for Lotto</b>
+
+                                                                    </div>
+                                                                    <div class="">
+                                                                        <p>Enter your Lotto registered contact number to
+                                                                            check what deal is available..</p>
+                                                                    </div>
+                                                                    <div>
+                                                                        <small>Terms & Conditions </small>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between my-4">
+                                                                        <input type="text" class="form-control m-1"
+                                                                            placeholder="Enter Your number">
+                                                                        <button
+                                                                            class="btn btn-sm btn-primary m-1">Apply</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        {{-- ------------------------------- --}}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+
+                                        </div>
+                                        {{-- promo code loop list  --}}
+                                        <div class="card-footer">
+                                            @if ($totalInsurance > 0)
+                                                <a href="{{ route('life_and_health_one_page_form_fill_up') }}">
+                                                    <button type="button"
+                                                        class="default-btn btn-primary btn-lg btn-block">
+                                                        Go to Next (Policy Form) <span></span>
+                                                    </button>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+
+
+                                {{-- summary section  --}}
+                                <div class="col-md-4 wow animate__zoomIn ">
+                                    <div class="card mb-4 d-none">
+
+
+                                    </div>
+                                </div>
+                                {{-- summary section  --}}
+
+
+                            </div>
+                            {{-- ----------------------------- End Promo Code Section ---------------------------------- --}}
+                        </div>
+                    </section>
+                    {{-- end cart table ------------------------ --}}
+                    {{-- <div class="card mb-3 w-100 p-5 shadow-lg">
+
+                    </div> --}}
+
+                </div>
+                {{-- Insurance Details  --}}
+
+
+
+            </div>
+    </section>
+    <!-- End Pricing Area -->
+
+
+
+
+
+
+@stop
+
+
+
+
+
+
+Route: 
+----------
+//apply promo code with ajax for life and health packeges: ----------------------------------------
+    Route::POST('/apply-promo-code-life', [cart_all::class, 'applyPromoCode'])->name('apply-promo-code-life');
+
+Controller : 
+---------------
+//update the promo code :-----------------------------------------------
+
+    public function applyPromoCode(Request $request)
+    {
+
+
+
+
+        // return $request->all();
+
+
+        $promoName = $request->input('promo_name');
+        $discountValue = $request->input('discount_value') ?? 0;
+
+        $promoCode = Promo_Codes_All::where('promo_name', $promoName)->first();
+
+
+
+
+
+        //fetch cart items :
+        $cart_items = Cart::where('customer_id', Auth::user()->id)->get();
+
+
+        //update discount on cart items :
+        foreach ($cart_items as $c) {
+            $vat = $c->vat ?? 0;
+            $pkg_price = ($c->before_discount_price ?? 0) + ($c->hospital_card_fee ?? 0) + ($c->teli_medicine_fee ?? 0);
+            //apply discount on $pkg_price:
+            $discounted_price = $pkg_price - ($pkg_price * ($discountValue / 100));
+
+            //after discount price then update vat on $pkg_price:
+            $with_discount_price = round($discounted_price + ($discounted_price * ($vat / 100)));
+
+            // dd($pkg_price, $discounted_price, $with_discount_price);
+            $c->update([
+                "promo_code" => $promoName,
+                "with_discount_price" => $with_discount_price,
+                "discount" => $discountValue,
+            ]);
+
+
+        }
+
+
+
+        return response()->json([
+            'success' => true,
+            'new_total_price' => $with_discount_price,
+            "promo_code" => $promoName,
+            "with_discount_price" => $with_discount_price,
+            "discount" => $discountValue,
+
+        ]);
+    }
