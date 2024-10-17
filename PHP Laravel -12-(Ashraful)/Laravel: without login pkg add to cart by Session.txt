@@ -1,7 +1,7 @@
 #working flow => *** Laravel after login back to previouse controller or view. 
 -----------------
 1. show the life pkg for anonimous user => Click 'Buy Now' from pkg => 2. goto route 'addTo_cart_for_all'(for anomimus User) ,Controller: In store all data in session which need to order  and send to route => 
-=> 3.'addTo_cart' (for login User) , get all data from session then create order . 
+=> 3.'addTo_cart' (for login User & optional work: route must be get:method) , get all data from session then create order . 
 
 
 #session Problem fix: 
