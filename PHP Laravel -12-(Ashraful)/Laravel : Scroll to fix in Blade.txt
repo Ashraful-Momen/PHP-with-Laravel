@@ -1,0 +1,10 @@
+@push('js')
+    <script src="{{ asset('js/jquery-scrolltofixed-min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#orderSummary').scrollToFixed({
+                marginTop: 100
+            });
+        });
+    </script>
+@endpush
