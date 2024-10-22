@@ -1,0 +1,10 @@
+<div
+        class="page-title-area page-title-bg1 d-lg-block d-none {{ Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') || Session::has('RobiMicrosite') ? ' d-lg-block d-none' : '' }} wow animate__zoomIn ">
+        <div class="d-table bg-white">
+            <div class="d-table-cell "
+            @if(Session::has('nagadMicrosite') || Session::has('aamarPayMicrosite') || Session::has('RobiMicrosite'))
+                style="background-image: url('{{ asset('microsite/img/banner/nagad.png') }}'); background-size: contain; background-repeat: no-repeat; background-position: center; "
+            @endif
+
+
+            >
