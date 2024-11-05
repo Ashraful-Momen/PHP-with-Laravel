@@ -130,8 +130,8 @@ Route::group(['as' => 'childDealer.', 'prefix' => 'childDealer', 'namespace' => 
 });
 ----------------------------------------
 Route::group([
-    'as' => 'childDealer.', // This route will be named 'childDealer.dashboard'
-    'prefix' => 'childDealer',  // This route will be accessed at '/childDealer/dashboard'
+    'as' => 'childDealer.', // This route will be named 'childDealer.dashboard' . *** Use in before route name . 
+    'prefix' => 'childDealer',  // This route will be accessed at '/childDealer/dashboard' . *** use in before url. 
     'namespace' => 'ChildDealer', // This assumes the controller class is in the App\Http\Controllers\ChildDealer namespace
     'middleware' => ['auth', 'childDealer'] 
 ], function () {
