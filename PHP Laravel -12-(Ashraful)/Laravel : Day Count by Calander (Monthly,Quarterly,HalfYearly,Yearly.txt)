@@ -1,0 +1,81 @@
+<div class="col">
+    <label for="duration_type">Select Duration Type</label>
+    <select class="form-control" id="duration_type" onchange="calculateExactDuration()">
+        <option value="">Select Duration</option>
+        <option value="monthly">Monthly</option>
+        <option value="quarterly">Quarterly (3 Months)</option>
+        <option value="half_yearly">Half Yearly (6 Months)</option>
+        <option value="yearly">Yearly</option>
+    </select>
+    
+    <div class="mt-3">
+        <label for="duration">Package Duration (Days)</label>
+        <input type="number" name="duration" id="duration" class="form-control" readonly>
+    </div>
+    
+    <!-- Info text to show date range -->
+    <small id="dateRangeInfo" class="text-muted mt-2 d-block"></small>
+</div>
+
+<script>
+function calculateExactDuration() {
+    const startDate = new Date(); // Today's date
+    let endDate = new Date(); // Will be calculated
+    const durationType = document.getElementById('duration_type').value;
+    
+    if (!durationType) {
+        document.getElementById('duration').value = '';
+        document.getElementById('dateRangeInfo').textContent = '';
+        return;
+    }
+    
+    // Calculate end date based on selection
+    switch(durationType) {
+        case 'monthly':
+            // Move to the same date next month, then subtract one day
+            endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
+            endDate.setDate(endDate.getDate() - 1);
+            break;
+            
+        case 'quarterly':
+            // Move to the same date after 3 months, then subtract one day
+            endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 3, startDate.getDate());
+            endDate.setDate(endDate.getDate() - 1);
+            break;
+            
+        case 'half_yearly':
+            // Move to the same date after 6 months, then subtract one day
+            endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 6, startDate.getDate());
+            endDate.setDate(endDate.getDate() - 1);
+            break;
+            
+        case 'yearly':
+            // Move to the same date next year, then subtract one day
+            endDate = new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate());
+            endDate.setDate(endDate.getDate() - 1);
+            break;
+    }
+    
+    // Calculate exact number of days
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Update the duration input
+    document.getElementById('duration').value = diffDays;
+    
+    // Show date range info
+    const startDateStr = startDate.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    const endDateStr = endDate.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    document.getElementById('dateRangeInfo').textContent = 
+        `Duration: ${startDateStr} to ${endDateStr} (${diffDays} days)`;
+}
+</script>
