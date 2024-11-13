@@ -7,3 +7,10 @@
                                                             @endif
                                                             
                                                         </div>
+
+=========================================
+<!-- Product Description -->
+<div class="description mb-4">
+    <h5 class="mb-3">Description</h5>
+    <p>{!! strip_tags(str_replace('&nbsp;', ' ', $product->description)) !!}</p>
+</div>
