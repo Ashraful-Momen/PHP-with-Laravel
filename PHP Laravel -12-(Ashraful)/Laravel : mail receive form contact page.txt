@@ -1,0 +1,206 @@
+php artisan make:model Contact -m
+
+sql table : 
+-------------
+public function up()
+{
+    Schema::create('contacts', function (Blueprint $table) {
+        $table->id();
+        $table->string('first_name');
+        $table->string('last_name');
+        $table->string('email');
+        $table->text('message');
+        $table->timestamps();
+    });
+}
+
+#create controller : 
+---------------------
+php artisan make:mail ContactFormMail
+
+#ContactMail Controller : 
+-----------------------
+// app/Mail/ContactFormMail.php
+namespace App\Mail;
+
+use Illuminate\Mail\Mailable;
+
+class ContactFormMail extends Mailable
+{
+    public $contact;
+
+    public function __construct($contact)
+    {
+        $this->contact = $contact;
+    }
+
+    public function build()
+    {
+        return $this->from('support@lindwas.com', 'Lindwas Design')
+                    ->subject('New Contact Form Submission')
+                    ->view('emails.contact-form');
+    }
+}
+
+#email template : 
+--------------------
+// resources/views/emails/contact-form.blade.php
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>New Contact Form Submission</h2>
+        
+        <p><strong>Name:</strong> {{ $contact->first_name }} {{ $contact->last_name }}</p>
+        <p><strong>Email:</strong> {{ $contact->email }}</p>
+        
+        <h3>Message:</h3>
+        <p>{{ $contact->message }}</p>
+    </div>
+</body>
+</html>
+
+#contact page : 
+-----------------
+@extends('lindwas_frontend.pages.master')
+
+@section('content')
+    <!-- Your existing hero section -->
+
+    <!-- Start Contact Form -->
+    <div class="untree_co-section">
+        <div class="container">
+            <div class="block">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-8 pb-4">
+                        <!-- Your existing address section -->
+
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        <form action="{{ route('contact.submit') }}" method="POST">
+                            @csrf
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="text-black" for="first_name">First name</label>
+                                        <input type="text" class="form-control @error('first_name') is-invalid @enderror" 
+                                               name="first_name" id="first_name" value="{{ old('first_name') }}" required>
+                                        @error('first_name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="text-black" for="last_name">Last name</label>
+                                        <input type="text" class="form-control @error('last_name') is-invalid @enderror" 
+                                               name="last_name" id="last_name" value="{{ old('last_name') }}" required>
+                                        @error('last_name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-black" for="email">Email address</label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                       name="email" id="email" value="{{ old('email') }}" required>
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-5">
+                                <label class="text-black" for="message">Message</label>
+                                <textarea name="message" class="form-control @error('message') is-invalid @enderror" 
+                                          id="message" cols="30" rows="5" required>{{ old('message') }}</textarea>
+                                @error('message')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <button type="submit" class="btn btn-primary-hover-outline">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+#Create ContactController:
+--------------------------
+// app/Http/Controllers/ContactController.php
+namespace App\Http\Controllers;
+
+use App\Models\Contact;
+use App\Mail\ContactFormMail;
+use Illuminate\Http\Request;
+use Mail;
+
+class ContactController extends Controller
+{
+    public function submit(Request $request)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string'
+        ]);
+
+        try {
+            // Save to database
+            $contact = Contact::create($validated);
+
+            // Send email
+            Mail::to('support@lindwas.com')->send(new ContactFormMail($contact));
+
+            // Also send confirmation to user
+            Mail::to($contact->email)->send(new ContactFormMail($contact));
+
+            return redirect()->back()->with('success', 'Thank you for your message. We will contact you shortly!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                           ->withInput()
+                           ->with('error', 'Sorry, there was an error sending your message. Please try again later.');
+        }
+    }
+}
+
+#Add route : 
+-----------------
+
+// routes/web.php
+Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
+
+#update contact model : 
+--------------------------
+// app/Models/Contact.php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Contact extends Model
+{
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'message'
+    ];
+}
+#run command : 
+----------------
+php artisan optimize:clear
