@@ -1,3 +1,94 @@
+#Laravel Send sms with curl : 
+------------------------------
+ public static function smsAPITest($receiver_number, $sms_text)
+    {
+
+        // dd($receiver_number, $sms_text);
+        // 1. First, let's clean up the phone number format
+        $receiver_number =$receiver_number;
+
+        // 2. Construct the URL properly with base URL only
+        $base_url = 'https://sms.novocom-bd.com/api/v2/SendSMS';
+
+        // 3. Prepare the data according to the API documentation
+        $data = [
+            // "SenderId" => '8809638010025',
+            "SenderId" => '8809638010025',
+            "Is_Unicode" => true,
+            // "Is_Flash" => true,  // Changed to false unless specifically needed
+            // "DataCoding" => "UTF-8",  // Use the value from .env
+            // "SchedTime"=> "string",
+            // "GroupId"=> "string",
+            "Message" => $sms_text,  // Use the actual message parameter
+            "MobileNumbers" =>  $receiver_number,  // Use the formatted number
+            "ApiKey" => 'FqKrUOlAWMQ7UAuXnbMnakDLOhwjP7SLy4AKhJbtxOg=',  // Remove trailing '=' if present
+            "ClientId" => 'c2a8334c-95f8-42cb-ad8f-2fa845e78a47',
+        ];
+
+        $json_test = json_encode($data);
+
+        // dd($json_test); // {"SenderId":"8809638010025","Is_Unicode":true,"Message":"CHECK THE SMS ","MobileNumbers":"8801859385787","ApiKey":"FqKrUOlAWMQ7UAuXnbMnakDLOhwjP7SLy4AKhJbtxOg=","ClientId":"c2a8334c-95f8-42cb-ad8f-2fa845e78a47"}
+
+        // 4. Initialize cURL
+        $ch = curl_init();
+
+        // 5. Set proper cURL options
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $base_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_VERBOSE => true,
+            CURLOPT_POST=> true ,
+            CURLOPT_POSTFIELDS => json_encode($data),
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Accept: application/json'
+            ],
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
+
+        // 6. Execute the request and get response
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        // 7. Log both request and response for debugging
+        Log::info('SMS API Request', [
+            'url' => $base_url,
+            'data' => $data,
+            'receiver' => $receiver_number,
+            'message' => $sms_text
+        ]);
+
+        Log::info('SMS API Response', [
+            'error' => $err,
+            'response' => $response,
+            'http_code' => $httpcode
+        ]);
+
+        curl_close($ch);
+
+        // 8. Handle the response
+        if ($err) {
+            Log::error('SMS API Error', ['error' => $err]);
+            return $err;
+        }
+
+        $responseData = json_decode($response, true);
+        if ($httpcode !== 200) {
+            Log::error('SMS API Failed', ['response' => $responseData]);
+            return "SMS sending failed: " . ($responseData['message'] ?? 'Unknown error');
+        }
+
+        return "SMS sent successfully";
+    }
+
+
+===================================================================================== another process ==============================================================
 #Laravel SMS to the user: 
 --------------------------
 #install the SMS pkg: >>> composer require laravel/nexmo-notification-channel nexmo/laravel
