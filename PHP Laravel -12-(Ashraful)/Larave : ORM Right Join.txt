@@ -1,0 +1,109 @@
+Here’s a **note on RIGHT JOIN** with a simple explanation, ASCII diagram, and Laravel ORM example:
+
+---
+
+### **RIGHT JOIN in SQL**
+
+A **RIGHT JOIN** retrieves all rows from the **right table** and only the matching rows from the **left table**. If no match is found, `NULL` values are returned for the left table's columns.
+
+---
+
+### **ASCII Representation**
+
+```
+TABLE1 (Left)                     TABLE2 (Right)
++----+-------+                   +----+-------+
+| ID | Name  |                   | ID | Order |
++----+-------+                   +----+-------+
+| 1  | Alice |                   | 1  | A123  |
+| 2  | Bob   |                   | 3  | B456  |
+| 3  | Charlie                   | 4  | C789  |
++----+-------+                   +----+-------+
+
+RIGHT JOIN Result:
++----+---------+-------+
+| ID | Name    | Order |
++----+---------+-------+
+| 1  | Alice   | A123  |
+| NULL | NULL  | B456  |
+| NULL | NULL  | C789  |
++----+---------+-------+
+```
+
+---
+
+### **SQL Query**
+
+```sql
+SELECT table1.id, table1.name, table2.order
+FROM table1
+RIGHT JOIN table2
+ON table1.id = table2.id;
+```
+
+---
+
+### **RIGHT JOIN in Laravel ORM**
+
+#### Query Builder Syntax:
+
+```php
+use Illuminate\Support\Facades\DB;
+
+$results = DB::table('table1') // Left Table
+    ->rightJoin('table2', 'table1.id', '=', 'table2.id') // Right Table
+    ->select('table1.id', 'table1.name', 'table2.order') // Specify columns
+    ->get();
+```
+
+#### Output:
+
+```php
+[
+    { "id": 1, "name": "Alice", "order": "A123" },
+    { "id": null, "name": null, "order": "B456" },
+    { "id": null, "name": null, "order": "C789" }
+]
+```
+
+---
+
+### **Notes**
+1. **Right Table**: The second table in the query (`table2`) is the **right table**. All its rows will appear in the result.
+2. **Left Table**: The first table in the query (`table1`) is the **left table**. Only matching rows appear; unmatched rows return `NULL`.
+3. Use **Eloquent ORM** when working with models, or **DB query builder** for raw table access.
+
+---
+
+### **Multiple RIGHT JOIN Example**
+
+To perform a **RIGHT JOIN** with multiple tables in Laravel, you can chain multiple `rightJoin()` methods to join more than two tables in a single query.
+
+#### MySQL Query:
+
+```sql
+SELECT table1.column_name, table2.column_name, table3.column_name
+FROM table1
+RIGHT JOIN table2 ON table1.column_name = table2.column_name
+RIGHT JOIN table3 ON table2.column_name = table3.column_name;
+```
+
+#### Laravel Query Builder:
+
+```php
+use Illuminate\Support\Facades\DB;
+
+$results = DB::table('table1')
+    ->rightJoin('table2', 'table1.column_name', '=', 'table2.column_name') // First RIGHT JOIN
+    ->rightJoin('table3', 'table2.column_name', '=', 'table3.column_name') // Second RIGHT JOIN
+    ->select('table1.column_name as col1', 'table2.column_name as col2', 'table3.column_name as col3') // Select desired columns
+    ->get();
+```
+
+---
+
+### **Summary**
+1. **Right Join**: Returns all rows from the **right table**, and only matching rows from the **left table**.
+2. If no match is found in the **left table**, `NULL` values are returned for the left table's columns.
+3. In **Laravel**, you can use `rightJoin()` to perform right joins between multiple tables, chaining them as needed.
+
