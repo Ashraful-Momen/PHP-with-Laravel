@@ -1,0 +1,108 @@
+Here’s a **note on INNER JOIN** with a simple explanation, ASCII diagram, and Laravel ORM example:
+
+---
+
+### **INNER JOIN in SQL**
+
+An **INNER JOIN** retrieves only the rows that have matching values in both tables. If no match is found between the two tables, those rows are excluded from the result.
+
+---
+
+### **ASCII Representation**
+
+```
+TABLE1 (Left)                     TABLE2 (Right)
++----+-------+                   +----+-------+
+| ID | Name  |                   | ID | Order |
++----+-------+                   +----+-------+
+| 1  | Alice |                   | 1  | A123  |
+| 2  | Bob   |                   | 3  | B456  |
+| 3  | Charlie                   | 4  | C789  |
++----+-------+                   +----+-------+
+
+INNER JOIN Result:
++----+---------+-------+
+| ID | Name    | Order |
++----+---------+-------+
+| 1  | Alice   | A123  |
++----+---------+-------+
+```
+
+---
+
+### **SQL Query**
+
+```sql
+SELECT table1.id, table1.name, table2.order
+FROM table1
+INNER JOIN table2
+ON table1.id = table2.id;
+```
+
+In this case, only rows where the `id` column in `table1` matches the `id` column in `table2` will appear in the result. If there is no match for a particular row, that row will be excluded.
+
+---
+
+### **INNER JOIN in Laravel ORM**
+
+#### Query Builder Syntax:
+
+```php
+use Illuminate\Support\Facades\DB;
+
+$results = DB::table('table1') // Left Table
+    ->join('table2', 'table1.id', '=', 'table2.id') // Right Table
+    ->select('table1.id', 'table1.name', 'table2.order') // Specify columns
+    ->get();
+```
+
+#### Output:
+
+```php
+[
+    { "id": 1, "name": "Alice", "order": "A123" }
+]
+```
+
+Only the row where `table1.id` matches `table2.id` is included in the result.
+
+---
+
+### **Notes**
+1. **INNER JOIN**: Retrieves only the rows that have matching values in both tables.
+2. If a row in either table has no corresponding match in the other table, it is **excluded** from the result.
+3. Use **Eloquent ORM** when working with models, or **DB query builder** for raw table access.
+
+---
+
+### **Multiple INNER JOIN Example**
+
+To perform an **INNER JOIN** with multiple tables in Laravel, you can chain multiple `join()` methods.
+
+#### MySQL Query:
+
+```sql
+SELECT table1.column_name, table2.column_name, table3.column_name
+FROM table1
+INNER JOIN table2 ON table1.column_name = table2.column_name
+INNER JOIN table3 ON table2.column_name = table3.column_name;
+```
+
+#### Laravel Query Builder:
+
+```php
+use Illuminate\Support\Facades\DB;
+
+$results = DB::table('table1')
+    ->join('table2', 'table1.column_name', '=', 'table2.column_name') // First INNER JOIN
+    ->join('table3', 'table2.column_name', '=', 'table3.column_name') // Second INNER JOIN
+    ->select('table1.column_name as col1', 'table2.column_name as col2', 'table3.column_name as col3') // Select desired columns
+    ->get();
+```
+
+---
+
+### **Summary**
+1. **INNER JOIN**: Only returns rows where there is a match between the left and right tables.
+2. If no matching row is found, those rows are **excluded** from the result.
+3. Use `join()` in Laravel to perform an inner join between tables, and chain additional joins for multiple tables.
