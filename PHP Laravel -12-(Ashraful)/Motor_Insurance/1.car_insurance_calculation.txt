@@ -1,0 +1,50 @@
+Here's the mathematical formula for calculating comprehensive car insurance:
+
+Let FIV = Full Insured Value of the vehicle
+
+1. Basic Components Formula:
+```
+Basic Premium = BDT 2,873 (fixed)
+Own Damage = FIV × 0.0165
+Cyclone & Flood = FIV × 0.0025
+Earthquake = FIV × 0.0025
+Riot & Strike = FIV × 0.005
+```
+
+2. Gross Own Damage Premium Formula:
+```
+Gross Own Damage Premium = Basic Premium + Own Damage + Cyclone & Flood + Earthquake + Riot & Strike
+```
+
+3. Liability Coverage Formula:
+```
+Act Liability = BDT 250 (fixed)
+Passenger Liability = BDT 45 × Number of Passengers (usually 4)
+Driver Liability = BDT 30 (fixed for 1 driver)
+```
+
+4. Net Premium Formula:
+```
+Net Premium = Gross Own Damage Premium + Act Liability + Passenger Liability + Driver Liability
+```
+
+5. Final Premium Formula:
+```
+VAT = Net Premium × 0.15
+Gross Premium = Net Premium + VAT
+```
+
+Combined Single Formula:
+```
+Gross Premium = [(2,873 + (FIV × 0.0165) + (FIV × 0.0025) + (FIV × 0.0025) + (FIV × 0.005)) + 250 + (45 × 4) + 30] × 1.15
+```
+
+Simplified Formula:
+```
+Gross Premium = [2,873 + (FIV × 0.0265) + 460] × 1.15
+```
+Where:
+- FIV is the Full Insured Value of your vehicle
+- 0.0265 is the combined rate (1.65% + 0.25% + 0.25% + 0.5%)
+- 460 is the total fixed charges (250 + 180 + 30)
+- 1.15 represents the 15% VAT addition
