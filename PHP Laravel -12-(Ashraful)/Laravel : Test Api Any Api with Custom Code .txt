@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .header-row,
+        .param-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .header-row input,
+        .param-row input {
+            flex: 1;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .remove-btn {
+            background: #f44336;
+        }
+
+        .remove-btn:hover {
+            background: #da190b;
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+
+        .add-btn {
+            background: #2196F3;
+        }
+
+        .add-btn:hover {
+            background: #0b7dda;
+        }
+
+        .method-select {
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <?php
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $url = $_POST['url'] ?? '';
+        $method = $_POST['method'] ?? 'GET';
+        $headers = $_POST['headers'] ?? [];
+        $params = $_POST['params'] ?? [];
+        $files = $_FILES['files'] ?? [];
+
+        // Prepare cURL request
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+
+        // Prepare headers
+        $curlHeaders = [];
+        foreach ($headers['key'] as $index => $key) {
+            if (!empty($key) && !empty($headers['value'][$index])) {
+                $curlHeaders[] = "$key: " . $headers['value'][$index];
+            }
+        }
+        if (!empty($curlHeaders)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $curlHeaders);
+        }
+
+        // Prepare body data
+        $postData = [];
+        foreach ($params['key'] as $index => $key) {
+            if (!empty($key)) {
+                $postData[$key] = $params['value'][$index];
+            }
+        }
+
+        // Handle file uploads
+        if (!empty($files['file']['name'])) {
+            foreach ($files['file']['name'] as $index => $filename) {
+                if (!empty($filename)) {
+                    $postData[$params['key'][$index]] = new CURLFile(
+                        $files['file']['tmp_name'][$index],
+                        $files['file']['type'][$index],
+                        $files['file']['name'][$index]
+                    );
+                }
+            }
+        }
+
+        if (!empty($postData) && $method !== 'GET') {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        }
+
+        // Execute request
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        $responseData = [
+            'status' => $httpCode,
+            'response' => $response,
+            'error' => $error
+        ];
+    }
+    ?>
+
+    <div class="container">
+        <h1>API Tester</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="url">URL:</label>
+                <input type="text" id="url" name="url" required value="<?php echo $_POST['url'] ?? ''; ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="method">Method:</label>
+                <select id="method" name="method" class="method-select">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Headers:</label>
+                <div id="headers-container">
+                    <div class="header-row">
+                        <input type="text" name="headers[key][]" placeholder="Header Name">
+                        <input type="text" name="headers[value][]" placeholder="Header Value">
+                        <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
+                    </div>
+                </div>
+                <button type="button" class="add-btn" onclick="addHeader()">Add Header</button>
+            </div>
+
+            <div class="form-group">
+                <label>Parameters:</label>
+                <div id="params-container">
+                    <div class="param-row">
+                        <input type="text" name="params[key][]" placeholder="Parameter Name">
+                        <input type="text" name="params[value][]" placeholder="Parameter Value">
+                        <input type="file" name="files[file][]">
+                        <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
+                    </div>
+                </div>
+                <button type="button" class="add-btn" onclick="addParameter()">Add Parameter</button>
+            </div>
+
+            <button type="submit">Send Request</button>
+        </form>
+
+        <?php if (isset($responseData)): ?>
+            <div class="response">
+                <h3>Response:</h3>
+                <p>Status Code: <?php echo htmlspecialchars($responseData['status']); ?></p>
+                <?php if ($responseData['error']): ?>
+                    <p>Error: <?php echo htmlspecialchars($responseData['error']); ?></p>
+                <?php else: ?>
+                    <pre><?php echo htmlspecialchars($responseData['response']); ?></pre>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <script>
+        function addHeader() {
+            const container = document.getElementById('headers-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'header-row';
+            newRow.innerHTML = `
+        <input type="text" name="headers[key][]" placeholder="Header Name">
+        <input type="text" name="headers[value][]" placeholder="Header Value">
+        <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
+    `;
+            container.appendChild(newRow);
+        }
+
+        function addParameter() {
+            const container = document.getElementById('params-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'param-row';
+            newRow.innerHTML = `
+        <input type="text" name="params[key][]" placeholder="Parameter Name">
+        <input type="text" name="params[value][]" placeholder="Parameter Value">
+        <input type="file" name="files[file][]">
+        <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
+    `;
+            container.appendChild(newRow);
+        }
+
+        function removeRow(button) {
+            button.parentElement.remove();
+        }
+    </script>
+
+</body>
+
+</html>
