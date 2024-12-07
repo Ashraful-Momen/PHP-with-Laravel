@@ -1,6 +1,124 @@
+Before the the php script : 
+-----------------------------
+strat the php server >>> php -S localhost:8800
+file extension : fileName.php
+========================================
+
+Route : 
+----------
+Route::post('/test/image', function(Request $request) {
+    $data = $request->all();
+
+    // Handle file uploads
+    if ($request->hasFile('img1')) {
+        $file1 = $request->file('img1');
+        $data['img1'] = [
+            'name' => $file1->getClientOriginalName(),
+            'size' => $file1->getSize(),
+            'type' => $file1->getMimeType()
+        ];
+    }
+
+    if ($request->hasFile('img2')) {
+        $file2 = $request->file('img2');
+        $data['img2'] = [
+            'name' => $file2->getClientOriginalName(),
+            'size' => $file2->getSize(),
+            'type' => $file2->getMimeType()
+        ];
+    }
+
+    return response()->json($data);
+});
+
+============================================== Test any api with this script ==================================================
+
+<?php
+// Set PHP configurations for file uploads
+ini_set('upload_max_filesize', '10M');
+ini_set('post_max_size', '10M');
+ini_set('max_execution_time', '300');
+
+// Handle API Request
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $url = $_POST['url'];
+    $method = $_POST['method'];
+    $headers = $_POST['headers'] ?? [];
+    $params = $_POST['params'] ?? [];
+
+    // Initialize cURL
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+    
+    // Important: Set this to process the response properly
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+    // Handle headers
+    $curlHeaders = [
+        'Content-Type: multipart/form-data'
+    ];
+    if (!empty($headers['key'])) {
+        foreach ($headers['key'] as $index => $key) {
+            if (!empty($key) && !empty($headers['value'][$index])) {
+                $curlHeaders[] = "$key: " . $headers['value'][$index];
+            }
+        }
+    }
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $curlHeaders);
+
+    // Handle POST data and file uploads
+    $postData = [];
+    if (!empty($params['key'])) {
+        foreach ($params['key'] as $index => $key) {
+            if (!empty($key)) {
+                // Check if this parameter has a file upload
+                if (!empty($_FILES['files']['name'][$index])) {
+                    // For file uploads, ensure the file exists and is readable
+                    if (file_exists($_FILES['files']['tmp_name'][$index])) {
+                        $postData[$key] = new CURLFile(
+                            $_FILES['files']['tmp_name'][$index],
+                            $_FILES['files']['type'][$index],
+                            $_FILES['files']['name'][$index]
+                        );
+                        // Set proper permissions
+                        curl_setopt($ch, CURLOPT_SAFE_UPLOAD, true);
+                    }
+                } else {
+                    // Regular parameter value
+                    $postData[$key] = $params['value'][$index];
+                }
+            }
+        }
+    }
+
+    // Set POST fields if not GET request
+    if ($method !== 'GET' && !empty($postData)) {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    }
+
+    // Execute request
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+
+    $responseData = [
+        'status' => $httpCode,
+        'response' => $response,
+        'error' => $error,
+        'sent_data' => $postData,
+        'curl_info' => curl_getinfo($ch),
+        'files_debug' => $_FILES
+    ];
+
+    curl_close($ch);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +143,12 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
         }
 
         .form-group {
@@ -36,6 +159,7 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #555;
         }
 
         input[type="text"],
@@ -46,13 +170,14 @@
             margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 14px;
         }
 
-        .header-row,
-        .param-row {
+        .header-row, .param-row {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
+            align-items: center;
         }
 
         .header-row input,
@@ -68,6 +193,8 @@
             border-radius: 4px;
             cursor: pointer;
             margin-right: 10px;
+            font-size: 14px;
+            transition: background 0.3s ease;
         }
 
         button:hover {
@@ -76,6 +203,7 @@
 
         .remove-btn {
             background: #f44336;
+            padding: 8px 12px;
         }
 
         .remove-btn:hover {
@@ -87,7 +215,7 @@
             padding: 15px;
             background: #f8f9fa;
             border-radius: 4px;
-            white-space: pre-wrap;
+            border: 1px solid #ddd;
         }
 
         .add-btn {
@@ -101,78 +229,36 @@
         .method-select {
             width: 200px;
         }
+
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .status-code {
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: #f44336;
+            margin-bottom: 10px;
+        }
+
+        .param-row input[type="file"] {
+            width: auto;
+        }
     </style>
 </head>
-
 <body>
-
-    <?php
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $url = $_POST['url'] ?? '';
-        $method = $_POST['method'] ?? 'GET';
-        $headers = $_POST['headers'] ?? [];
-        $params = $_POST['params'] ?? [];
-        $files = $_FILES['files'] ?? [];
-
-        // Prepare cURL request
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-
-        // Prepare headers
-        $curlHeaders = [];
-        foreach ($headers['key'] as $index => $key) {
-            if (!empty($key) && !empty($headers['value'][$index])) {
-                $curlHeaders[] = "$key: " . $headers['value'][$index];
-            }
-        }
-        if (!empty($curlHeaders)) {
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $curlHeaders);
-        }
-
-        // Prepare body data
-        $postData = [];
-        foreach ($params['key'] as $index => $key) {
-            if (!empty($key)) {
-                $postData[$key] = $params['value'][$index];
-            }
-        }
-
-        // Handle file uploads
-        if (!empty($files['file']['name'])) {
-            foreach ($files['file']['name'] as $index => $filename) {
-                if (!empty($filename)) {
-                    $postData[$params['key'][$index]] = new CURLFile(
-                        $files['file']['tmp_name'][$index],
-                        $files['file']['type'][$index],
-                        $files['file']['name'][$index]
-                    );
-                }
-            }
-        }
-
-        if (!empty($postData) && $method !== 'GET') {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-        }
-
-        // Execute request
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        $responseData = [
-            'status' => $httpCode,
-            'response' => $response,
-            'error' => $error
-        ];
-    }
-    ?>
-
     <div class="container">
         <h1>API Tester</h1>
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" id="apiForm">
             <div class="form-group">
                 <label for="url">URL:</label>
                 <input type="text" id="url" name="url" required value="<?php echo $_POST['url'] ?? ''; ?>">
@@ -181,11 +267,11 @@
             <div class="form-group">
                 <label for="method">Method:</label>
                 <select id="method" name="method" class="method-select">
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>
-                    <option value="PATCH">PATCH</option>
+                    <option value="GET" <?php echo (($_POST['method'] ?? '') === 'GET') ? 'selected' : ''; ?>>GET</option>
+                    <option value="POST" <?php echo (($_POST['method'] ?? '') === 'POST') ? 'selected' : ''; ?>>POST</option>
+                    <option value="PUT" <?php echo (($_POST['method'] ?? '') === 'PUT') ? 'selected' : ''; ?>>PUT</option>
+                    <option value="DELETE" <?php echo (($_POST['method'] ?? '') === 'DELETE') ? 'selected' : ''; ?>>DELETE</option>
+                    <option value="PATCH" <?php echo (($_POST['method'] ?? '') === 'PATCH') ? 'selected' : ''; ?>>PATCH</option>
                 </select>
             </div>
 
@@ -207,25 +293,33 @@
                     <div class="param-row">
                         <input type="text" name="params[key][]" placeholder="Parameter Name">
                         <input type="text" name="params[value][]" placeholder="Parameter Value">
-                        <input type="file" name="files[file][]">
+                        <input type="file" name="files[]" accept="image/*">
                         <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
                     </div>
                 </div>
                 <button type="button" class="add-btn" onclick="addParameter()">Add Parameter</button>
             </div>
 
-            <button type="submit">Send Request</button>
+            <button type="submit" class="send-btn">Send Request</button>
         </form>
 
         <?php if (isset($responseData)): ?>
             <div class="response">
                 <h3>Response:</h3>
-                <p>Status Code: <?php echo htmlspecialchars($responseData['status']); ?></p>
+                <div class="status-code">Status Code: <?php echo htmlspecialchars($responseData['status']); ?></div>
+                
                 <?php if ($responseData['error']): ?>
-                    <p>Error: <?php echo htmlspecialchars($responseData['error']); ?></p>
-                <?php else: ?>
-                    <pre><?php echo htmlspecialchars($responseData['response']); ?></pre>
+                    <div class="error">Error: <?php echo htmlspecialchars($responseData['error']); ?></div>
                 <?php endif; ?>
+
+                <h4>Sent Data:</h4>
+                <pre><?php print_r($responseData['sent_data']); ?></pre>
+
+                <h4>Response Body:</h4>
+                <pre><?php echo htmlspecialchars($responseData['response']); ?></pre>
+
+                <h4>Debug Information:</h4>
+                <pre><?php print_r($responseData['curl_info']); ?></pre>
             </div>
         <?php endif; ?>
     </div>
@@ -236,10 +330,10 @@
             const newRow = document.createElement('div');
             newRow.className = 'header-row';
             newRow.innerHTML = `
-        <input type="text" name="headers[key][]" placeholder="Header Name">
-        <input type="text" name="headers[value][]" placeholder="Header Value">
-        <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
-    `;
+                <input type="text" name="headers[key][]" placeholder="Header Name">
+                <input type="text" name="headers[value][]" placeholder="Header Value">
+                <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
+            `;
             container.appendChild(newRow);
         }
 
@@ -248,11 +342,11 @@
             const newRow = document.createElement('div');
             newRow.className = 'param-row';
             newRow.innerHTML = `
-        <input type="text" name="params[key][]" placeholder="Parameter Name">
-        <input type="text" name="params[value][]" placeholder="Parameter Value">
-        <input type="file" name="files[file][]">
-        <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
-    `;
+                <input type="text" name="params[key][]" placeholder="Parameter Name">
+                <input type="text" name="params[value][]" placeholder="Parameter Value">
+                <input type="file" name="files[]" accept="image/*">
+                <button type="button" class="remove-btn" onclick="removeRow(this)">Remove</button>
+            `;
             container.appendChild(newRow);
         }
 
@@ -260,7 +354,5 @@
             button.parentElement.remove();
         }
     </script>
-
 </body>
-
 </html>
