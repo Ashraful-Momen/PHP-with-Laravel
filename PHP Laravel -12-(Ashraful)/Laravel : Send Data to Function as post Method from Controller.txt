@@ -1,0 +1,22 @@
+if ($category == 19) {
+    $record = DeviceInsCustomerOrder::find($trx_id);
+    $record->shuffle_key = $randomString;
+    $record->save();
+    
+    $amount = decrypt($request->order_amount);
+    $amount = round($amount);
+    
+    // Create the payment data
+    $paymentData = [
+        'amount' => $amount,
+        'trx_id' => decrypt($id),
+        'pgw_name' => $request->pgw,
+        'order_random_id' => $randomString
+    ];
+    
+    // Send data as POST request to the SSL Commerz controller
+    return redirect()->action(
+        [SslCommerzPaymentController::class, 'index'],
+        $paymentData
+    )->withInput($paymentData);
+}
