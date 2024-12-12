@@ -1,0 +1,138 @@
+To manage route permissions using the **Spatie Laravel Permissions** package for the same CRUD routes, here's how you can set it up:
+
+---
+
+### Step 1: Install Spatie Permissions
+Run the following command to install the package:
+
+```bash
+composer require spatie/laravel-permission
+```
+
+### Step 2: Publish the Config File and Migrate
+Publish the configuration file and run migrations:
+
+```bash
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan migrate
+```
+
+---
+
+### Step 3: Define Roles and Permissions
+You can define roles and permissions in a seeder or through the Tinker console.
+
+#### Example Seeder
+```php
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
+class RolesAndPermissionsSeeder extends Seeder
+{
+    public function run()
+    {
+        // Create permissions
+        Permission::create(['name' => 'create products']);
+        Permission::create(['name' => 'update products']);
+        Permission::create(['name' => 'delete products']);
+        Permission::create(['name' => 'view products']);
+
+        // Create roles and assign permissions
+        $admin = Role::create(['name' => 'admin']);
+        $manager = Role::create(['name' => 'manager']);
+        $user = Role::create(['name' => 'user']);
+
+        $admin->givePermissionTo(['create products', 'update products', 'delete products', 'view products']);
+        $manager->givePermissionTo(['create products', 'update products']);
+        $user->givePermissionTo(['view products']);
+    }
+}
+```
+
+Run the seeder:
+
+```bash
+php artisan db:seed --class=RolesAndPermissionsSeeder
+```
+
+---
+
+### Step 4: Assign Roles to Users
+You can assign roles to users in your user registration logic or via Tinker:
+
+#### Assign Role
+```php
+$user = \App\Models\User::find(1); // Admin user ID
+$user->assignRole('admin');
+
+$manager = \App\Models\User::find(2); // Manager user ID
+$manager->assignRole('manager');
+
+$normalUser = \App\Models\User::find(3); // User ID
+$normalUser->assignRole('user');
+```
+
+---
+
+### Step 5: Protect Routes with Middleware
+Update your `routes/web.php` file to use middleware for permissions.
+
+```php
+use App\Http\Controllers\ProductController;
+
+// Admin routes
+Route::group(['middleware' => ['role:admin']], function () {
+    Route::resource('products', ProductController::class);
+});
+
+// Manager routes
+Route::group(['middleware' => ['role:manager']], function () {
+    Route::post('products', [ProductController::class, 'store'])->name('products.store');
+    Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+});
+
+// User routes
+Route::group(['middleware' => ['role:user']], function () {
+    Route::get('products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+});
+```
+
+---
+
+### Step 6: Middleware for Permissions (Optional)
+If you want fine-grained control, use the `can` middleware provided by Spatie:
+
+```php
+Route::middleware(['auth'])->group(function () {
+    Route::get('products', [ProductController::class, 'index'])->middleware('can:view products');
+    Route::get('products/{product}', [ProductController::class, 'show'])->middleware('can:view products');
+    Route::post('products', [ProductController::class, 'store'])->middleware('can:create products');
+    Route::put('products/{product}', [ProductController::class, 'update'])->middleware('can:update products');
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->middleware('can:delete products');
+});
+```
+
+---
+
+### Step 7: Verify Permissions in Controller (Optional)
+You can use the `authorize` method in the controller for additional checks:
+
+```php
+public function store(Request $request)
+{
+    $this->authorize('create products');
+
+    // Logic for storing the product
+}
+```
+
+---
+
+### Step 8: Test Your Setup
+- Admin: Can perform all CRUD operations.
+- Manager: Can create and update products.
+- User: Can only view products (`index` and `show`).
+
+This setup ensures secure and manageable role-based permissions for your Laravel project. Let me know if you need help with anything else!
