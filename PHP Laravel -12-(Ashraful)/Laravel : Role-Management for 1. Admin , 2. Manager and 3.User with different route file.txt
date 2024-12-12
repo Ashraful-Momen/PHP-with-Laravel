@@ -1,0 +1,118 @@
+To implement role-based middleware with separate route files for your Laravel project, you can follow these steps:
+
+### Step 1: Add Roles to Users Table
+Ensure your `users` table has a `role` column to distinguish between Admin, Manager, and User. You can update your migration if it’s not already present:
+
+```php
+Schema::table('users', function (Blueprint $table) {
+    $table->string('role')->default('user'); // Default role as 'user'
+});
+```
+
+### Step 2: Create Middleware for Role Management
+Run the following command to create middleware:
+
+```bash
+php artisan make:middleware RoleMiddleware
+```
+
+In `app/Http/Middleware/RoleMiddleware.php`, add the following logic:
+
+```php
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Support\Facades\Auth;
+
+class RoleMiddleware
+{
+    public function handle($request, Closure $next, ...$roles)
+    {
+        if (!Auth::check() || !in_array(Auth::user()->role, $roles)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return $next($request);
+    }
+}
+```
+
+### Step 3: Register Middleware
+In `app/Http/Kernel.php`, register the middleware:
+
+```php
+protected $routeMiddleware = [
+    // Other middleware
+    'role' => \App\Http\Middleware\RoleMiddleware::class,
+];
+```
+
+### Step 4: Set Up Separate Route Files
+Create separate route files if not already present:
+- `routes/admin.php`
+- `routes/manager.php`
+- `routes/user.php`
+
+Then, include them in `RouteServiceProvider` (`app/Providers/RouteServiceProvider.php`):
+
+```php
+public function map()
+{
+    $this->mapAdminRoutes();
+    $this->mapManagerRoutes();
+    $this->mapUserRoutes();
+}
+
+protected function mapAdminRoutes()
+{
+    Route::middleware(['web', 'auth', 'role:admin'])
+        ->namespace($this->namespace)
+        ->group(base_path('routes/admin.php'));
+}
+
+protected function mapManagerRoutes()
+{
+    Route::middleware(['web', 'auth', 'role:manager'])
+        ->namespace($this->namespace)
+        ->group(base_path('routes/manager.php'));
+}
+
+protected function mapUserRoutes()
+{
+    Route::middleware(['web', 'auth', 'role:user'])
+        ->namespace($this->namespace)
+        ->group(base_path('routes/user.php'));
+}
+```
+
+### Step 5: Define Routes
+Define routes in each file:
+
+#### `routes/admin.php`
+```php
+Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+```
+
+#### `routes/manager.php`
+```php
+Route::get('/dashboard', [ManagerController::class, 'index'])->name('manager.dashboard');
+```
+
+#### `routes/user.php`
+```php
+Route::get('/dashboard', [UserController::class, 'index'])->name('user.dashboard');
+```
+
+### Step 6: Assign Roles to Users
+Assign roles when registering users or in the database manually:
+
+```php
+$user = User::find(1);
+$user->role = 'admin'; // or 'manager', 'user'
+$user->save();
+```
+
+### Step 7: Test Role-Based Access
+When accessing routes, users will be redirected or shown a "403 Unauthorized" page if they attempt to access routes outside their role.
+
+Let me know if you need further adjustments!
