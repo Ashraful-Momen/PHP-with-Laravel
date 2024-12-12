@@ -1,0 +1,180 @@
+#sslcommerzController => 
+----------------------------
+ public static function index(Request $request)
+    {
+
+        // dd($request->all());
+        $post_data = array();
+        // Ensure the 'amount' is numeric
+        $post_data['total_amount'] = floatval($request['amount']);
+        $post_data['currency'] = "BDT";
+        $post_data['tran_id'] = $request['order_random_id'];
+        $post_data['is_api'] = $request['is_api'];
+
+        # CUSTOMER INFORMATION
+        $post_data['cus_name'] = 'Customer Name';
+        $post_data['cus_email'] = 'customer@mail.com';
+        $post_data['cus_add1'] = 'Customer Address';
+        $post_data['cus_add2'] = "";
+        $post_data['cus_city'] = "";
+        $post_data['cus_state'] = "";
+        $post_data['cus_postcode'] = "";
+        $post_data['cus_country'] = "Bangladesh";
+        $post_data['cus_phone'] = '8801859385787';
+        $post_data['cus_fax'] = "";
+
+        # SHIPMENT INFORMATION
+        $post_data['ship_name'] = "Store Test";
+        $post_data['ship_add1'] = "Dhaka";
+        $post_data['ship_add2'] = "Dhaka";
+        $post_data['ship_city'] = "Dhaka";
+        $post_data['ship_state'] = "Dhaka";
+        $post_data['ship_postcode'] = "1000";
+        $post_data['ship_phone'] = "";
+        $post_data['ship_country'] = "Bangladesh";
+
+        $post_data['shipping_method'] = "NO";
+        $post_data['product_name'] = "Computer";
+        $post_data['product_category'] = "Goods";
+        $post_data['product_profile'] = "physical-goods";
+
+        # PAYMENT METHOD CONTROL
+        // Allow only Mastercard using the correct gateway codes
+        $post_data['multi_card_name'] = 'master_card'; // Use master_cards for all Mastercard options
+
+        // Additional examples:
+        // For specific bank Mastercard:
+        // $post_data['multi_card_name'] = 'brac_master,dbbl_master,city_master,ebl_master,sbl_master';
+
+        // For Single Bank Mastercard:
+        // $post_data['multi_card_name'] = 'brac_master';
+
+        // Force mobile banking only:
+        // $post_data['multi_card_name'] = 'mobilebank';
+
+        // Force bKash only:
+        // $post_data['multi_card_name'] = 'bkash';
+
+        $sslc = new SslCommerzNotification();
+
+
+        // return response()->json([
+        //     'request' => $request->all(),
+        //     'data' => $post_data,
+        // ]);
+
+        # Important: Use 'hosted' to ensure gateway restrictions are applied
+        $payment_options = $sslc->makePayment($post_data, 'hosted');
+
+        if (!is_array($payment_options)) {
+            print_r($payment_options);
+            $payment_options = array();
+        }
+    }
+
+
+#sslcommerzNotificaiton : redirect the api from here . 
+------------------------------
+ public function makePayment(array $requestData, $type = 'checkout', $pattern = 'json')
+    {
+
+        // dd($requestData['is_api'] == 'true');
+        //is_api true working for api and is_api ==false for web version. 
+
+        if ($requestData['is_api'] == 'true') {
+
+
+            if (empty($requestData)) {
+                return "Please provide valid transaction information";
+            }
+
+            $header = [];
+
+            $this->setApiUrl($this->config['apiDomain'] . $this->config['apiUrl']['make_payment']);
+
+            // Set parameters and authentication
+            $this->setParams($requestData);
+            $this->setAuthenticationInfo();
+
+            // Call the Gateway API
+            $response = $this->callToApi($this->data, $header, $this->config['connect_from_localhost']);
+
+            $formattedResponse = $this->formatResponse($response, $type, $pattern);
+
+            if ($type == 'hosted') {
+                if (!empty($formattedResponse['GatewayPageURL'])) {
+                    $redirect_url = $formattedResponse['GatewayPageURL'];
+
+                    // For API requests, return the URL in JSON response
+                    if (isset($requestData['is_api']) && $requestData['is_api'] === 'true') {
+                        return response()->json([
+                            'success' => true,
+                            'redirect_url' => $redirect_url,
+                            'msg' => 'Payment gateway URL generated successfully'
+                        ]);
+                    }
+
+                    // For non-API requests, perform redirect
+                    if (!headers_sent()) {
+                        return redirect()->away($redirect_url);
+                    } else {
+                        echo "<script>window.location.href = '" . $redirect_url . "';</script>";
+                        exit;
+                    }
+                } else {
+                    $message = (strpos($formattedResponse['failedreason'], 'Store Credential') === false)
+                        ? $formattedResponse['failedreason']
+                        : "Invalid store credentials. Please check your configuration.";
+
+                    if (isset($requestData['is_api']) && $requestData['is_api'] === 'true') {
+                        return response()->json([
+                            'success' => false,
+                            'msg' => $message
+                        ], 400);
+                    }
+
+                    return $message;
+                }
+            }
+
+            return $formattedResponse;
+        }
+        else{
+            if (empty($requestData)) {
+                return "Please provide a valid information list about transaction with transaction id, amount, success url, fail url, cancel url, store id and pass at least";
+            }
+
+            $header = [];
+
+            $this->setApiUrl($this->config['apiDomain'] . $this->config['apiUrl']['make_payment']);
+
+            // Set the required/additional params
+            $check = $this->setParams($requestData);
+
+
+
+            // Set the authentication information
+            $this->setAuthenticationInfo();
+
+            // Now, call the Gateway API
+            $response = $this->callToApi($this->data, $header, $this->config['connect_from_localhost']);
+
+            $formattedResponse = $this->formatResponse($response, $type, $pattern); // Here we will define the response pattern
+
+            if ($type == 'hosted') {
+                if (!empty($formattedResponse['GatewayPageURL'])) {
+                    $this->redirect($formattedResponse['GatewayPageURL']);
+                } else {
+                    if (strpos($formattedResponse['failedreason'], 'Store Credential') === false) {
+                        $message = $formattedResponse['failedreason'];
+                    } else {
+                        $message = "Check the SSLCZ_TESTMODE and SSLCZ_STORE_PASSWORD value in your .env; DO NOT USE MERCHANT PANEL PASSWORD HERE.";
+                    }
+
+                    return $message;
+                }
+            } else {
+                return $formattedResponse;
+            }
+        }
+    }
