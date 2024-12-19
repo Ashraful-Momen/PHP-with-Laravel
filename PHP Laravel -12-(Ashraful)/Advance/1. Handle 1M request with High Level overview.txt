@@ -369,3 +369,36 @@ redis-cli info | grep used_memory_human
 
 # Monitor Queue
 php artisan queue:monitor redis
+------------------------------------------------------------
+Key Features for Handling 1M Requests:
+
+Request Flow:
+
+Immediate response with request ID
+Asynchronous processing via Redis queue
+Status checking endpoint
+
+
+Performance Optimizations:
+
+Redis for caching and queuing
+Database indexes
+Load balancing across multiple servers
+Rate limiting to prevent overload
+Supervisor for managing multiple queue workers
+
+
+Error Handling:
+
+Validation via Form Request
+Database transaction management
+Job retries
+Comprehensive logging
+
+
+Monitoring:
+
+Queue monitoring
+Worker status tracking
+Redis memory usage
+Error logging
