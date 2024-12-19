@@ -1,0 +1,371 @@
+// routes/api.php
+<?php
+
+use App\Http\Controllers\Api\UserController;
+
+Route::post('/user_reg', [UserController::class, 'register']);
+Route::get('/registration/status/{requestId}', [UserController::class, 'checkStatus']);
+
+// app/Http/Controllers/Api/UserController.php
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRegistrationRequest;
+use App\Jobs\ProcessUserRegistration;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Str;
+use Illuminate\Http\Response;
+
+class UserController extends Controller
+{
+    public function register(UserRegistrationRequest $request)
+    {
+        try {
+            // Generate unique request ID
+            $requestId = Str::uuid()->toString();
+
+            // Prepare user data
+            $userData = [
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'gender' => $request->gender,
+                'status' => 'pending',
+                'created_at' => now()
+            ];
+
+            // Store in Redis with 24 hour expiration
+            Redis::setex(
+                "user_registration:{$requestId}",
+                86400,
+                json_encode($userData)
+            );
+
+            // Dispatch job to queue
+            ProcessUserRegistration::dispatch($requestId)
+                ->onQueue('registrations');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registration initiated successfully',
+                'request_id' => $requestId
+            ], Response::HTTP_ACCEPTED);
+
+        } catch (\Exception $e) {
+            \Log::error('Registration Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration failed'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function checkStatus(string $requestId)
+    {
+        $data = Redis::get("user_registration:{$requestId}");
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $userData = json_decode($data, true);
+
+        return response()->json([
+            'success' => true,
+            'status' => $userData['status'],
+            'message' => $userData['message'] ?? null
+        ]);
+    }
+}
+
+// app/Http/Requests/UserRegistrationRequest.php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+
+class UserRegistrationRequest extends FormRequest
+{
+    public function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|unique:users,phone',
+            'email' => 'required|email|unique:users,email',
+            'gender' => 'required|in:male,female,other'
+        ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422)
+        );
+    }
+}
+
+// app/Models/User.php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'gender'
+    ];
+}
+
+// app/Jobs/ProcessUserRegistration.php
+<?php
+
+namespace App\Jobs;
+
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\DB;
+
+class ProcessUserRegistration implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    private $requestId;
+    public $tries = 3;
+    public $timeout = 30;
+
+    public function __construct($requestId)
+    {
+        $this->requestId = $requestId;
+    }
+
+    public function handle()
+    {
+        $key = "user_registration:{$this->requestId}";
+        $userData = Redis::get($key);
+
+        if (!$userData) {
+            return;
+        }
+
+        $userData = json_decode($userData, true);
+
+        try {
+            DB::beginTransaction();
+
+            // Check again for unique email/phone
+            if (User::where('email', $userData['email'])
+                    ->orWhere('phone', $userData['phone'])
+                    ->exists()) {
+                throw new \Exception('Email or phone already registered');
+            }
+
+            User::create([
+                'name' => $userData['name'],
+                'phone' => $userData['phone'],
+                'email' => $userData['email'],
+                'gender' => $userData['gender']
+            ]);
+
+            $userData['status'] = 'completed';
+            $userData['message'] = 'Registration successful';
+            
+            DB::commit();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            $userData['status'] = 'failed';
+            $userData['message'] = $e->getMessage();
+            
+            \Log::error("Registration failed for request {$this->requestId}: " . $e->getMessage());
+        }
+
+        Redis::setex($key, 86400, json_encode($userData));
+    }
+}
+
+// database/migrations/xxxx_xx_xx_create_users_table.php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('phone')->unique();
+            $table->enum('gender', ['male', 'female', 'other']);
+            $table->timestamps();
+            
+            // Add indexes for better performance
+            $table->index(['email', 'phone']);
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('users');
+    }
+};
+
+// .env configuration
+APP_NAME=Laravel
+APP_ENV=production
+APP_KEY=base64:your-key-here
+APP_DEBUG=false
+
+DB_CONNECTION=mysql
+DB_HOST=your-db-host
+DB_PORT=3306
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+REDIS_HOST=your-redis-host
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+REDIS_CLIENT=predis
+
+QUEUE_CONNECTION=redis
+REDIS_QUEUE=registrations
+
+# Multiple Redis instances for different purposes
+REDIS_HOST_CACHE=redis-cache
+REDIS_HOST_QUEUE=redis-queue
+REDIS_HOST_SESSION=redis-session
+
+// config/queue.php
+'redis' => [
+    'driver' => 'redis',
+    'connection' => 'queue',
+    'queue' => env('REDIS_QUEUE', 'registrations'),
+    'retry_after' => 90,
+    'block_for' => null,
+    'after_commit' => false,
+],
+
+// Supervisor Configuration (/etc/supervisor/conf.d/laravel-worker.conf)
+[program:laravel-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /path/to/your/project/artisan queue:work redis --queue=registrations --tries=3 --timeout=30
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=20
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/worker.log
+stopwaitsecs=3600
+
+// Nginx Load Balancer Configuration (/etc/nginx/nginx.conf)
+http {
+    upstream laravel_backend {
+        least_conn;  # Least connection distribution
+        server app1.example.com:80 max_fails=3 fail_timeout=30s;
+        server app2.example.com:80 max_fails=3 fail_timeout=30s;
+        server app3.example.com:80 max_fails=3 fail_timeout=30s;
+        keepalive 32;
+    }
+
+    # Rate limiting configuration
+    limit_req_zone $binary_remote_addr zone=registration_limit:10m rate=10r/s;
+
+    server {
+        listen 80;
+        server_name your-domain.com;
+
+        location /api/user_reg {
+            limit_req zone=registration_limit burst=20 nodelay;
+            
+            proxy_pass http://laravel_backend;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            proxy_next_upstream error timeout http_500;
+            proxy_next_upstream_tries 3;
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+    }
+}
+
+// Redis Configuration (/etc/redis/redis.conf)
+maxmemory 8gb
+maxmemory-policy allkeys-lru
+appendonly yes
+appendfsync everysec
+no-appendfsync-on-rewrite yes
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+timeout 0
+tcp-keepalive 300
+
+==============================================================================================================================================
+To deploy and run this system:
+
+Set up Infrastructure:
+---------------------
+# Install Redis
+sudo apt-get install redis-server
+
+# Install Supervisor
+sudo apt-get install supervisor
+
+# Configure PHP-FPM with proper settings
+sudo vim /etc/php/8.2/fpm/php.ini
+
+Start Queue Workers:
+--------------------
+# Reload supervisor
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start laravel-worker:*
+
+Optimize Laravel:
+------------------
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+Monitor the System:
+----------------------
+# Monitor Redis
+redis-cli info | grep connected_clients
+redis-cli info | grep used_memory_human
+
+# Monitor Queue
+php artisan queue:monitor redis
