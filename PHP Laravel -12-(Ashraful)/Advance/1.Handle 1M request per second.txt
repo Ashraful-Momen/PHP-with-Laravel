@@ -1,0 +1,181 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Queue;
+use App\Jobs\ProcessUserRegistration;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
+class UserRegistrationController extends Controller
+{
+    public function register(Request $request)
+    {
+        // Validate request
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|unique:users,phone',
+            'email' => 'required|email|unique:users,email',
+            'gender' => 'required|in:male,female,other'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Generate unique request ID
+        $requestId = Str::uuid()->toString();
+
+        // Store request data in Redis with 24-hour expiration
+        $userData = [
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'gender' => $request->gender,
+            'status' => 'pending'
+        ];
+        
+        Redis::setex("user_registration:{$requestId}", 86400, json_encode($userData));
+
+        // Dispatch job to process registration
+        ProcessUserRegistration::dispatch($requestId)
+            ->onQueue('registrations')
+            ->delay(now()->addSeconds(1));
+
+        return response()->json([
+            'message' => 'Registration request received',
+            'request_id' => $requestId
+        ], 202);
+    }
+
+    public function checkStatus($requestId)
+    {
+        $userData = Redis::get("user_registration:{$requestId}");
+        
+        if (!$userData) {
+            return response()->json(['message' => 'Registration request not found'], 404);
+        }
+
+        $userData = json_decode($userData, true);
+        return response()->json([
+            'status' => $userData['status'],
+            'message' => $userData['message'] ?? null
+        ]);
+    }
+}
+
+// ProcessUserRegistration Job
+namespace App\Jobs;
+
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\DB;
+
+class ProcessUserRegistration implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    private $requestId;
+
+    public function __construct($requestId)
+    {
+        $this->requestId = $requestId;
+    }
+
+    public function handle()
+    {
+        $key = "user_registration:{$this->requestId}";
+        $userData = Redis::get($key);
+
+        if (!$userData) {
+            return;
+        }
+
+        $userData = json_decode($userData, true);
+
+        try {
+            DB::beginTransaction();
+
+            $user = User::create([
+                'name' => $userData['name'],
+                'phone' => $userData['phone'],
+                'email' => $userData['email'],
+                'gender' => $userData['gender']
+            ]);
+
+            $userData['status'] = 'completed';
+            $userData['message'] = 'Registration successful';
+            
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            $userData['status'] = 'failed';
+            $userData['message'] = 'Registration failed';
+            
+            // Log the error
+            \Log::error("Registration failed for request {$this->requestId}: " . $e->getMessage());
+        }
+
+        // Update status in Redis
+        Redis::setex($key, 86400, json_encode($userData));
+    }
+}
+
+// User Model
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    protected $fillable = [
+        'name',
+        'phone',
+        'email',
+        'gender'
+    ];
+
+    // Add database indexes
+    // Run this migration:
+    /*
+    Schema::table('users', function (Blueprint $table) {
+        $table->index(['email', 'phone']);
+    });
+    */
+}
+
+// Configuration - queue.php
+'redis' => [
+    'driver' => 'redis',
+    'connection' => 'default',
+    'queue' => 'registrations',
+    'retry_after' => 90,
+    'block_for' => null,
+],
+
+// Configuration - database.php
+'mysql' => [
+    'driver' => 'mysql',
+    'host' => env('DB_HOST', '127.0.0.1'),
+    'database' => env('DB_DATABASE', 'forge'),
+    'username' => env('DB_USERNAME', 'forge'),
+    'password' => env('DB_PASSWORD', ''),
+    'charset' => 'utf8mb4',
+    'collation' => 'utf8mb4_unicode_ci',
+    'prefix' => '',
+    'strict' => false,
+    'engine' => 'InnoDB',
+    'options' => extension_loaded('pdo_mysql') ? array_filter([
+        PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+        PDO::ATTR_PERSISTENT => true,
+    ]) : [],
+]
