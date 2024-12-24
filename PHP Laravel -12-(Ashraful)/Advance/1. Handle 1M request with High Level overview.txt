@@ -323,7 +323,7 @@ http {
     }
 }
 
-// nginx complete setup : -----------------------------------------------------------------------
+//method:1 nginx complete setup : -----------------------------------------------------------------------
 http {
     # Upstream configuration for load balancing
     upstream laravel_backend {
@@ -372,6 +372,101 @@ http {
     }
 }
 
+// end nginx full setup : -----------------------------------------------------------------------
+
+// method:2 nginx setup : -----------------------------------------------------------------------
+http {
+    # Basic settings
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    
+    # Upstream configuration for load balancing
+    upstream laravel_backend {
+        least_conn;  # Least connection distribution
+        server 127.0.0.1:9000 max_fails=3 fail_timeout=30s;
+        keepalive 32;
+    }
+
+    # Rate limiting configuration
+    limit_req_zone $binary_remote_addr zone=registration_limit:10m rate=10r/s;
+
+    # Main server block for instasure-microsite-main.xyz
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name instasure-microsite-main.xyz;
+        
+        # Redirect all HTTP traffic to HTTPS
+        return 301 https://$server_name$request_uri;
+    }
+
+    server {
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+        server_name instasure-microsite-main.xyz;
+
+        # SSL configuration
+        ssl_certificate /etc/letsencrypt/live/instasure-microsite-main.xyz/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/instasure-microsite-main.xyz/privkey.pem;
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:SSL:50m;
+        ssl_session_tickets off;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+        ssl_prefer_server_ciphers off;
+
+        # HSTS (uncomment if you're sure)
+        # add_header Strict-Transport-Security "max-age=63072000" always;
+
+        # Log files
+        access_log /var/log/nginx/instasure.access.log;
+        error_log /var/log/nginx/instasure.error.log;
+
+        # Root directory and index
+        root /var/www/instasure/public;
+        index index.php index.html;
+
+        # Main location block
+        location / {
+            try_files $uri $uri/ /index.php?$query_string;
+            limit_req zone=registration_limit burst=20 nodelay;
+
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_next_upstream error timeout http_500;
+            proxy_next_upstream_tries 3;
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+        }
+
+        # PHP-FPM configuration
+        location ~ \.php$ {
+            fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+            fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+            include fastcgi_params;
+            fastcgi_buffering on;
+            fastcgi_buffer_size 16k;
+            fastcgi_buffers 16 16k;
+        }
+
+        # Deny access to .htaccess files
+        location ~ /\.ht {
+            deny all;
+        }
+
+        # Cache static files
+        location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+            expires 30d;
+            add_header Cache-Control "public, no-transform";
+        }
+    }
+}
 // end nginx full setup : -----------------------------------------------------------------------
 
 // Redis Configuration (/etc/redis/redis.conf)
