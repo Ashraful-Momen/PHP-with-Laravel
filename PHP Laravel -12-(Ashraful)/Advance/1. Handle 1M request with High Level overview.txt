@@ -469,6 +469,142 @@ http {
 }
 // end nginx full setup : -----------------------------------------------------------------------
 
+//method : 3 for 10k rps each endpoint : --------------------------------------------------------
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    # Define 10 backend proxy servers
+    upstream registration_backends {
+        hash $request_id consistent; # Consistent hashing based on request ID
+        
+        # Each backend can handle 10k requests per second
+        server backend1.instasure.xyz:9001 max_fails=3 fail_timeout=30s weight=1;
+        server backend2.instasure.xyz:9002 max_fails=3 fail_timeout=30s weight=1;
+        server backend3.instasure.xyz:9003 max_fails=3 fail_timeout=30s weight=1;
+        server backend4.instasure.xyz:9004 max_fails=3 fail_timeout=30s weight=1;
+        server backend5.instasure.xyz:9005 max_fails=3 fail_timeout=30s weight=1;
+        server backend6.instasure.xyz:9006 max_fails=3 fail_timeout=30s weight=1;
+        server backend7.instasure.xyz:9007 max_fails=3 fail_timeout=30s weight=1;
+        server backend8.instasure.xyz:9008 max_fails=3 fail_timeout=30s weight=1;
+        server backend9.instasure.xyz:9009 max_fails=3 fail_timeout=30s weight=1;
+        server backend10.instasure.xyz:9010 max_fails=3 fail_timeout=30s weight=1;
+        
+        keepalive 100;
+    }
+
+    # Global rate limit zone
+    limit_req_zone $binary_remote_addr zone=registration_limit:50m rate=100000r/s;
+
+    # Main server configuration
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name instasure.xyz;
+        return 301 https://$server_name$request_uri;
+    }
+
+    server {
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+        server_name instasure.xyz;
+
+        # SSL Configuration
+        ssl_certificate /etc/letsencrypt/live/instasure.xyz/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/instasure.xyz/privkey.pem;
+        
+        # SSL optimization
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:SSL:50m;
+        ssl_session_tickets off;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+        ssl_prefer_server_ciphers off;
+
+        # Logging
+        access_log /var/log/nginx/instasure.access.log combined buffer=512k flush=1m;
+        error_log /var/log/nginx/instasure.error.log;
+
+        # Main registration endpoint
+        location /api/usr_registration/v1 {
+            # Rate limiting with high burst capacity
+            limit_req zone=registration_limit burst=1000 nodelay;
+
+            # Generate request ID if not present
+            set $request_id $request_id;
+            if ($request_id = "") {
+                set $request_id $request_time$request_length$remote_addr;
+            }
+
+            # Proxy settings
+            proxy_pass http://registration_backends;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Request-ID $request_id;
+
+            # Timeouts
+            proxy_connect_timeout 10s;
+            proxy_send_timeout 30s;
+            proxy_read_timeout 30s;
+
+            # Buffering
+            proxy_buffering on;
+            proxy_buffer_size 16k;
+            proxy_buffers 8 16k;
+            proxy_busy_buffers_size 32k;
+
+            # Retry settings
+            proxy_next_upstream error timeout http_500 http_502 http_503 http_504;
+            proxy_next_upstream_tries 3;
+            proxy_next_upstream_timeout 10s;
+        }
+
+        # Health check endpoint for backends
+        location /health {
+            access_log off;
+            return 200 'healthy\n';
+        }
+
+        # Nginx status monitoring
+        location /nginx_status {
+            stub_status on;
+            access_log off;
+            allow 127.0.0.1;
+            deny all;
+        }
+    }
+
+    # Optimization settings
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    keepalive_requests 1000;
+    types_hash_max_size 2048;
+    server_tokens off;
+    
+    # File descriptor settings
+    worker_rlimit_nofile 65535;
+    
+    # Gzip settings
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+}
+
+events {
+    worker_connections 65535;
+    use epoll;
+    multi_accept on;
+}
+-------------------------------------------------------------------------------------------------
+
 // Redis Configuration (/etc/redis/redis.conf)
 maxmemory 8gb
 maxmemory-policy allkeys-lru
