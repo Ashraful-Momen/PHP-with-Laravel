@@ -1,0 +1,16 @@
+#Add in the Master Blade
+--------------------------
+<style>
+    .whatsapp-icon {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+</style>
+-----------------------------
+<a href="https://wa.me/8801859385787?text=Hello%20I%20need%20help" target="_blank" class="whatsapp-icon">
+    <img src="{{ asset('images/whatsapp-icon.png') }}" alt="WhatsApp" style="width: 50px; height: 50px;">
+</a>
+
+-----------------------------
