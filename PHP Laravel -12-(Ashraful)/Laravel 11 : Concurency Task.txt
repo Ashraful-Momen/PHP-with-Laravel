@@ -1,0 +1,19 @@
+#Laravel 11 Concurency task : 
+-----------------------------
+Route::get('/concurrency', function () {
+    
+    $values = Concurrency::run(
+        //write here the login of function; that run in thread parallely in processor . 
+        fn () => User::get();
+        fn () => Post::get(); 
+        fn () => Balance::get();
+    );
+    
+    return view('time'); 
+    
+    // More faster concurrency and run in deferred in Background with multi PHP processor:
+    // if deferred something is wrong then
+    Concurrency::defer( function of logic  ); 
+
+
+});
