@@ -1,0 +1,716 @@
+#First page: 
+-------------
+
+@extends('backend.layouts.master')
+@section('title', 'Life and Health Categories List')
+@push('css')
+    <link rel="stylesheet" href="{{ asset('backend/plugins/datatables/dataTables.bootstrap4.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+    </style>
+@endpush
+@section('content')
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Life and Health Insurance </h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item active">Life and Health Order List</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-info card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title float-left">Life and Health Order List</h3>
+                        <div class="float-right">
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive">
+                        @if (Session::has('msg'))
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <strong>{{ session('msg') }}</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        <table id="example1" class="table table-bordered table-striped bg-white m-2">
+                            <thead>
+                                <div class="mb-3 row">
+                                    <div class="col">
+                                        <label>Start Date:</label>
+                                        <input type="date" id="startDate" class="form-control">
+                                    </div>
+                                    <div class="col">
+                                        <label>End Date:</label>
+                                        <input type="date" id="endDate" class="form-control">
+                                    </div>
+                                    <div class="col">
+                                        <label>Search By Date:</label>
+                                        <button onclick="filterOrders()" class="btn text-white form-control"
+                                            style="background-color: #002e5b">Filter</button>
+                                    </div>
+                                    <div class="col">
+                                        <label>&nbsp;</label>
+                                        <button onclick="prepareInvoice()" class="btn text-white form-control"
+                                            style="background-color: #002e5b">Generate Invoice</button>
+                                    </div>
+
+                                </div>
+
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Order ID</th>
+                                    <th>Policy Start Date</th>
+                                    <th>Sold By</th>
+                                    <th>Customer Phone</th>
+                                    <th>Total Bill</th>
+                                    <th>Policy Status</th>
+                                    <th>Renew</th>
+                                    <th>Payment Status</th>
+                                    <th>Update Payment Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($order as $k => $o)
+                                    <tr>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $k + 1 }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $o->order_parent_id }}</p>
+                                        </td>
+                                        @php
+                                            $policyStartDate = Carbon\Carbon::parse($o->policy_start_date);
+                                            $policy_end_date = Carbon\Carbon::parse($o->policy_end_date);
+                                        @endphp
+                                        <td class="text-center" data-date="{{ $policyStartDate->format('Y-m-d') }}">
+                                            @if (isset($o->policy_start_date))
+                                                {{ $policyStartDate->format('d M, Y') }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        @php
+                                            $order_parent = App\OrderParent::where(
+                                                'order_ref_id',
+                                                $o->order_parent_id,
+                                            )->first();
+                                            $sold_by = App\User::find($o->sold_by);
+                                        @endphp
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $sold_by->name ?? 'N/A' }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $o->o_phone }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $order_parent->bill }}</p>
+                                        </td>
+                                        <td>
+                                            @if (\Carbon\Carbon::parse($o->policy_end_date)->isPast())
+                                                <span class="badge bg-danger">Expired</span>
+                                            @else
+                                                <span class="badge bg-success">Active : Expires on
+                                                    ({{ $policy_end_date->format('d M, Y') }})</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <p class="current-status fw-bold mb-1 text-dark">{{ $o->renew ?? 0 }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $order_parent->pgw_name }} -
+                                                {{ $order_parent->payment_status }}</p>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-primary m-1 btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#modal-{{ $o->id }}">
+                                                Update
+                                            </button>
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modal-{{ $o->id }}"
+                                                data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                                aria-labelledby="modalLabel-{{ $o->id }}" aria-hidden="true">
+                                                <form action="{{ route('admin.order_payment_change_status_staff') }}"
+                                                    method="post">
+                                                    @csrf
+                                                    <input type="text" name="order_parent_id"
+                                                        value="{{ $order_parent->id }}" hidden>
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h1 class="modal-title fs-5"
+                                                                    id="modalLabel-{{ $o->id }}">Update Payment
+                                                                    Status</h1>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="form-row mb-4">
+                                                                    <div class="col">
+                                                                        <label
+                                                                            for="insuranceCompanyName-{{ $o->id }}">Current
+                                                                            Payment status:{{ $order_parent->pgw_name }}
+                                                                        </label><br>
+
+                                                                        <div data-mdb-input-init
+                                                                            class="col form-outline mb-4">
+
+
+                                                                            <select
+                                                                                id="insuranceCompanyName-{{ $o->id }}"
+                                                                                name="payment_status" class="form-select"
+                                                                                required>
+
+                                                                                <option value="pending">Pending</option>
+                                                                                <option value="Complete">Complete</option>
+
+                                                                            </select>
+
+                                                                        </div>
+
+
+                                                                    </div>
+
+                                                                    <div class="col">
+                                                                        <label
+                                                                            for="insuranceCompanyPrice-{{ $o->id }}">Reason
+                                                                            Of Payment Status:</label><br>
+                                                                        <input type="text"
+                                                                            id="insuranceCompanyPrice-{{ $o->id }}"
+                                                                            name="pgw_status_change_reason"
+                                                                            class="form-control"
+                                                                            placeholder="Reasn Of Payment Status"
+                                                                            required><br>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Close</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-primary">Update</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+
+
+
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+
+
+
+
+                        <script>
+                            function filterOrders() {
+                                var startDate = document.getElementById('startDate').value;
+                                var endDate = document.getElementById('endDate').value;
+
+                                var startDateObj = startDate ? new Date(startDate) : null;
+                                var endDateObj = endDate ? new Date(endDate) : null;
+
+                                var rows = document.querySelectorAll('#example1 tbody tr');
+
+                                rows.forEach(function(row) {
+                                    var dateCell = row.querySelector('td[data-date]');
+
+                                    if (dateCell && dateCell.getAttribute('data-date')) {
+                                        var rowDate = new Date(dateCell.getAttribute('data-date'));
+
+                                        if (startDateObj) startDateObj.setHours(0, 0, 0, 0);
+                                        if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
+                                        rowDate.setHours(0, 0, 0, 0);
+
+                                        var showRow = true;
+                                        if (startDateObj && rowDate < startDateObj) showRow = false;
+                                        if (endDateObj && rowDate > endDateObj) showRow = false;
+
+                                        row.style.display = showRow ? '' : 'none';
+                                    }
+                                });
+                            }
+
+                            function prepareInvoice() {
+                                const visibleRows = Array.from(document.querySelectorAll('#example1 tbody tr'))
+                                    .filter(row => row.style.display !== 'none');
+
+                                if (visibleRows.length === 0) {
+                                    alert('No orders found for the selected date range.');
+                                    return;
+                                }
+
+                                const invoiceData = visibleRows.map(row => {
+                                    const cells = row.querySelectorAll('td p');
+                                    return {
+                                        orderId: cells[1].textContent.trim(),
+                                        soldBy: cells[2].textContent.trim(),
+                                        phone: cells[3].textContent.trim(),
+                                        bill: parseFloat(cells[4].textContent.trim().replace(/[^0-9.-]+/g, '')) || 0
+                                    };
+                                });
+
+                                const startDate = document.getElementById('startDate').value;
+                                const endDate = document.getElementById('endDate').value;
+
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = "{{ route('admin.life_and_health_generate-invoice') }}";
+                                form.target = '_blank';
+
+                                const csrfToken = document.createElement('input');
+                                csrfToken.type = 'hidden';
+                                csrfToken.name = '_token';
+                                csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
+                                form.appendChild(csrfToken);
+
+                                const dataInput = document.createElement('input');
+                                dataInput.type = 'hidden';
+                                dataInput.name = 'invoiceData';
+                                dataInput.value = JSON.stringify({
+                                    orders: invoiceData,
+                                    dateRange: {
+                                        startDate,
+                                        endDate
+                                    }
+                                });
+                                form.appendChild(dataInput);
+
+                                document.body.appendChild(form);
+                                form.submit();
+                                document.body.removeChild(form);
+                            }
+
+                            //                         function prepareInvoice() {
+                            //     const visibleRows = Array.from(document.querySelectorAll('#example1 tbody tr'))
+                            //         .filter(row => row.style.display !== 'none');
+
+                            //     if (visibleRows.length === 0) {
+                            //         alert('No orders found for the selected date range.');
+                            //         return;
+                            //     }
+
+                            //     const invoiceData = visibleRows.map(row => {
+                            //         const cells = row.querySelectorAll('td p, td span');
+                            //         return {
+                            //             orderId: cells[1].textContent.trim(),
+                            //             soldBy: cells[2].textContent.trim(),
+                            //             phone: cells[3].textContent.trim(),
+                            //             bill: parseFloat(cells[4].textContent.trim().replace(/[^0-9.-]+/g, '')) || 0
+                            //         };
+                            //     });
+
+                            //     const startDate = document.getElementById('startDate').value;
+                            //     const endDate = document.getElementById('endDate').value;
+
+                            //     // Create form to post data to new route
+                            //     const form = document.createElement('form');
+                            //     form.method = 'POST';
+                            //     form.action = '/admin/generate-invoice';
+                            //     form.target = '_blank';
+
+                            //     // Add CSRF token
+                            //     const csrfToken = document.createElement('input');
+                            //     csrfToken.type = 'hidden';
+                            //     csrfToken.name = '_token';
+                            //     csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
+                            //     form.appendChild(csrfToken);
+
+                            //     // Add data
+                            //     const dataInput = document.createElement('input');
+                            //     dataInput.type = 'hidden';
+                            //     dataInput.name = 'invoiceData';
+                            //     dataInput.value = JSON.stringify({
+                            //         orders: invoiceData,
+                            //         dateRange: { startDate, endDate }
+                            //     });
+                            //     form.appendChild(dataInput);
+
+                            //     document.body.appendChild(form);
+                            //     form.submit();
+                            //     document.body.removeChild(form);
+                            // }
+
+
+
+
+
+
+                            // Add event listeners for date inputs
+                            document.getElementById('startDate').addEventListener('change', filterOrders);
+                            document.getElementById('endDate').addEventListener('change', filterOrders);
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+@stop
+@push('js')
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
+    </script>
+@endpush
+
+
+
+{{-- @push('js')
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="{{ asset('backend/plugins/datatables/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('backend/plugins/datatables/dataTables.bootstrap4.js') }}"></script>
+    <script src="https://unpkg.com/sweetalert2@7.19.1/dist/sweetalert2.all.js"></script>
+    <script>
+        $(function() {
+            $("#example1").DataTable();
+            $('#example2').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false
+            });
+        });
+
+        //sweet alert
+        function deleteCategory(id) {
+            swal({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById('delete-form-' + id).submit();
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    swal(
+                        'Cancelled',
+                        'Your Data is save :)',
+                        'error'
+                    )
+                }
+            })
+        }
+        //today's deals
+        function update_is_home(el)
+        if (el.checked)
+            var status = 1;
+
+        else
+            var status = 0;
+
+        $.post('{{ __('admin.categories.is_home') }}', {
+                    _token: '{{ csrf_token() }}',
+                    id: el.value,
+                    status: status
+                }, function(data) if (data == 1)
+                    toastr.success('success', 'Is Home updated successfully');
+
+                else
+                    toastr.danger('danger', 'Something went wrong');
+    </script>
+@endpush --}}
+
+--------------------------------------------------
+route: 
+-------
+ Route::post('/life_and_health_order_list_staff_invoice', [\App\Http\Controllers\Admin\LifeAndHealth\LifeAndHealthController::class, 'generateInvoice'])->name('life_and_health_generate-invoice');
+
+Controller : 
+------------
+    // show the invoice page for the account manager staff (life insurance bill ): _______________________________________
+
+    public function generateInvoice(Request $request)
+    {
+
+        // dd($request);
+        $data = json_decode($request->invoiceData, true);
+        $orders = $data['orders'];
+
+        // Calculate total amount
+        $totalAmount = array_sum(array_column($orders, 'bill'));
+
+        // Calculate agent summary
+        $agentSummary = [];
+        foreach ($orders as $order) {
+            $agent = $order['soldBy'] ?: 'Unassigned';
+            $agentSummary[$agent] = ($agentSummary[$agent] ?? 0) + $order['bill'];
+        }
+
+        // Format date range
+        $dateRange = '';
+        if (!empty($data['dateRange']['startDate']) && !empty($data['dateRange']['endDate'])) {
+            $dateRange = "Period: " . date('d M, Y', strtotime($data['dateRange']['startDate']))
+                . " to " . date('d M, Y', strtotime($data['dateRange']['endDate']));
+        } else {
+            $dateRange = "Generated on: " . date('d M, Y');
+        }
+
+        return view('backend/admin/lifeAndHealth_insurance/life_and_health_order_list_staff_invoice', compact('orders', 'totalAmount', 'agentSummary', 'dateRange'));
+    }
+--------------------------------------------------
+#invoice webpage with download button : 
+---------------------------------------
+
+@extends('backend.layouts.master')
+@section('title', 'Invoice')
+
+@section('content')
+<div class="container mt-4 mb-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="invoice-header text-center mb-4">
+                <h3>Instasure Ltd.</h3>
+                {{-- <p class="mb-0">Insurance Technology Company</p> --}}
+                <small>{{ $dateRange }}</small>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Bill To Company Name:</label>
+                        <input type="text" class="form-control" id="billToCompany">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Company Address:</label>
+                        <textarea class="form-control" id="companyAddress" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="printArea">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Sold By</th>
+                                <th>Customer Phone</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($orders as $order)
+                            <tr>
+                                <td>{{ $order['orderId'] }}</td>
+                                <td>{{ $order['soldBy'] }}</td>
+                                <td>{{ $order['phone'] }}</td>
+                                <td class="text-end">{{ number_format($order['bill'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                                <td class="text-end"><strong>{{ number_format($totalAmount, 2) }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    {{-- <p class="mt-3"><strong>In Words: BDT {{ $amountInWords }} only.</strong></p> --}}
+
+                    <p class="mt-3"><strong>Note:</strong> All prices mentioned above are excluding VAT, SD, TAX and other Govt. Levies. If anything applicable will be charged extra.</p>
+
+                    <div class="mt-4">
+                        <p><strong><u>INSTRUCTION:</u></strong></p>
+                        <ol>
+                            <li>Please notify us of any discrepancies after receiving this invoice.</li>
+                            <li><strong>Mode of Payment:</strong> Bank Transfer/ A/C payee Cheques/ Pay Order in favor of <strong>Instasure Limited</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="mt-4">
+                        <p><strong><u>Bank Details:</u></strong></p>
+                        <p>Account Name: <strong>Instasure Limited</strong><br>
+                        Account Number: 1012010175785<br>
+                        Bank Name: NRB Bank PLC<br>
+                        Branch Name: Principal Branch<br>
+                        Routing No: 290260218<br>
+                        Swift Code: NRBDBDDH</p>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="row mt-5 mb-4">
+                            <div class="col-6 text-center">
+                                <div style="height: 50px; margin-top:10px ">
+                                </div><br>
+                                <p>------------------------</p>
+                                <p>Checked By<br>
+                                Finance & Accounts Department</p>
+                            </div>
+                            <div class="col-6 text-center">
+                                <img src="{{ asset('Rafel_Sir_signature/Screenshot from 2025-01-27 12-37-07.png') }}"
+                                     alt="Digital Signature"
+                                     style="height: 80px;"><br>
+                                <p>------------------------</p>
+                                <p>Authorized Signature<br>
+                                Engr. Rafel Kabir<br>
+                                Managing Director</p>
+                            </div>
+                    </div>
+                </div>
+                </div>
+
+
+            </div>
+
+            <div class="mt-4 no-print d-flex justify-content-center gap-3">
+                <button onclick="window.print()" class="btn btn-primary">Print Invoice</button>
+                <button onclick="downloadPDF()" class="btn btn-success">Download PDF (A4)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        #printArea {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 0 auto;
+        }
+        /* Force table layout */
+        table { width: 100% !important; }
+        th, td { padding: 8px !important; }
+    }
+
+    .table th, .table td {
+        padding: 8px;
+        vertical-align: middle;
+    }
+    </style>
+{{-- <style>
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        #printArea {
+            padding: 2cm;
+            width: 21cm;
+            min-height: 29.7cm;
+            margin: 0 auto;
+        }
+    }
+</style> --}}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+    function downloadPDF() {
+    // Get the print area element
+    const element = document.getElementById('printArea');
+
+    // Get input values
+    const billToCompany = document.getElementById('billToCompany').value;
+    const companyAddress = document.getElementById('companyAddress').value;
+
+    // Create a temporary container
+    const container = document.createElement('div');
+    container.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3>Instasure Ltd.</h3>
+                <small>${document.querySelector('.invoice-header small').textContent}</small>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
+                    <strong>Bill To Company Name:</strong> ${billToCompany}
+                </div>
+                <div>
+                    <strong>Company Address:</strong> ${companyAddress}
+                </div>
+            </div>
+
+            ${element.innerHTML}
+        </div>
+    `;
+
+    // PDF options
+    const opt = {
+        margin: [10, 10, 10, 10],
+        filename: 'invoice.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            letterRendering: true
+        },
+        jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+        }
+    };
+
+    // Generate PDF
+    html2pdf().set(opt).from(container).save();
+}
+// function downloadPDF() {
+//     const element = document.getElementById('printArea');
+//     const opt = {
+//         margin: 1,
+//         filename: 'invoice.pdf',
+//         image: { type: 'jpeg', quality: 0.98 },
+//         html2canvas: { scale: 2 },
+//         jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+//     };
+
+//     html2pdf().set(opt).from(element).save();
+// }
+</script>
+@endsection
+
