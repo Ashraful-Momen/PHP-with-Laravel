@@ -496,6 +496,7 @@ Controller :
 #invoice webpage with download button : 
 ---------------------------------------
 
+
 @extends('backend.layouts.master')
 @section('title', 'Invoice')
 
@@ -602,10 +603,19 @@ Controller :
 
             </div>
 
-            <div class="mt-4 no-print d-flex justify-content-center gap-3">
+
+
+
+            {{-- <div class="mt-4 no-print d-flex justify-content-center gap-3">
                 <button onclick="window.print()" class="btn btn-primary">Print Invoice</button>
                 <button onclick="downloadPDF()" class="btn btn-success">Download PDF (A4)</button>
-            </div>
+            </div> --}}
+        </div>
+
+        <div class="mt-4 no-print d-flex justify-content-center gap-3">
+            <button onclick="window.print()" class="btn btn-primary">Print Invoice</button>
+            <button onclick="downloadPDF()" class="btn btn-success">Download PDF (A4)</button>
+            <button onclick="downloadDOCX()" class="btn btn-info">Download DOCX</button>
         </div>
     </div>
 </div>
@@ -710,6 +720,96 @@ Controller :
 //     };
 
 //     html2pdf().set(opt).from(element).save();
+// }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.29.0/docxtemplater.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/file-saver/2.0.5/FileSaver.min.js"></script>
+
+<script>
+
+function downloadDOCX() {
+    // Get input values
+    const billToCompany = document.getElementById('billToCompany').value;
+    const companyAddress = document.getElementById('companyAddress').value;
+
+    // Base64 encoding for the digital signature
+    const signatureImgSrc = document.querySelector('.col-6 img').src;
+
+    // Prepare the document content
+    const content = `
+        <h3 style="text-align: center;">Instasure Ltd.</h3>
+        <small>${document.querySelector('.invoice-header small').textContent}</small>
+        <p><strong>Bill To Company Name:</strong> ${billToCompany}</p>
+        <p><strong>Company Address:</strong> ${companyAddress}</p>
+
+        <!-- Table Section -->
+        ${document.querySelector('#printArea .table-responsive').outerHTML}
+
+        <!-- Additional Sections -->
+        <p class="mt-3"><strong>Note:</strong> All prices mentioned above are excluding VAT, SD, TAX, and other Govt. Levies. If anything applicable will be charged extra.</p>
+
+        <div class="mt-4">
+            <p><strong><u>INSTRUCTION:</u></strong></p>
+            <ol>
+                <li>Please notify us of any discrepancies after receiving this invoice.</li>
+                <li><strong>Mode of Payment:</strong> Bank Transfer/ A/C payee Cheques/ Pay Order in favor of <strong>Instasure Limited</strong>.</li>
+            </ol>
+        </div>
+
+        <div class="mt-4">
+            <p><strong><u>Bank Details:</u></strong></p>
+            <p>Account Name: <strong>Instasure Limited</strong><br>
+            Account Number: 1012010175785<br>
+            Bank Name: NRB Bank PLC<br>
+            Branch Name: Principal Branch<br>
+            Routing No: 290260218<br>
+            Swift Code: NRBDBDDH</p>
+        </div>
+
+        <!-- Signatures -->
+        <div style="display: flex; justify-content: center; margin-top: 50px;">
+            <div style="text-align: start;">
+                <div style="height: 50px;"></div>
+                <p>------------------------</p>
+                <p>Checked By<br>Finance & Accounts Department</p>
+            </div>
+            <div style="text-align: start;">
+                <img src="${signatureImgSrc}" alt="Digital Signature" style="height: 80px;">
+                <p>------------------------</p>
+                <p>Authorized Signature<br>Engr. Rafel Kabir<br>Managing Director</p>
+            </div>
+        </div>
+    `;
+
+    // Create a Blob and trigger the download
+    const blob = new Blob([content], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+    saveAs(blob, "invoice.docx");
+}
+
+
+// function downloadDOCX() {
+//     // Get input values
+//     const billToCompany = document.getElementById('billToCompany').value;
+//     const companyAddress = document.getElementById('companyAddress').value;
+
+//     // Fetch table data
+//     const tableHTML = document.querySelector('#printArea .table-responsive').innerHTML;
+
+//     // Prepare the document content
+//     const content = `
+//         <h3 style="text-align: center;">Instasure Ltd.</h3>
+//         <small>${document.querySelector('.invoice-header small').textContent}</small>
+//         <p><strong>Bill To Company Name:</strong> ${billToCompany}</p>
+//         <p><strong>Company Address:</strong> ${companyAddress}</p>
+//         ${tableHTML}
+//         <p><strong>Note:</strong> All prices mentioned above are excluding VAT, SD, TAX, and other Govt. Levies. If anything applicable will be charged extra.</p>
+//     `;
+
+//     // Create a blob and download the file
+//     const blob = new Blob([content], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+//     saveAs(blob, "invoice.docx");
 // }
 </script>
 @endsection
