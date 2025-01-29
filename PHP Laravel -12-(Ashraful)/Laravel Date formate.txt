@@ -23,3 +23,21 @@ $order_child->expire_date = now()->addYears(2)->format('Y-m-d');
                                                 <label class="form-label" for="form3Example1">Date of Birth</label>
                                             </div>
                                         </div>
+
+====================================================== Policy date will be next month ======================================
+ // Get current date
+        $current_date = now();
+
+        // Set policy start date to 1st of next month
+        // Using startOfMonth() first, then adding a month ensures we get the correct next month
+        $policy_start_date = $current_date->copy()
+            ->startOfMonth()  // Go to the start of current month
+            ->addMonth()      // Add one month to get to next month
+            ->format('Y-m-d');
+
+        // Calculate end date by adding duration days from start date (subtract 1 to include start date)
+        $policy_end_date = $current_date->copy()
+            ->startOfMonth()
+            ->addMonth()
+            ->addDays($pkg->duration - 1)
+            ->format('Y-m-d');
