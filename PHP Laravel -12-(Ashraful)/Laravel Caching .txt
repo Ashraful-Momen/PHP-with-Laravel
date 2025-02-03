@@ -10,7 +10,7 @@
 -----------
                 => get value from cache key :   $value = Cache::get('key');
                 
-                => Cache::get('key',functin() { #if not get data by Cache::$key : then use the function for query to fetch datas }); 
+                => Cache::get('key',functin() { #if not get data by Cache::$key : then use the closer function for query to fetch datas }); 
                 
                 => check the data is exit or not in cache : Cache::has('key) . example: if(Cache::has('key')){execute this block}. 
                 
