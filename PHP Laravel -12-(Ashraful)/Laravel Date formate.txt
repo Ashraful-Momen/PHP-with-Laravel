@@ -13,6 +13,11 @@ $order_child->expire_date = now()->addYears(2)->format('Y-m-d');
 
  {{ (new DateTime($hdc_card->send_date))->format('d-F-Y h:i A') }}
 
+#another way to solve the same error (Carbon must be install in the Laravel System ) => 
+
+<input id="policyNumber" name="policyNumber" type="text" class="form-control text-center btn-outline-danger text-dark" placeholder="Policy End Date"
+          value="{{\Carbon\Carbon::parse($c->policy_end_date)->format('d-m-Y') }}" disabled />
+
 =========================================================
                                           <div class="col">
                                             <div data-mdb-input-init class="form-outline">
