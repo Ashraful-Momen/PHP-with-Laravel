@@ -1,0 +1,164 @@
+#Permission with spatie pkg : 
+-------------------------------
+
+route => 
+---------
+Route::resource('roles', 'RoleController');
+
+#add the permission view load=> 
+--------------------------
+
+  public function create()
+    {
+        $permission = Permission::get();
+
+       
+        return view('backend.admin.roles.create', compact('permission'));
+    }
+    
+#view (backend.admin.roles.create) for add the permission => 
+-----------------------------------
+<form action="{{ URL('admin/roles/permission') }}" method="post">
+                        @csrf
+                        {{-- <div class="form-group">
+                            <label for="due">Enter Controller <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="controller_permission" aria-describedby="emailHelp" name="controller_name" placeholder="ProductController">
+                        </div> --}}
+                        <div class="form-group">
+                            <label for="due">Enter Controller Action <span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="permission" aria-describedby="emailHelp"
+                                name="name" placeholder="product-list">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+
+
+#RoleController for create the permission : 
+----------------------------------------------
+ public function create_permission(Request $request)
+    {
+        /*$this->validate($request, [
+        'name' => 'required|unique:permissions,name',
+        ]);
+
+        Permission::create(['name' => $request->input('name')]);*/
+
+        $this->validate($request, [
+            'name' => 'required|unique:permissions,name',
+            //'controller_name' => 'required',
+        ]);
+
+        Permission::create(['name' => $request->input('name')]);
+
+        Toastr::success('Role List Created Successfully');
+        return redirect()->back();
+    }
+    
+-------------------------------
+ public function create()
+    {
+        $permission = Permission::get();
+
+       
+        return view('backend.admin.roles.create', compact('permission'));
+    }
+    
+#Show the permission : view (backend.admin.roles.create)
+-----------------------
+                             <div class="form-group">
+                                <h3>Permissions</h3>
+                                <p class="bg-info pl-3">
+                                    <input type="checkbox" id="checkAll"> By a click you can select all
+                                </p>
+                                <ul style="height: 415px; overflow-y: scroll;">
+                                    @foreach ($permission as $per)
+                                        <li>
+                                            <label for="permission">
+                                                <input type="checkbox" class="checkbox" name="permission[]" id="permission"
+                                                    value="{{ $per->id }}"> {{ $per->name }}
+                                            </label>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+    
+#add the role with selected permission : 
+----------------------------------------
+<form role="form" action="{{ route('admin.roles.store') }}" method="post">
+                        @csrf
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="name">Role Name</label>
+                                <input type="text" class="form-control" name="name" id="name"
+                                    placeholder="Enter Role Name" required>
+                            </div>
+                            <div class="form-group">
+                                <h3>Permissions</h3>
+                                <p class="bg-info pl-3">
+                                    <input type="checkbox" id="checkAll"> By a click you can select all
+                                </p>
+                                <ul style="height: 415px; overflow-y: scroll;">
+                                    @foreach ($permission as $per)
+                                        <li>
+                                            <label for="permission">
+                                                <input type="checkbox" class="checkbox" name="permission[]" id="permission"
+                                                    value="{{ $per->id }}"> {{ $per->name }}
+                                            </label>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+
+
+
+
+#RoleController for adding the role : 
+----------------------------------
+ public function store(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|unique:roles,name',
+            'permission' => 'required',
+        ]);
+
+        $role = Role::create(['name' => $request->input('name')]);
+        $role->syncPermissions($request->input('permission')); //explain this ->syncPermissions() methods 
+
+        Toastr::success('Role Created Successfully', 'Success');
+        return redirect()->back();
+    }
+    
+
+#incontroller use => for the persmission 
+------------------------------------
+    function __construct()
+    {
+      
+        $this->middleware('permission:permission_name', ['only' => ['method_name']]);
+        $this->middleware('permission:hdc-package-staff_show', ['only' => ['staff_show']]);
+        $this->middleware('permission:hdc-package-staff_edit', ['only' => ['staff_edit']]);
+
+
+    }
+    
+      public function staff_show()
+    {
+        $packages =  HDCPackages::all();
+
+        $provider = PolicyProvider::all();
+
+
+        // dd($packages);
+
+
+        return view('backend.admin.hdc_packages.hdc_pkg_show_staff', compact('packages','provider'));
+
+    }
