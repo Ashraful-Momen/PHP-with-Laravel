@@ -13,6 +13,19 @@
 #Global middleware : app/Http/Kernel.php [in private middleware => add the MiddlewareName::class ]
 ---------------------
 
+ protected $middleware = [
+        // \App\Http\Middleware\TrustHosts::class,
+        \App\Http\Middleware\TrustProxies::class,
+        \Fruitcake\Cors\HandleCors::class,
+        \App\Http\Middleware\CheckForMaintenanceMode::class,
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        \App\Http\Middleware\TrimStrings::class,
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        // \App\Http\Middleware\webGuard::class,
+    ];
+
+
+
 #GroupMiddleware : Multiple middleware set as group 
 #$middlewareGroups: [
 ------------------
@@ -34,13 +47,14 @@
 
 #routeMiddleware Function (web.php=> ) : 
 ---------------------------
-// routes/web.php
+// routes/web.php => 
+--------------------
 Route::get('/role_test', function () {
     return "Welcome, Admin!";
 })->middleware('role_test:admin'); // Pass 'admin' as the $roles parameter
 
-#middleWare class : 
--------------------
+#middleWare class (with function) : 
+----------------------------------
  public function handle(Request $request, Closure $next,$roles)
     {
 
