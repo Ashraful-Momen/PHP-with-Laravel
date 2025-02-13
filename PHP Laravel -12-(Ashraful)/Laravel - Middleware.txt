@@ -18,6 +18,10 @@
 **** don't forget to use >>> $php artisan optimize:clear
 
 =============================================Main Part ==========================================
+#url (hit): 
+--------------
+browser hit url : /login_user
+
 middleware: 
 -----------
 class webGuard
