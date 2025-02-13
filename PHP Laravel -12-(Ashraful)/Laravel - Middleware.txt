@@ -8,9 +8,55 @@
 
 #before going to the route : middleware work as controller function app/http/middleware:MiddlewareName. 
 
-#Global middleware : app/Http/Kernel.php [in private middleware => add the MiddlewareName::class ]
 
-=====================================================
+#when hit url : pass the global middleware then goto the route---> function . 
+#Global middleware : app/Http/Kernel.php [in private middleware => add the MiddlewareName::class ]
+---------------------
+
+#GroupMiddleware : Multiple middleware set as group 
+#$middlewareGroups: [
+------------------
+                    'name_of_the_group' => [
+                                        custom_middleware_1:class,
+                                        custom_middleware_1:class,
+                                        ]
+
+                    ]
+
+
+
+#routeMiddleware: from route pass the parrams in middlware function (request,close $next, $custom_fileds){  dd($custom_fields}
+-----------------
+
+#app/Http/kernal => 
+----------------------
+ protected $routeMiddleware = ['role_test' => webGuard::class,];
+
+#routeMiddleware Function (web.php=> ) : 
+---------------------------
+// routes/web.php
+Route::get('/role_test', function () {
+    return "Welcome, Admin!";
+})->middleware('role_test:admin'); // Pass 'admin' as the $roles parameter
+
+#middleWare class : 
+-------------------
+ public function handle(Request $request, Closure $next,$roles)
+    {
+
+        dd("from middleware",$roles);
+
+        if (Auth::check() && Auth::user()->user_type === $roles) {
+            return $next($request);
+        }
+
+        return redirect('/'); // Redirect if the user does not have the required role
+    }
+
+
+
+
+===================================================== Test the Global middleware =====================================
 >>> php artisan make:middleware webGuard
 
 #Route Middleware: *** app/Http/Kernel.php [in protected route middleware => add the MiddlewareName::class ]
