@@ -1,0 +1,499 @@
+@extends('backend.layouts.master')
+@section('title', 'Life and Health Categories List')
+@push('css')
+    <link rel="stylesheet" href="{{ asset('backend/plugins/datatables/dataTables.bootstrap4.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+@endpush
+
+@section('content')
+
+    <!-- Main content section -->
+    <section class="content">
+        <div class="row">
+            <!-- Back button -->
+            <div class="my-3 ">
+                <a href="{{ url()->previous() }}" class="btn " style="background-color: #002e5b; color:white">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <div class="col-12">
+                <div class="card card-info card-outline">
+
+                    <div class="card-header">
+                        <h3 class="card-title float-left">Life and Health Order List</h3>
+                    </div>
+
+                    <div class="card-body table-responsive">
+                        @if (Session::has('msg'))
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <strong>{{ session('msg') }}</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        <!-- Date filter and invoice controls -->
+                        <div class="mb-3 row">
+                            <div class="col">
+                                <label>Start Date:</label>
+                                <input type="date" id="startDate" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>End Date:</label>
+                                <input type="date" id="endDate" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Search By Date:</label>
+                                <button onclick="filterOrders()" class="btn text-white form-control"
+                                    style="background-color: #002e5b">Filter</button>
+                            </div>
+                            <div class="col">
+                                <label>&nbsp;</label>
+                                <button onclick="prepareInvoice()" class="btn text-white form-control"
+                                    style="background-color: #002e5b">Generate Invoice</button>
+                            </div>
+                        </div>
+
+                        <!-- Orders table -->
+                        <table id="example1" class="table table-bordered table-striped bg-white m-2">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Order ID</th>
+                                    <th>Order Created Date</th>
+                                    {{-- <th>Policy Start Date</th> --}}
+                                    <th>Sold By</th>
+                                    <th>Customer Phone</th>
+                                    <th>Total Bill</th>
+                                    <th>Policy Status</th>
+                                    <th>Renew</th>
+                                    <th>Payment Status</th>
+                                    <th>Update Payment Status</th>
+                                    <th>Order Details</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($order as $k => $o)
+                                    @php
+                                        $order_parent = App\OrderParent::where(
+                                            'order_ref_id',
+                                            $o->order_parent_id,
+                                        )->first();
+                                        $sold_by = App\User::find($o->sold_by);
+                                        $orderStartDate = Carbon\Carbon::parse($o->created_at);
+                                        $policyStartDate = Carbon\Carbon::parse($o->policy_start_date);
+                                        $policy_end_date = Carbon\Carbon::parse($o->policy_end_date);
+                                    @endphp
+                                    <tr>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $k + 1 }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $o->order_parent_id }}</p>
+                                        </td>
+                                        <td class="text-center" data-date="{{ $orderStartDate->format('Y-m-d') }}">
+                                            {{ isset($orderStartDate) ? $orderStartDate->format('d M, Y') : 'N/A' }}
+                                        </td>
+                                        {{-- <td class="text-center" data-date="{{ $policyStartDate->format('Y-m-d') }}">
+                                            {{ isset($o->policy_start_date) ? $policyStartDate->format('d M, Y') : 'N/A' }}
+                                        </td> --}}
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $sold_by->name ?? 'N/A' }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $o->o_phone ?? 'N/A' }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">{{ $order_parent->bill ?? 'N/A' }} TK</p>
+                                        </td>
+                                        <td>
+                                            @if ($policy_end_date && $policy_end_date->isPast())
+                                                <span class="badge bg-danger">Expired</span>
+                                            @else
+                                                <span class="badge bg-success">
+                                                    Active :
+                                                    ({{ $policyStartDate ? $policyStartDate->format('d M, Y') : 'N/A' }} -
+                                                    {{ $policy_end_date ? $policy_end_date->format('d M, Y') : 'N/A' }})
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <p class="current-status fw-bold mb-1 text-dark">{{ $o->renew ?? 0 }}</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-bold mb-1 text-dark">
+                                                {{ $order_parent ? $order_parent->pgw_name . ' - ' . $order_parent->payment_status : 'N/A' }}
+                                            </p>
+                                        </td>
+                                        <td class="text-center">
+                                            @if ($order_parent)
+                                                <button type="button" class="btn  m-1 btn-sm" data-bs-toggle="modal"
+                                                    style="background-color:#002e5b; color:white"
+                                                    data-bs-target="#modal-{{ $o->id }}">
+                                                    Update
+                                                </button>
+
+                                                <!-- Payment Status Update Modal -->
+                                                <style>
+                                                    .modal-content {
+                                                        border-radius: 0.5rem;
+                                                        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+                                                    }
+
+                                                    .modal-header {
+                                                        border-top-left-radius: 0.5rem;
+                                                        border-top-right-radius: 0.5rem;
+                                                    }
+
+                                                    .form-select-lg {
+                                                        padding: 0.5rem 1rem;
+                                                        font-size: 1rem;
+                                                    }
+
+                                                    .alert-info {
+                                                        background-color: #000d1a;
+                                                        border-left: 4px solid #02243f;
+                                                    }
+
+                                                    .modal-footer {
+                                                        border-bottom-left-radius: 0.5rem;
+                                                        border-bottom-right-radius: 0.5rem;
+                                                    }
+                                                </style>
+                                                <!-- Payment Status Update Modal -->
+                                                <div class="modal fade" id="modal-{{ $o->id }}"
+                                                    data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                                    aria-labelledby="modalLabel-{{ $o->id }}" aria-hidden="true">
+                                                    <form action="{{ route('admin.order_payment_change_status_staff') }}"
+                                                        method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="order_parent_id"
+                                                            value="{{ $order_parent->id }}">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <!-- Modal Header -->
+                                                                <div class="modal-header  text-white"
+                                                                    style="background-color:#002e5b; color:white">
+                                                                    <h5 class="modal-title">
+                                                                        <i class="fas fa-edit me-2"></i>Update Payment
+                                                                        Status
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close btn-close-white"
+                                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+
+                                                                <!-- Modal Body -->
+                                                                <div class="modal-body">
+                                                                    <!-- Current Status Info Box -->
+                                                                    <div class="alert alert-info mb-4">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <i class="fas fa-info-circle me-2"></i>
+
+                                                                            <div>
+                                                                                <p class="m-2">
+                                                                                    Current Payment Status:
+                                                                                    <strong
+                                                                                        class="badge
+                                                                                @if ($order_parent->payment_status == 'pending') bg-warning
+                                                                                @elseif($order_parent->payment_status == 'Complete')
+                                                                                    bg-success
+                                                                                @else
+                                                                                    bg-secondary @endif
+                                                                            ">
+                                                                                        {{ $order_parent->pgw_name }} -
+                                                                                        {{ $order_parent->pgw_status }}
+                                                                                    </strong>
+                                                                                </p>
+
+                                                                                {{-- <h6 class="mb-1">Current Payment Information</h6> --}}
+                                                                                {{-- <p class="mb-0"> &nbsp;&nbsp;&nbsp;Current Payment Status: <strong class="badge @if ($order_parent->payment_status == 'pending') bg-warning @elseif($order_parent->payment_status == 'Complete') bg-success">{{ $order_parent->pgw_name }} - {{ $order_parent->pgw_status }}</strong></p> --}}
+                                                                                @if ($order_parent->pgw_status_change_reason)
+                                                                                    <p class="mb-0">Last Update Reason:
+                                                                                        <strong>{{ $order_parent->pgw_status_change_reason }}</strong>
+                                                                                    </p>
+                                                                                @endif
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Payment Status Selection -->
+                                                                    <div class="mb-4">
+                                                                        <label class="form-label fw-bold">New Payment
+                                                                            Status</label>
+                                                                        <select name="payment_status"
+                                                                            class="form-select form-select-lg" required>
+                                                                            <option value="" disabled>Select Status
+                                                                            </option>
+                                                                            <option value="pending"
+                                                                                {{ $order_parent->payment_status == 'pending' ? 'selected' : '' }}>
+                                                                                Pending</option>
+                                                                            <option value="Complete"
+                                                                                {{ $order_parent->payment_status == 'Complete' ? 'selected' : '' }}>
+                                                                                Complete</option>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <!-- Reason Input -->
+                                                                    <div class="mb-4">
+                                                                        <label class="form-label fw-bold">Reason for Status
+                                                                            Change</label>
+                                                                        <textarea name="pgw_status_change_reason" class="form-control" rows="3"
+                                                                            placeholder="Please provide a detailed reason for this status change..." required></textarea>
+                                                                        <div class="form-text text-muted">
+                                                                            <i class="fas fa-info-circle me-1"></i>
+                                                                            This reason will be recorded in the system for
+                                                                            tracking purposes
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Modal Footer -->
+                                                                <div class="modal-footer bg-light">
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-secondary"
+                                                                        data-bs-dismiss="modal">
+                                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                                    </button>
+                                                                    <button type="submit" class="btn "
+                                                                        style="background-color:#002e5b; color:white">
+                                                                        <i class="fas fa-check me-1"></i>Update Status
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">Not Available</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @php
+                                                $order_parent_id = App\OrderParent::where(
+                                                    'order_ref_id',
+                                                    $o->order_parent_id,
+                                                )->first();
+                                            @endphp
+
+                                            @if ($order_parent_id)
+                                                <a href="{{ route('admin.view_details_order', $order_parent_id->id) }}">
+                                                    <button type="submit" class="btn btn-sm my-auto"
+                                                        style="background-color: #002e5b; color:white">Click For
+                                                        Details</button>
+                                                </a>
+                                            @else
+                                                <button type="button" class="btn btn-sm btn-secondary" disabled>No
+                                                    Details Available</button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@stop
+
+@push('js')
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        // Global variable to store DataTable instance
+let dataTable;
+
+$(document).ready(function() {
+    // Destroy existing DataTable if it exists
+    if ($.fn.DataTable.isDataTable('#example1')) {
+        $('#example1').DataTable().destroy();
+    }
+
+    // Initialize DataTable
+    dataTable = $("#example1").DataTable({
+        dom: '<"row"<"col-sm-12 col-md-4 b"l><"col-sm-12 col-md-4"f><"col-sm-12 col-md-4 mt-4"B>>tip',
+        buttons: [
+            'colvis',
+            'csv',
+            'print'
+        ],
+        paging: true,
+        lengthChange: true,
+        pageLength: 10,
+        searching: true,
+        ordering: true,
+        info: true,
+        autoWidth: false,
+        language: {
+            info: "Showing _START_ to _END_ of _TOTAL_ filtered entries",
+            infoFiltered: "(filtered from _MAX_ total entries)"
+        }
+    });
+});
+
+function filterOrders() {
+    var startDate = document.getElementById('startDate').value;
+    var endDate = document.getElementById('endDate').value;
+
+    // Remove any existing custom filter
+    $.fn.dataTable.ext.search.pop();
+
+    // Add new custom filter
+    $.fn.dataTable.ext.search.push(
+        function(settings, data, dataIndex) {
+            var dateCell = $(dataTable.row(dataIndex).node()).find('td[data-date]');
+            if (!dateCell.length) return true;
+
+            var rowDate = new Date(dateCell.attr('data-date'));
+            var startDateObj = startDate ? new Date(startDate) : null;
+            var endDateObj = endDate ? new Date(endDate) : null;
+
+            if (startDateObj) startDateObj.setHours(0, 0, 0, 0);
+            if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
+            rowDate.setHours(0, 0, 0, 0);
+
+            if (startDateObj && rowDate < startDateObj) return false;
+            if (endDateObj && rowDate > endDateObj) return false;
+
+            return true;
+        }
+    );
+
+    // Redraw the table with the filter applied
+    dataTable.draw();
+}
+
+function prepareInvoice() {
+    if (!dataTable) {
+        console.error('DataTable not initialized');
+        return;
+    }
+
+    const filteredData = dataTable.rows({ search: 'applied' }).data();
+
+    if (filteredData.length === 0) {
+        alert('No orders found for the selected date range.');
+        return;
+    }
+
+    const invoiceData = Array.from(filteredData).map(row => {
+        return {
+            orderId: $(row[1]).text().trim(),
+            soldBy: $(row[3]).text().trim(),
+            phone: $(row[4]).text().trim(),
+            bill: parseFloat($(row[5]).text().trim().replace(/[^0-9.-]+/g, '')) || 0
+        };
+    });
+
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ route('admin.life_and_health_generate-invoice') }}";
+    form.target = '_blank';
+
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
+    form.appendChild(csrfToken);
+
+    const dataInput = document.createElement('input');
+    dataInput.type = 'hidden';
+    dataInput.name = 'invoiceData';
+    dataInput.value = JSON.stringify({
+        orders: invoiceData,
+        dateRange: { startDate, endDate }
+    });
+    form.appendChild(dataInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}
+    </script>
+
+    {{-- <script>
+        // function filterOrders() {
+        //     var startDate = document.getElementById('startDate').value;
+        //     var endDate = document.getElementById('endDate').value;
+
+        //     var startDateObj = startDate ? new Date(startDate) : null;
+        //     var endDateObj = endDate ? new Date(endDate) : null;
+
+        //     var rows = document.querySelectorAll('#example1 tbody tr');
+
+        //     rows.forEach(function(row) {
+        //         var dateCell = row.querySelector('td[data-date]');
+
+        //         if (dateCell && dateCell.getAttribute('data-date')) {
+        //             var rowDate = new Date(dateCell.getAttribute('data-date'));
+
+        //             if (startDateObj) startDateObj.setHours(0, 0, 0, 0);
+        //             if (endDateObj) endDateObj.setHours(23, 59, 59, 999);
+        //             rowDate.setHours(0, 0, 0, 0);
+
+        //             var showRow = true;
+        //             if (startDateObj && rowDate < startDateObj) showRow = false;
+        //             if (endDateObj && rowDate > endDateObj) showRow = false;
+
+        //             row.style.display = showRow ? '' : 'none';
+        //         }
+        //     });
+        // }
+
+        // function prepareInvoice() {
+        //     const visibleRows = Array.from(document.querySelectorAll('#example1 tbody tr'))
+        //         .filter(row => row.style.display !== 'none');
+
+        //     if (visibleRows.length === 0) {
+        //         alert('No orders found for the selected date range.');
+        //         return;
+        //     }
+
+        //     const invoiceData = visibleRows.map(row => {
+        //         const cells = row.querySelectorAll('td p');
+        //         return {
+        //             orderId: cells[1].textContent.trim(),
+        //             soldBy: cells[2].textContent.trim(),
+        //             phone: cells[3].textContent.trim(),
+        //             bill: parseFloat(cells[4].textContent.trim().replace(/[^0-9.-]+/g, '')) || 0
+        //         };
+        //     });
+
+        //     const startDate = document.getElementById('startDate').value;
+        //     const endDate = document.getElementById('endDate').value;
+
+        //     const form = document.createElement('form');
+        //     form.method = 'POST';
+        //     form.action = "{{ route('admin.life_and_health_generate-invoice') }}";
+        //     form.target = '_blank';
+
+        //     const csrfToken = document.createElement('input');
+        //     csrfToken.type = 'hidden';
+        //     csrfToken.name = '_token';
+        //     csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
+        //     form.appendChild(csrfToken);
+
+        //     const dataInput = document.createElement('input');
+        //     dataInput.type = 'hidden';
+        //     dataInput.name = 'invoiceData';
+        //     dataInput.value = JSON.stringify({
+        //         orders: invoiceData,
+        //         dateRange: { startDate, endDate }
+        //     });
+        //     form.appendChild(dataInput);
+
+        //     document.body.appendChild(form);
+        //     form.submit();
+        //     document.body.removeChild(form);
+        // }
+
+        // document.getElementById('startDate').addEventListener('change', filterOrders);
+        // document.getElementById('endDate').addEventListener('change', filterOrders);
+     </script> --}}
+@endpush
