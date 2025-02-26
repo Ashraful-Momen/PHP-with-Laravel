@@ -1,0 +1,7 @@
+ if ($user) {
+            return response()->json([
+                'success' => true, 
+                'code' => $this->get_success_code(), 
+                'data' => new CustomerProfileResource($user)
+            ], $this->get_success_code(), [], JSON_UNESCAPED_SLASHES); // this line remove the json unashes
+        }
