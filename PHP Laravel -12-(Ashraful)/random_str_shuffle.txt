@@ -1,3 +1,9 @@
-    $length = 10;
+#generate order ref id =>
+--------------------------
+$randomString = 'LH' . date('y') . strtoupper(Str::random(6));
+
+
+#----------------- Generate random string -------------------------
+        $length = 10;
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randomString = substr(str_shuffle($characters), 0, $length);
