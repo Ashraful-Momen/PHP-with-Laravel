@@ -2,6 +2,13 @@
 --------------------------
 $randomString = 'LH' . date('y') . strtoupper(Str::random(6));
 
+#generate the uid for order id => 
+---------------------------------
+do {
+    $randomString = 'TM' . date('y') . strtoupper(Str::random(6));
+} while (YourModel::where('uid', $randomString)->exists());
+
+
 
 #----------------- Generate random string -------------------------
         $length = 10;
