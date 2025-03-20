@@ -9,8 +9,30 @@
                                                         </div>
 
 =========================================
+#remove the html tags : 
+--------------------------
+
 <!-- Product Description -->
 <div class="description mb-4">
     <h5 class="mb-3">Description</h5>
     <p>{!! strip_tags(str_replace('&nbsp;', ' ', $product->description)) !!}</p>
 </div>
+=====================================
+
+#replace the special character :
+--------------------------------
+
+
+ <div class="info-row">
+                                        <div class="info-label">Property Address</div>
+                                        <div class="info-value">
+                                            <div class="property-address">
+                                                @php
+                                                    $address = json_decode($order->address_in, true);
+                                                @endphp
+                                                {{ $address['address_line'] }}<br>
+                                                {{ $address['city'] }}, {{ $address['state'] }}<br>
+                                                {{ $address['postal_code'] }}
+                                            </div>
+                                        </div>
+                                    </div>
