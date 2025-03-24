@@ -1,3 +1,135 @@
+1. First all form data save into Cookies/Session with the json-format
+2. after login use custom method for further operation and redirect to route . 
+-----------------------------------------------------------------------------
+
+
+1. store data in session : 
+-------------------------
+ public function storeQuotation(Request $request)
+    {
+
+        // dd($request);
+        // Validate the request
+        $validated = $request->validate([
+            'pkg_id' => 'required|exists:fire_insurance_new_pkgs,id',
+            'property_name' => 'required|string|max:255',
+            'property_type' => 'required|string|in:company,organization,office,home,commercial',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'address_line' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
+            'postal_code' => 'required|string|max:20',
+            'coverage_amount' => 'required|numeric|min:50000',
+            'property_documents' => 'required|array',
+            'property_documents.*' => 'file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB limit per file
+        ]);
+
+        // Calculate the premium
+        $coverageAmount = $validated['coverage_amount'];
+        $unitSize = 50000;
+        $premiumPerUnit = 250;
+        $units = ceil($coverageAmount / $unitSize);
+        $premium = $units * $premiumPerUnit;
+
+        // Generate a unique reference number
+        $referenceNumber = 'FIQ-' . date('Ymd') . '-' . Str::random(6);
+
+        // Save documents
+        $documentPaths = [];
+        if ($request->hasFile('property_documents')) {
+            foreach ($request->file('property_documents') as $file) {
+                $path = $file->store('fire-insurance/documents', 'public');
+                $documentPaths[] = $path;
+            }
+        }
+
+        // Prepare quotation data
+        $quotationData = [
+            'pkg_id' => $validated['pkg_id'],
+            'reference_number' => $referenceNumber,
+            'property_name' => $validated['property_name'],
+            'property_type' => $validated['property_type'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'address_line' => $validated['address_line'],
+            'city' => $validated['city'],
+            'state' => $validated['state'],
+            'postal_code' => $validated['postal_code'],
+            'coverage_amount' => $coverageAmount,
+            'premium_amount' => $premium,
+            'documents' => json_encode($documentPaths),
+            'status' => 'pending',
+        ];
+
+        // Check if user is logged in
+        if (auth()->check()) {
+            // User is logged in, save directly to database with user_id
+            $quotation = new FireInsuranceQuotation($quotationData);
+            $quotation->user_id = auth()->id();
+            $quotation->save();
+
+            $message = 'Your fire insurance quotation request has been submitted successfully! Reference Number: ' . $referenceNumber;
+
+            // Return with success message
+            return redirect()->route('fire-insurance.details', ['id' => $quotation->id])->with('success', $message);
+        } else {
+            // User is not logged in, store in session
+            session()->put('pending_fire_quotation', $quotationData);
+
+            $message = 'Your quotation has been saved temporarily. Please login or register to complete your submission. Reference Number: ' . $referenceNumber;
+
+
+            return redirect()->route('login')->with('success', $message);
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+2. after login do the further process: 
+-----------------------------------------
+  protected function redirectTo()
+    {
+        if (Auth::check() && Auth::user()->user_type == 'customer') {
+            // dd('okk');
+            // dd(Session::all());
+
+            //Ashraful : -------------------------------------------------------
+
+            // Check if there's a pending fire quotation in the session
+            if (Session::has('pending_fire_quotation')) {
+                // Get the quotation data from session
+                $quotationData = Session::get('pending_fire_quotation');
+
+                // Add the user ID to the data
+                $quotationData['user_id'] = auth()->user()->id;
+
+
+                // Save to database
+                $quotation = FireInsuranceQuotation::create($quotationData);
+
+                Log::info(["===========save the quotation fire : " => $quotation]);
+
+                // Clear the session
+                Session::forget('pending_fire_quotation');
+
+                // Set a notification message
+                Session::flash('quotation_saved', 'Your pending fire insurance quotation has been saved to your account.');
+
+                // Redirect to the quotation details page
+
+                $message = 'Your fire insurance quotation request has been submitted successfully! ';
+
+                //  dd($quotation);
+
+                // Fixed code
+                Session::flash('success', 'Your fire insurance quotation request has been submitted successfully!Reference Number: ' . $quotation->reference_number);
+                return $this->redirectTo = route('fire-insurance.details', ['id' => $quotation->id]);
+            }
+}
+
+
+======================================================= Old method ================================================================================
 #working flow => *** Laravel after login back to previouse controller or view. 
 -----------------
 1. show the life pkg for anonimous user => Click 'Buy Now' from pkg => 2. goto route 'addTo_cart_for_all'(for anomimus User) ,Controller: In store all data in session which need to order  and send to route => 
