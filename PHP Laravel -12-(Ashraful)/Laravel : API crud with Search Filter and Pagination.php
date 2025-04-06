@@ -240,3 +240,37 @@ class CreateProductsTable extends Migration
     'url' => env('APP_URL').'/storage',
     'visibility' => 'public',
 ],
+
+// pagination : ______________________________________________________-
+     public function claimList()
+    {
+        try {
+            // Get all user's policies
+            $userPolicies = FireInsuranceNewOrder::where('user_id', Auth::id())
+                ->pluck('policy_id')
+                ->toArray();
+
+            // Get claims for user's policies with pagination
+            $claims = FireInsuranceNewClaim::whereIn('policy_id', $userPolicies)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            return response()->json([
+                'success' => true,
+                'data' => $claims,
+                'pagination' => [
+                    'total' => $claims->total(),
+                    'per_page' => $claims->perPage(),
+                    'current_page' => $claims->currentPage(),
+                    'last_page' => $claims->lastPage(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve claim list',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
