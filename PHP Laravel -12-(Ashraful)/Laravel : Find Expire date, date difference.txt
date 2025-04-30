@@ -1,3 +1,12 @@
+
+                                                                    @if (\Carbon\Carbon::parse($policy->policy_end_date)->isPast())
+                                                                        <span class="badge bg-danger">Expired</span>
+                                                                    @else
+                                                                        <span class="badge bg-success">Active</span>
+                                                                    @endif
+
+
+==============================================================================================================================================
                                       @foreach ($order as $o)
                                             @php
                                                 // use Carbon\Carbon;
