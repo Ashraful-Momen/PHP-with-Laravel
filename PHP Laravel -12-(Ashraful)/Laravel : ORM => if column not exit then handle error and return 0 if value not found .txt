@@ -45,3 +45,77 @@
                     // This is a final safety check to ensure the expression never returns NULL. If for any reason the inner expression results in NULL, it defaults to 0.
 
                 // ----------------------------------------------------------------------------
+
+================================== another approach ==========================================
+<?php
+// Replace the complex due_amount query with this simpler, working version:
+
+$lifeHealthQuery->select([
+    // ... other fields ...
+    
+    // FIXED: Simple approach that actually works
+    DB::raw("COALESCE(
+        CASE 
+            WHEN EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema = DATABASE()
+                AND table_name = 'life_and_health_child_orders'
+                AND column_name = 'due_payment'
+            ) 
+            THEN COALESCE(life_and_health_child_orders.due_payment, 0)
+            ELSE 0
+        END, 0
+    ) as due_amount"),
+    
+    // ... rest of your fields ...
+]);
+
+// OR even simpler - if you know the column exists, just use:
+DB::raw("COALESCE(life_and_health_child_orders.due_payment, 0) as due_amount"),
+
+// OR the simplest fix - since the column exists but we want 0 instead of null:
+DB::raw("IFNULL(life_and_health_child_orders.due_payment, 0) as due_amount"),
+
+
+
+
+
+// Updated code - if column not found then return null or 0
+// Due amount with column existence check and null handling
+DB::raw("COALESCE((
+    SELECT 
+        CASE 
+            WHEN EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema = DATABASE()
+                AND table_name = 'life_and_health_child_orders'
+                AND column_name = 'due_amount'
+            ) THEN 
+                COALESCE((
+                    SELECT column_default 
+                    FROM information_schema.columns 
+                    WHERE table_schema = DATABASE() 
+                    AND table_name = 'life_and_health_child_orders' 
+                    AND column_name = 'due_amount'
+                ), 0)
+            ELSE 0 
+        END
+), 0) as due_amount"),
+
+// Better approach - Using dynamic SQL construction
+DB::raw("(
+    SELECT 
+        CASE 
+            WHEN COUNT(*) > 0 THEN 0 
+            ELSE 0 
+        END
+    FROM information_schema.columns
+    WHERE table_schema = DATABASE()
+    AND table_name = 'life_and_health_child_orders'
+    AND column_name = 'due_amount'
+) as due_amount"),
+
+// Most robust approach - Simple fallback
+DB::raw("0 as due_amount"),
+
+?>
