@@ -521,6 +521,18 @@ $users->load('posts');
 
 ```
 
+### Django vs Laravel Eger Loading : 
+
+| Django                               | Laravel                                          | Purpose                                                               |
+| ------------------------------------ | ------------------------------------------------ | --------------------------------------------------------------------- |
+| `select_related('relation')`         | `with('relation')`                               | Eager load a **single related object** (ForeignKey or OneToOne)       |
+| `prefetch_related('relation')`       | `with('relation')`                               | Eager load a **"many" relationship** (ManyToMany, reverse ForeignKey) |
+| `Prefetch('relation', queryset=...)` | `with(['relation' => fn($q) => $q->where(...)])` | Add conditions to the prefetch                                        |
+| `only('field1', 'field2')`           | `select('field1', 'field2')`                     | Select specific columns only                                          |
+| `defer('field1')`                    | No direct equivalent                             | Avoid loading specific fields                                         |
+| `prefetch_related_objects()`         | Not needed                                       | Laravel handles collection prefetching via `with()`                   |
+
+
 
 ---
 
