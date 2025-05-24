@@ -1,0 +1,47 @@
+# if column not exit in table and handling the sql error that column not found and return 0 if value not exit or not found . 
+-----------------------------------------------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+                #Ashraful Momen : Show the due amount
+                // -----------------
+
+                // DB::raw("COALESCE(life_and_health_child_orders.due_payment, 0) as due_payment"),
+
+
+                // return 0 and handle execption col not fount , return life_and_health_child_orders.due_payment value if exist or return 0.
+                DB::raw("COALESCE(
+                CASE
+                    WHEN EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_schema = DATABASE()
+                        AND table_name = 'life_and_health_child_orders'
+                        AND column_name = 'due_payment'
+                    )
+                    THEN COALESCE(life_and_health_child_orders.due_payment, 0)
+                    ELSE 0
+                END, 0
+            ) as due_amount"),
+
+                // ----------------- Explain the query ----------------------------------------
+                    //🧠 Line-by-Line Explanation
+                    
+                    //  ✅ information_schema.columns = This is a system metadata table that stores info about all the columns in all tables.
+
+                    //     table_schema = DATABASE() – ensures you're checking in the current database.
+
+                    //     table_name = 'life_and_health_child_orders' – targets the table.
+
+                    //     column_name = 'due_payment' – checks for the presence of the due_payment column.
+
+                    // ✅ WHEN EXISTS (...) THEN COALESCE(...) ELSE 0
+
+                    // If the column exists, it tries to use its value:
+
+                    //     COALESCE(life_and_health_child_orders.due_payment, 0) – returns the value of due_payment if not null; otherwise, returns 0.
+
+                    // If the column does not exist, it safely returns 0.
+                    // ✅ Outer COALESCE(..., 0)
+
+                    // This is a final safety check to ensure the expression never returns NULL. If for any reason the inner expression results in NULL, it defaults to 0.
+
+                // ----------------------------------------------------------------------------
