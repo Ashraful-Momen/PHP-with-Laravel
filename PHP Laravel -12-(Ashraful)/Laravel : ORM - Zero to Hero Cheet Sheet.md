@@ -488,6 +488,40 @@ try {
 }
 ```
 
+### Solve N+1 problem, Eager Loading with with()
+
+```php
+
+$users = User::with('posts')->get();
+
+foreach ($users as $user) {
+    echo $user->posts->count();
+}
+```
+
+### Nested Egerloading
+
+```php
+
+$users = User::with('posts.comments')->get();
+```
+
+### Conditional Eger Loading : 
+
+```php
+$users = User::with(['posts' => function ($query) {
+    $query->where('published', true);
+}])->get();
+```
+
+### 🛠 Tip: Use load() for Already Fetched Models
+```php
+$users = User::all();
+$users->load('posts');
+
+```
+
+
 ---
 
 ## 💡 Pro Tips
