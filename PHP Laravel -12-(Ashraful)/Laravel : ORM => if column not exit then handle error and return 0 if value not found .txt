@@ -1,5 +1,21 @@
 # if column not exit in table and handling the sql error that column not found and return 0 if value not exit or not found . 
 -----------------------------------------------------------------------------------------------------------------------------
+ DB::raw("COALESCE(
+                                        CASE
+                                            WHEN EXISTS (
+                                                SELECT 1 FROM information_schema.columns
+                                                WHERE table_schema = DATABASE()
+                                                AND table_name = 'life_and_health_child_orders'
+                                                AND column_name = 'policy_end_date'
+                                            )
+                                            THEN CASE
+                                                WHEN life_and_health_child_orders.policy_end_date IS NULL OR life_and_health_child_orders.policy_end_date = ''
+                                                THEN '0'
+                                                ELSE life_and_health_child_orders.policy_end_date
+                                            END
+                                            ELSE '0'
+                                        END, '0'
+                                    ) as policy_end_date"),
 
 // ----------------------------------------------------------------------------
                 #Ashraful Momen : Show the due amount
