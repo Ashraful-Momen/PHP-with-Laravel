@@ -16,6 +16,11 @@ edit cron  >>> crontab -e
 example: 
 -----------
 * * * * * /usr/local/bin/php /home/ashraful/Laravel7/instasure-microsite-main/artisan schedule:run >> /home/ashraful/Laravel7/cron.log 2>&1
+
+-> for docker container: 
+-------------------------
+* * * * * docker exec $(docker ps --filter "name=laravel_app" --format "{{.Names}}") php /var/www/html/artisan schedule:run >> /home/ashraful/gitlab_project/instasure-dockerized/cron.log 2>&1
+
 ----------------------------------------------------------
 # check the cron log >>> cat /home/ashraful/Laravel7/cron.log
 
